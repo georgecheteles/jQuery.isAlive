@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(0.9.54b)
+jQuery.isAlive(0.9.55b)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1190,10 +1190,8 @@ Last modification on this file: 21 September 2013
 		thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
 		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
 		
-		/*CHECK IS EASING EXIST*/
-		if (typeof(jQuery.easing[thisObj.settings.easing])=="undefined")
-			thisObj.settings.easing = "linear";
-		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier(0.42, 0, 1.0, 1.0)'))	
+		/*SET CSS3 EASING*/
+		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier')==-1)	
 			thisObj.settings.CSS3Easing  = "linear";
 		
 		/*MAKE SURE THAT MAXSCROLL AND MAXTOUCH IS NO BIGGER THEN SCROLLJUMP AND TOUCHJUMP*/
@@ -1332,19 +1330,19 @@ Last modification on this file: 21 September 2013
 					/*CSS3 WILL FALLBACK TO JQUERY*/
 					if (thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && ieFound && browserVer<10){
 						delete thisObj.settings.elements[key]['useCSS3'];
-						delete thisObj.settings.elements[key]['easingCSS3'];
+						delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
 					
 					/*PUTS PREFIX FOR CSS3*/
 					thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
 					
 					/*DELETES INVALID EASING*/
-					if (typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
+					if (typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
 						delete thisObj.settings.elements[key]['easing'];
 					
 					/*DELETES INVALID EASING CSS3*/
-					if(typeof(jQuery.easing[thisObj.settings.elements[key]['easingCSS3']])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['easingCSS3'])==-1 && thisObj.settings.elements[key]['easingCSS3'].indexOf('cubic-bezier(0.42, 0, 1.0, 1.0)'))
-						delete thisObj.settings.elements[key]['easingCSS3'];
+					if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
+						delete thisObj.settings.elements[key]['CSS3Easing'];
 					
 					/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
 					if (thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
@@ -1808,8 +1806,8 @@ Last modification on this file: 21 September 2013
 
 					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['easingCSS3'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easingCSS3'];
+						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
@@ -1845,8 +1843,8 @@ Last modification on this file: 21 September 2013
 
 					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['easingCSS3'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easingCSS3'];
+						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
@@ -1891,8 +1889,8 @@ Last modification on this file: 21 September 2013
 						
 					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['easingCSS3'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easingCSS3'];
+						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
@@ -1927,8 +1925,8 @@ Last modification on this file: 21 September 2013
 
 					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['easingCSS3'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easingCSS3'];
+						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
