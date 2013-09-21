@@ -96,7 +96,9 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":0,
-						"value-end":"eval(elementWidth-100)"
+						"value-end":function(selector,dim){
+							return dim.elementWidth-100;
+						}
 					},
 					1:{
 						"method":"animate",
@@ -104,7 +106,7 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":0,
-						"value-end":100
+						"value-end":"eval(elementHeight-100)"
 					},
 					2:{
 						"method":"animate",
@@ -140,7 +142,7 @@
 						"property":"left",
 						"step-from":10,
 						"value-under":200,
-						"value-above":"eval(elementWidth-100)"
+						"value-above":"eval(elementWidth-200)"
 					}
 				},
 				"#drawSurface2  #myDiv4":{

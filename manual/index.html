@@ -513,10 +513,6 @@
 						<span class="red">**</span> The browsers values can be: webkit|mozilla|opera|mobile|msie|msie7-|msie7|msie8|msie9|msie10|msie10+|unknown. But you can also use it like this: webkit+mobile(webkit mobile browsers) or webkit!mobile(non-mobile webkit browsers)
 					</p>
 				</div>
-
-
-
-
 				<div id="section-6" class="section">
 					<h3>6. Events</h3>
 					<p class="text">
@@ -545,7 +541,7 @@ jQuery('#scroll-over-me').isAlive('create',{
 								This event is called after all the initializations were done and the plugin is ready to be used
 							</p>
 						<p class="code">
-jQuery('#scroll-over-me').isAlive('onLoadingComplete',{
+jQuery('#scroll-over-me').isAlive('create',{
 	elements:animations,
 	onLoadingComplete:function(){
 		// code here
@@ -649,7 +645,7 @@ jQuery('#scroll-over-me').isAlive('rebuild');
 					<p class="text">
 						<p class="imp">8. enableScroll</p>
 							<p class="blue">
-								Enables or dsiables scroll events.
+								Enables or disables scroll events.
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('enableScroll',true); //to enable
