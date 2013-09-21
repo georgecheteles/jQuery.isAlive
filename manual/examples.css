@@ -4,29 +4,25 @@
 }
 
 .drawSurface{
-	position:relative;height:260px;background:#ccc;
+	position:relative;height:340px;background:#ccc;
 }
 
-.myDiv{color:white;font-size:12px;}
+.myDiv{color:white;font-size:14px;text-align:center;}
 
-.myDiv1{position:absolute;top:0px;left:0px;width:50px;height:50px;background:red;}
+.myDiv1{position:absolute;top:0px;left:0px;width:100px;height:100px;background:red;}
 
-.myDiv2{position:absolute;top:0px;left:0px;width:50px;height:50px;background:yellow;color:gray;}
+.myDiv2{position:absolute;top:0px;left:0px;width:100px;height:100px;background:yellow;color:gray;}
 
-.myDiv3{position:absolute;top:0px;left:0px;width:50px;height:50px;background:blue;color:white;}
+.myDiv3{position:absolute;top:0px;left:0px;width:100px;height:100px;background:blue;color:white;}
 
-.myDiv4{position:absolute;top:0px;left:0px;width:50px;height:50px;background:green;color:white;}
+.myDiv4{position:absolute;top:0px;left:0px;width:100px;height:100px;background:green;color:white;}
 
 body.example-1 .myDiv2{
-	top:70px;
+	top:120px;
 }
 
 body.example-1 .myDiv3{
-	top:140px;
-}
-
-body.example-1 .myDiv4{
-	top:210px;
+	top:240px;
 }
 
 body.example-1 .myDiv4.round{

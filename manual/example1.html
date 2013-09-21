@@ -26,7 +26,7 @@
 					"step-start":0,
 					"step-end":10,
 					"value-start":0,
-					"value-end":"eval(elementHeight-50)"
+					"value-end":"eval(elementHeight-100)"
 				},
 				2:{
 					"selector":"#drawSurface1 #myDiv1",
@@ -35,7 +35,7 @@
 					"step-start":0,
 					"step-end":10,
 					"value-start":1,
-					"value-end":0
+					"value-end":0.2
 				},
 				3:{
 					"selector":"#drawSurface1 #myDiv2",
@@ -79,13 +79,13 @@
 					"selector":"#drawSurface1 #myDiv4",
 					"method":"set@start",
 					"property":"top",
-					"value":"eval((elementHeight/2)-25)"
+					"value":"eval((elementHeight/2)-50)"
 				},
 				9:{
 					"selector":"#drawSurface1 #myDiv4",
 					"method":"set@start",
 					"property":"left",
-					"value":"eval((elementWidth/2)-25)"
+					"value":"eval((elementWidth/2)-50)"
 				}
 			};
 			var animations2 = {
@@ -96,7 +96,7 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":0,
-						"value-end":"eval(elementWidth-50)"
+						"value-end":"eval(elementWidth-100)"
 					},
 					1:{
 						"method":"animate",
@@ -123,7 +123,7 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":0,
-						"value-end":"eval(elementWidth-50)",
+						"value-end":"eval(elementWidth-100)",
 						"move-on":2
 					}
 				},
@@ -140,7 +140,7 @@
 						"property":"left",
 						"step-from":10,
 						"value-under":200,
-						"value-above":"eval(elementWidth-50)"
+						"value-above":"eval(elementWidth-100)"
 					}
 				},
 				"#drawSurface2  #myDiv4":{
@@ -157,12 +157,12 @@
 					2:{
 						"method":"static",
 						"property":"top",
-						"value":"eval((elementHeight/2)-25)"
+						"value":"eval((elementHeight/2)-50)"
 					},
 					3:{
 						"method":"static",
 						"property":"left",
-						"value":"eval((elementWidth/2)-25)"
+						"value":"eval((elementWidth/2)-50)"
 					}
 				}
 			};
@@ -187,25 +187,26 @@
 	<body class="example-1">
 		<div id="wrapper">
 			<h2 align="center">Simple jQuery.isAlive animation example</h2>
-			<p>Linear structure(same results, diferent object structure)</p>
+			<p>Linear structure:</p>
 			<div id="drawSurface1" class="drawSurface">
 				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
 				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
 				<div id="myDiv3" class="myDiv3 myDiv">set</div>
-				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class</div>
+				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
 			</div>
-			<p>Tree structure(same results, diferent object structure)</p>
+			<p>Tree structure:</p>
 			<div id="drawSurface2" class="drawSurface">
 				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
 				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
 				<div id="myDiv3" class="myDiv3 myDiv">set</div>
-				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class</div>
+				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class<br/>static</div>
 			</div>
 			<p>
 				The red rectangle animates to left,top.<br/>
 				The yellow rectangle animates-set to left.<br/>
 				The blue rectangle is set at step 5 and then at step 10.<br/>
 				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+				The green rectangle shows whow set@start and static method works.<br/>
 				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
 			</p>
 		</div>
