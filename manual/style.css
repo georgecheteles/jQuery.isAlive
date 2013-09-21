@@ -1,0 +1,93 @@
+/* RESET CSS */
+* {
+	margin:0px;
+	padding:0px;
+	-webkit-text-size-adjust: 100%;
+}
+
+img {
+	border:0px;
+}
+
+div {
+	border:0px;
+}
+
+a {
+	outline:none;
+}
+
+ul {
+	list-style-type: none;
+}
+
+/* MY CSS */
+
+html,body{
+	/*font-family: Lucida Grande, Verdana, Geneva, Sans-serif;*/
+	color: #333;
+	font-size:15px;
+}
+
+#wrapper{
+	width:95%;
+	margin:auto;
+}
+
+#table-of-contents{
+	margin-left:50px;
+	color:brown;
+}
+
+#table-of-contents ul li{
+	font-weight:bold;
+}
+
+div.section{
+	margin:10px 0;
+}
+
+div.text{
+	margin:0 20px;
+}
+
+p.exp{
+	margin-left: 50px;
+	color: green;
+}
+
+p.code{
+	font-style: italic;
+	color: gray;
+	margin:5px 20px;
+	white-space: pre;
+}
+
+p.imp{
+	color:red;
+	font-size:20px;
+	margin:5px 20px;
+}
+
+.blue{
+	color:blue;
+}
+
+.red{
+	color:red;
+}
+
+#goToTop{
+	display:block;
+	position:fixed;
+	right:10px;
+	top:10px;
+	width:120px;
+	height:30px;
+	line-height:30px;
+	background:wheat;
+	text-align:center;
+	text-decoration:none;
+	border-radius:5px;
+	box-shadow: 5px 5px 5px #ccc;
+}

@@ -1,0 +1,213 @@
+<html>
+	<head>
+
+		<title>jQuery.isAlive Manual </title>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="examples.css" media="screen" />
+		<script src="../jquery-1.9.1.min.js"></script>
+		<script src="../jquery.isAlive.beta.js"></script>
+		<script src="../easing.js"></script>
+		<script>
+			var animations1 = {
+				0:{
+					"selector":"#drawSurface1 #myDiv1",
+					"method":"animate",
+					"property":"left",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":450
+				},
+				1:{
+					"selector":"#drawSurface1 #myDiv1",
+					"method":"animate",
+					"property":"top",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":"eval(elementHeight-50)"
+				},
+				2:{
+					"selector":"#drawSurface1 #myDiv1",
+					"method":"animate",
+					"property":"opacity",
+					"step-start":0,
+					"step-end":10,
+					"value-start":1,
+					"value-end":0
+				},
+				3:{
+					"selector":"#drawSurface1 #myDiv2",
+					"method":"animate-set",
+					"property":"left",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":450,
+					"move-on":2
+				},
+				4:{
+					"selector":"#drawSurface1 #myDiv3",
+					"method":"set",
+					"property":"left",
+					"step-from":5,
+					"value-under":0,
+					"value-above":200
+				},
+				5:{
+					"selector":"#drawSurface1 #myDiv3",
+					"method":"set",
+					"property":"left",
+					"step-from":10,
+					"value-under":200,
+					"value-above":450
+				},
+				6:{
+					"selector":"#drawSurface1 #myDiv4",
+					"method":"add-class",
+					"step-from":5,
+					"class-name":"round"
+				},
+				7:{
+					"selector":"#drawSurface1 #myDiv4",
+					"method":"remove-class",
+					"step-from":10,
+					"class-name":"round"
+				},
+				8:{
+					"selector":"#drawSurface1 #myDiv4",
+					"method":"set@start",
+					"property":"top",
+					"value":"eval((elementHeight/2)-25)"
+				},
+				9:{
+					"selector":"#drawSurface1 #myDiv4",
+					"method":"set@start",
+					"property":"left",
+					"value":"eval((elementWidth/2)-25)"
+				}
+			};
+			var animations2 = {
+				"#drawSurface2 #myDiv1":{
+					0:{
+						"method":"animate",
+						"property":"left",
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":"eval(elementWidth-50)"
+					},
+					1:{
+						"method":"animate",
+						"property":"top",
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":100
+					},
+					2:{
+						"method":"animate",
+						"property":"transform",
+						"step-start":0,
+						"step-end":10,
+						"value-start":"0deg",
+						"value-end":"180deg",
+						"format":"rotate(value)"
+					}
+				},
+				"#drawSurface2  #myDiv2":{
+					0:{
+						"method":"animate-set",
+						"property":"left",
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":"eval(elementWidth-50)",
+						"move-on":2
+					}
+				},
+				"#drawSurface2  #myDiv3":{
+					0:{
+						"method":"set",
+						"property":"left",
+						"step-from":5,
+						"value-under":0,
+						"value-above":200
+					},
+					1:{
+						"method":"set",
+						"property":"left",
+						"step-from":10,
+						"value-under":200,
+						"value-above":"eval(elementWidth-50)"
+					}
+				},
+				"#drawSurface2  #myDiv4":{
+					0:{
+						"method":"add-class",
+						"step-from":5,
+						"class-name":"round"
+					},
+					1:{
+						"method":"remove-class",
+						"step-from":10,
+						"class-name":"round"
+					},
+					2:{
+						"method":"static",
+						"property":"top",
+						"value":"eval((elementHeight/2)-25)"
+					},
+					3:{
+						"method":"static",
+						"property":"left",
+						"value":"eval((elementWidth/2)-25)"
+					}
+				}
+			};
+
+			$(document).ready(function(){
+				jQuery('#drawSurface1').isAlive('create',{
+					elements:animations1,
+					elementsType:"linear",
+					debug:true
+				});
+			});
+			$(document).ready(function(){
+				jQuery('#drawSurface2').isAlive('create',{
+					elements:animations2,
+					elementsType:"tree",
+					useCSS3:true,
+					debug:true
+				});
+			});
+		</script>
+	</head>
+	<body class="example-1">
+		<div id="wrapper">
+			<h2 align="center">Simple jQuery.isAlive animation example</h2>
+			<p>Linear structure(same results, diferent object structure)</p>
+			<div id="drawSurface1" class="drawSurface">
+				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
+				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
+				<div id="myDiv3" class="myDiv3 myDiv">set</div>
+				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class</div>
+			</div>
+			<p>Tree structure(same results, diferent object structure)</p>
+			<div id="drawSurface2" class="drawSurface">
+				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
+				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
+				<div id="myDiv3" class="myDiv3 myDiv">set</div>
+				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class</div>
+			</div>
+			<p>
+				The red rectangle animates to left,top.<br/>
+				The yellow rectangle animates-set to left.<br/>
+				The blue rectangle is set at step 5 and then at step 10.<br/>
+				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
+			</p>
+		</div>
+	</body>
+</html>

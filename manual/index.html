@@ -1,0 +1,720 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>jQuery.isAlive Manual </title>
+		<script src="../jquery-1.9.1.min.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
+	</head>
+	<body>
+		<a href="#" id="goToTop">Go To Top</a>
+		<div id="wrapper">
+			<div id="header">
+				<h1>jQuery.isAlive 0.9x (beta) Manual</h1>
+			</div>
+			<div id="content">
+				<div id="table-of-contents" class="section">
+					<ul>
+						<li>1. <a href="#section-1">What is jQuery.isAlive?</a></li>
+						<li>2. <a href="#section-2">How to install?</a></li>
+						<li>3. <a href="#section-3">Plugin setup</a></li>
+						<li>4. <a href="#section-4">Plugin options</a></li>
+						<li>5. <a href="#section-5">Building animations</a></li>
+						<li>6. <a href="#section-6">Events</a></li>
+						<li>7. <a href="#section-7">Methods</a></li>
+						<li>8. <a href="#section-8">Known problems</a></li>
+						<li>9. <a href="#section-9">Examples</a></li>
+					</ul>
+				</div>
+				<div id="section-1" class="section">
+					<h3>1. What is jQuery.isAlive?</h3>
+					<p class="text">
+						jQuery.isAlive is a complex jQuery plugin that allows you to create advance javascript animation for your site using jQuery animation function and CSS3 transitions.<br/>
+						jQuery.isAlive is compatible with the all modern browsers, but also old ones, starting with IE7 and higher.<br/>
+						Building animations with this plugin is simple and does not require codind skils.<br/>
+					</p>
+				</div>
+				<div id="section-2" class="section">
+					<h3>2. How to install?</h3>
+					<p class="text">
+						To install jQuery.isAlive simple include in your HEAD block the js file.<br/>
+						The plug in comes with some extra files(optional) that you can include in your project if you need them.
+					</p>
+					<p class="code">
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.isAlive.beta.min.js&quot;&gt;&lt;/script&gt;
+					</p>
+				</div>
+				<div id="section-3" class="section">
+					<h3>3. Plugin setup</h3>
+					<p class="text">
+						Initializing the plug in is very simple and is done with a single coding line:
+					</p>
+					<p class="code">
+&lt;script type=&quot;text/javascript&quot;&gt;
+	var elements = {};/*THIS IS THE ANIMATIONS OBJECT | YOU WILL LEAN HOW TO BUILD THIS OBJECT IN THE NEXT CHAPTER*/					
+	$(document).ready(function(){
+		jQuery('#scroll-over-me').isAlive('create',{
+			elements:animations /*HERE IS WHERE YOU WILL ADD ALL THE PLUGIN OPTIONS*/
+		});
+	});
+&lt;/script&gt;
+					</p>
+				</div>					
+				<div id="section-4" class="section">					
+					<h3>4. Plugin options</h3>					
+					<div class="text">
+						elements:
+						<p class="exp">
+							Type: Object<br/>
+							Default: {}<br/>
+							This are the elemets that will create the animations. You will learn about this on Chapter 5.
+						</p>
+						elementsType:
+						<p class="exp">
+							Type: String<br/>
+							Default: linear<br/>
+							Values: linear | tree<br/>
+							Set this to "tree" if you want to use a tree structure when building "elements" object.(See example)
+						</p>
+						duration:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 1000<br/>
+							This is the default duration in milliseconds for any animation. This value can be overwrite by "durationTweaks" object.
+						</p>
+						durationTweaks:
+						<p class="exp">
+							Type: Object<br/>
+							Default: auto<br/>
+							With this object you can set durations for "jump","wipe","scrollbar" animations. Every one of this settings can have a "duration","durationType", and a "minStepDuration" value.(See example)
+						</p>
+						enableScroll:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: true<br/>
+							Values: true | false<br/>
+							Set to false if you do not want mouse scroll events for your animations.
+						</p>
+						scrollType:
+						<p class="exp">
+							Type: String<br/>
+							Default: scroll<br/>
+							Values: scroll | jump
+							There are two types of scrolling types. "scroll" is when the animation is runing one step after another, "jump" is when the user sets an array of "jumpPoints" and the animation si jumping from one point to another.(See example)
+						</p>
+						jumpPoints:
+						<p class="exp">
+							Type: Array<br/>
+							Default: []<br/>
+							If "scrollType" is set to "jump" then here you will enter the points that you want to use for your animatins. Minimum 2 are needed.(See example)
+						</p>
+						max:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: auto<br/>
+							Sets how long do you want your animation to last. If nothing is set then this value will detect this value.
+						</p>
+						min:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 0<br/>
+							Sets the minimum step that a user can go with his animation at. Only applies to "scroll"(mouse) and "drag"(touch) events.(See example)
+						</p>
+						maxScroll:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: auto<br/>
+							Sets how many steps you can scroll at max in one animation.(See example)
+						</p>
+						maxDrag:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 0<br/>
+							Sets how many steps you can drag at max in one animation.(See example)
+						</p>
+						debug:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: False<br/>
+							Values: true | false<br/>
+							Adds a small debug tool.
+						</p>
+						easing:
+						<p class="exp">
+							Type: String<br/>
+							Default: linear<br/>
+							Values: linear | swing<br/>
+							Easing function that will be used for jQuery animation. More can be added.(See chapter)
+						</p>
+						start:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 0<br/>
+							Sets the starting value.(See example)
+						</p>
+						loop:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: False<br/>
+							Values: true | false<br/>
+							Enables loop animations.(See example)
+						</p>
+						stopScroll:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: True<br/>
+							Values: true | false<br/>
+							Prevents default action when scrolling of the site.
+						</p>
+						stepPoints:
+						<p class="exp">
+							Type: Array<br/>
+							Define here the steps where you want to have a "breakpoint".(See example)
+						</p>
+						stepPointsSelector:
+						<p class="exp">
+							Type: String<br/>
+							The "breakpoint" jQuery selector.(See example)
+						</p>
+						stepPointsActiveClass:
+						<p class="exp">
+							Type: String<br/>
+							The "breakpoint" active jQuery class selector.(See example)
+						</p>
+						enableTouch:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: false<br/>
+							Values: true | false<br/>
+							Enables touch events.
+						</p>
+						touchType:
+						<p class="exp">
+							Type: String<br/>
+							Default: drag<br/>
+							Values: drag | wipe<br/>
+							There are 2 types of touch events.(See example)
+						</p>
+						touchActions:
+						<p class="exp">
+							Type: Object<br/>
+							Default: {left:0,down:1,right:0,up:-1}<br/>
+							You can define the action for each touch. +1 means forward and -1 means backward. 0 means no action.(See example)
+						</p>
+						dragXFrom:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 10<br/>
+							Number of pixels for horizontal drag to start.
+						</p>
+						dragYFrom:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 10<br/>
+							Number of pixels for vertical drag to start.
+						</p>
+						wipeXFrom:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 20<br/>
+							Number of pixels for horizontal wipe to start.
+						</p>
+						wipeYFrom:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 20<br/>
+							Number of pixels for vertical wipe to start.
+						</p>
+						wipePoints:,<br/>
+						<p class="exp">
+							Type: Array<br/>
+							Define here the steps where you want to jump on each wipe(only when "touchType" is set to "wipe").(See example)
+						</p>
+						stopTouch:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: true<br/>
+							Values: true | false<br/>
+							Prevents default action when draging of the site.
+						</p>
+						animateClass:
+						<p class="exp">
+							Type: String<br/>
+							Default: isalive-(random number)<br/>
+							Every animating element will get a class with this value. If none is defined a class is given.
+						</p>
+						resizeType:
+						<p class="exp">
+							Type: String<br/>
+							Default: resize<br/>
+							Values: default | reload | none<br/>
+							Set here the action that you want on a window resize. "resize" means that the layout will be rebuild,"reload" means that the page will be reloaded.(See example)
+						</p>
+						playPoints:
+						<p class="exp">
+							Type: Array<br/>
+							Define here the steps where you want to have a "playpoint". This will be used only at "play/rewind" method.(See example)
+						</p>
+						CSS3Easing:
+						<p class="exp">
+							Type: String<br/>
+							Default: linear<br/>
+							Values: linear | ease | ease-in | ease-out | ease-in-out<br/>
+							Set the type of easing you want when having a CSS3 animation.
+						</p>
+						stepsOnScroll:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 1<br/>
+							The number of steps you want when having a scroll event(only when "scrollType" is on "scroll").(See example)
+						</p>
+						stepsOnDrag:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 1<br/>
+							The number of steps you want when having a drag event(only when "touchType" is on "drag").(See example)
+						</p>
+						stepsOnScrollbar:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 1<br/>
+							The number of steps you want when having a scrollbar event(only when "scrollbarType" is on "scroll").(See example)
+						</p>
+						minStepDuration:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 0<br/>
+							The milliseconds you want set as the minimum duration for each step to be animated.(See example)
+						</p>
+						initCSS:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: false<br/>
+							Values: true | false<br/>
+							Inits all the css value at the start.(See example)
+						</p>
+						useCSS3:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: false<br/>
+							Values: true | false<br/>
+							Enables CSS3 animations.(See example)
+						</p>
+						scrollbarType:
+						<p class="exp">
+							Type: String<br/>
+							Default: scroll<br/>
+							Values: scroll | jump<br/>
+							There are 2 types of actions on scrollbar move.(See example)
+						</p>
+						scrollbarPoints:
+						<p class="exp">
+							Type: Array<br/>
+							Set here the step points where you want to have a scrollbar jump point.(See example)
+						</p>
+						scrollbarActiveClass:
+						<p class="exp">
+							Type: String<br/>
+							jQuery class for scroll active state.(See example)
+						</p>
+						enableScrollbarTouch:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: false<br/>
+							Values: true | false<br/>
+							Enables touch events on scrollbar element.
+						</p>
+						scrollDelay:
+						<p class="exp">
+							Type: Integer<br/>
+							Default: 250<br/>
+							Values: number | false<br/>
+							Set here the number of milliseconds before a new scroll action can be taken(only when "scrollType" is on "scroll"). If set to "false" the animations will have to end before a new animation can start.(See example)
+						</p>
+						enableGPU:
+						<p class="exp">
+							Type: String<br/>
+							Default: webkit&mobile<br/>
+							Values: none | webkit | mobile | webkit&mobile | webkit!mobile<br/>
+							For webkit browsers you can enable the use of GPU. This will make your animation run smother but may also cause some bugs. By default isAlive enables this on mobile devices, but can use it on desktop too.
+						</p>
+						onStep:
+						<p class="exp">
+							Type: Function<br/>
+							This function will be caled at every step of animation.(See example)
+						</p>
+						onLoadingComplete:
+						<p class="exp">
+							Type: Function<br/>
+							This function will be caled when the animations are ready.(See example)
+						</p>
+					</div>
+				</div>
+				<div id="section-5" class="section">
+					<h3>5. Building animations</h3>
+					<p class="text">
+						Once you setup your the plugin to work better with your project it's time to start creating the animation object.<br/>
+						Depending on the "elementsType" option, you can create a linear type array or a tree type one. In this chapter we will work with "linear" type.<br/>
+						Every animation from your project will be an element in this object.<br/>
+					</p>
+
+					<p class="text">
+						<p class="imp">1. animate</p>
+							<p class="blue">
+								This is the most used method.<br/>
+								You can use this at building animations with easing, CSS3 animations or just to scroll an HTML element.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "animate" > use "animate" if you want to do a animation
+	"property": > CSS property | scrollTop | scrollLeft | custom function
+	"step-start": > step where animation will start
+	"step-end": > step where animation will end
+	"value-start": > CSS value at start<span class="red">*</span>
+	"value-end": > CSS value at end
+	"format": > this is used for special cases like working with CSS3 transform
+	"useCSS3": > true | false > force to use CSS3 or not
+	"easing": > easing for jQuery animations
+	"easingCSS3": > easing for CSS3 animations
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+	"scrollbar": > true or false, if you want this element to act as a scrollbar. "property" setting must be "top" or "left".
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">2. set</p>
+							<p class="blue">
+								Using this method you can change an element CSS value,scroll value or call a function from a step.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "set" > use "animate" if you want to change a CSS setting for an element
+	"property": > CSS property | scrollTop | scrollLeft | custom function
+	"step-from": > step where you want this action to be done
+	"value-under": > CSS value at under this step<span class="red">*</span>
+	"value-above": > CSS value at above this step
+	"format": > this is used for special cases like working with CSS3 transform
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">3. animate-set</p>
+							<p class="blue">
+								This method will set a CSS value, scroll value or call a function on every step from "value-start" to "value-end".
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "animate-set" > use "animate" if you want to do a animation
+	"property": > CSS property | scrollTop | scrollLeft | custom function
+	"step-start": > step where animation will start
+	"step-end": > step where animation will end
+	"value-start": > CSS value at start<span class="red">*</span>
+	"value-end": > CSS value at end
+	"format": > this is used for special cases like animating CSS3
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+	"type" : > can be float or int, by default is float
+	"move-on" : > the number of steps where the animation will occur, by defaul is 1. This means that on every step an animation will occur.
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">4. static</p>
+							<p class="blue">
+								This is not an dinamic element. Will set an CSS value, scroll or function at start and on every window resize.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "static" > use "animate" if you want to change a CSS setting for an element
+	"property": > CSS property | scrollTop | scrollLeft | custom function
+	"value": > CSS value that you want to set
+	"format": > this is used for special cases like working with CSS3 transform
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">5. set@start</p>
+							<p class="blue">
+								Will set a CSS value at the start of the load of the page.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "set@start" > use "animate" if you want to change a CSS setting for an element
+	"property": > CSS property | scrollTop | scrollLeft | custom function
+	"value": > CSS value that you want to set
+	"format": > this is used for special cases like working with CSS3 transform
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">6. add-class</p>
+							<p class="blue">
+								Will add a class to the element at a given step.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "add-class" > use "add-class" if you want to add a class to an element
+	"step-from": > step where the class will be added
+	"class-name": > the name of the class
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">7. remove-class</p>
+							<p class="blue">
+								Will remove a class from the element at a given step.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"method": "remove-class" > use "remove-class" if you want to remove a class from an element
+	"step-from": > step where the class will be removed
+	"class-name": > the name of the class
+	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
+	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
+}
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">8. group</p>
+							<p class="blue">
+								Will add this animation to every child in the group.
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"group":true > makes the animation apply to the group
+	"childrens": jQuery selector for the childrens
+	"method": > add any type of animation "animate,set,animate-set,add-class,remove-class,set@start,static"
+	insert the rest of the settings just like any other animation depending on the method you chose.
+}
+						</p>
+					</p>
+					<p class="text">
+						<span class="red">*</span> In not added this value is autodetected by the plugin<br/>
+						<span class="red">**</span> The browsers values can be: webkit|mozilla|opera|mobile|msie|msie7-|msie7|msie8|msie9|msie10|msie10+|unknown. But you can also use it like this: webkit+mobile(webkit mobile browsers) or webkit!mobile(non-mobile webkit browsers)
+					</p>
+				</div>
+
+
+
+
+				<div id="section-6" class="section">
+					<h3>6. Events</h3>
+					<p class="text">
+						jQuery.isAlive has 2 events that you can use.
+					</p>
+
+					<p class="text">
+						<p class="imp">1. onStep</p>
+							<p class="blue">
+								This event is called on every step of your animation
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('create',{
+	elements:animations,
+	onStep:function(position,loop,animationType){
+		// position: the position that your animation reached
+		// loop: the loop value(if your animation can has loops)
+		// animationType: the type of animation that is used when the function is called. Ca be: "init","skip","goTo","scroll","jump","touchWipe","touchDrag","scrollbar"
+	}
+});
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">2. onLoadingComplete</p>
+							<p class="blue">
+								This event is called after all the initializations were done and the plugin is ready to be used
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('onLoadingComplete',{
+	elements:animations,
+	onLoadingComplete:function(){
+		// code here
+	}
+});
+						</p>
+					</p>
+				</div>
+				<div id="section-7" class="section">
+					<h3>7. Methods</h3>
+					<p class="text">
+						jQuery.isAlive has some helpfull methods that will enable you to interact with your animations very easy.
+					</p>
+
+					<p class="text">
+						<p class="imp">1. create</p>
+							<p class="blue">
+								Initializing the jQuery.isAlive plugin
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('create',settings); // where settings is the setting object mentioned on Chapter 3.
+
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">2. goTo</p>
+							<p class="blue">
+								Plays animation to the given step
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('goTo',{
+	to: > step where you want to go
+	duration: > duration, if nothing is provided the default will be used
+	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
+	orientation: > can be "default" or if your animation has a loop you can enter "next","prev","loop".
+	minStepDuration: > the minimum duration per step
+	force: > will force the animation to play until the end
+	onComplete: > this is a function that will be called on the animation end
+}); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">3. skip</p>
+							<p class="blue">
+								Skips the animation to the given step
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('skip',{
+	to: > step where you want to skip
+}); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">4. play</p>
+							<p class="blue">
+								Plays animation to the next "play point"
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('play',{
+	duration: > duration, if nothing is provided the default will be used
+	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
+	minStepDuration: > the minimum duration per step
+	force: > will force the animation to play until the end
+	onComplete: > this is a function that will be called on the animation end
+}); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">5. rewind</p>
+							<p class="blue">
+								Plays animation to the previous "play point"
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('play',{
+	duration: > duration, if nothing is provided the default will be used
+	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
+	minStepDuration: > the minimum duration per step
+	force: > will force the animation to play until the end
+	onComplete: > this is a function that will be called on the animation end
+}); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">6. stop</p>
+							<p class="blue">
+								Stops the animation
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('stop'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">7. rebuild</p>
+							<p class="blue">
+								Rebuilds the layout.
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('rebuild'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">8. enableScroll</p>
+							<p class="blue">
+								Enables or dsiables scroll events.
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('enableScroll',true); //to enable
+jQuery('#scroll-over-me').isAlive('enableScroll',false); //to disable
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">9. enableTouch</p>
+							<p class="blue">
+								Enables or dsiables touch events.
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('enableTouch',true); //to enable
+jQuery('#scroll-over-me').isAlive('enableTouch',false); //to disable
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">10. addOnComplete</p>
+							<p class="blue">
+								Adds a function that will be called when the animation in progres will end.
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('addOnComplete',myFunction); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">11. getStepPosition</p>
+							<p class="blue">
+								Returns the current step position of your animation
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('getStepPosition'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">12. getMaxStep</p>
+							<p class="blue">
+								Returns the last step of your animation
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('getStepPosition'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">13. getBrowser</p>
+							<p class="blue">
+								Returns your browser informations, like engine, version, and if mobile or not
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('getBrowser'); 
+						</p>
+					</p>
+				</div>
+				<div id="section-8" class="section">
+					<h3>8. Known problems</h3>
+					<p class="text">
+						This chapter is still under construction.
+					</p>
+				</div>
+				<div id="section-9" class="section">
+					<h3>9. Examples</h3>
+					<p class="text">
+						<a href="example1.html">Simple animation example</a><br/>Demo for basic uses of "animate","animate-set","set","add-class","remove-class".
+					</p>
+				</div>
+			</div>
+			<div id="footer"></div>
+		</div>
+	</body>
+</html>
