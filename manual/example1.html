@@ -11,7 +11,7 @@
 		<script>
 			var animations1 = {
 				0:{
-					"selector":"#drawSurface1 #myDiv1",
+					"selector":"#drawSurface1 .myDiv1",
 					"method":"animate",
 					"property":"left",
 					"step-start":0,
@@ -20,7 +20,7 @@
 					"value-end":450
 				},
 				1:{
-					"selector":"#drawSurface1 #myDiv1",
+					"selector":"#drawSurface1 .myDiv1",
 					"method":"animate",
 					"property":"top",
 					"step-start":0,
@@ -29,16 +29,18 @@
 					"value-end":"eval(elementHeight-100)"
 				},
 				2:{
-					"selector":"#drawSurface1 #myDiv1",
+					"selector":"#drawSurface1",
+					"childrens":".myDiv",
 					"method":"animate",
 					"property":"opacity",
 					"step-start":0,
 					"step-end":10,
 					"value-start":1,
-					"value-end":0.2
+					"value-end":0.2,
+					"easing":"linear"
 				},
 				3:{
-					"selector":"#drawSurface1 #myDiv2",
+					"selector":"#drawSurface1 .myDiv2",
 					"method":"animate-set",
 					"property":"left",
 					"step-start":0,
@@ -48,7 +50,7 @@
 					"move-on":2
 				},
 				4:{
-					"selector":"#drawSurface1 #myDiv3",
+					"selector":"#drawSurface1 .myDiv3",
 					"method":"set",
 					"property":"left",
 					"step-from":5,
@@ -56,7 +58,7 @@
 					"value-above":200
 				},
 				5:{
-					"selector":"#drawSurface1 #myDiv3",
+					"selector":"#drawSurface1 .myDiv3",
 					"method":"set",
 					"property":"left",
 					"step-from":10,
@@ -64,32 +66,32 @@
 					"value-above":450
 				},
 				6:{
-					"selector":"#drawSurface1 #myDiv4",
+					"selector":"#drawSurface1 .myDiv4",
 					"method":"add-class",
 					"step-from":5,
 					"class-name":"round"
 				},
 				7:{
-					"selector":"#drawSurface1 #myDiv4",
+					"selector":"#drawSurface1 .myDiv4",
 					"method":"remove-class",
 					"step-from":10,
 					"class-name":"round"
 				},
 				8:{
-					"selector":"#drawSurface1 #myDiv4",
+					"selector":"#drawSurface1 .myDiv4",
 					"method":"set@start",
 					"property":"top",
 					"value":"eval((elementHeight/2)-50)"
 				},
 				9:{
-					"selector":"#drawSurface1 #myDiv4",
+					"selector":"#drawSurface1 .myDiv4",
 					"method":"set@start",
 					"property":"left",
 					"value":"eval((elementWidth/2)-50)"
 				}
 			};
 			var animations2 = {
-				"#drawSurface2 #myDiv1":{
+				"#drawSurface2 .myDiv1":{
 					0:{
 						"method":"animate",
 						"property":"left",
@@ -116,9 +118,17 @@
 						"value-start":"0deg",
 						"value-end":"180deg",
 						"format":"rotate(value)"
+					},
+					3:{
+						"method":"animate",
+						"property":"opacity",
+						"step-start":0,
+						"step-end":10,
+						"value-start":1,
+						"value-end":0
 					}
 				},
-				"#drawSurface2  #myDiv2":{
+				"#drawSurface2  .myDiv2":{
 					0:{
 						"method":"animate-set",
 						"property":"left",
@@ -129,7 +139,7 @@
 						"move-on":2
 					}
 				},
-				"#drawSurface2  #myDiv3":{
+				"#drawSurface2  .myDiv3":{
 					0:{
 						"method":"set",
 						"property":"left",
@@ -145,7 +155,7 @@
 						"value-above":"eval(elementWidth-200)"
 					}
 				},
-				"#drawSurface2  #myDiv4":{
+				"#drawSurface2  .myDiv4":{
 					0:{
 						"method":"add-class",
 						"step-from":5,
@@ -191,27 +201,37 @@
 	<body class="example-1">
 		<div id="wrapper">
 			<h2 align="center">Simple jQuery.isAlive animation example</h2>
-			<p>Linear structure:</p>
+			<h3>Linear structure:</h3>
 			<div id="drawSurface1" class="drawSurface">
-				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
-				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
-				<div id="myDiv3" class="myDiv3 myDiv">set</div>
-				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
-			</div>
-			<p>Tree structure:</p>
-			<div id="drawSurface2" class="drawSurface">
-				<div id="myDiv1" class="myDiv1 myDiv">animate</div>
-				<div id="myDiv2" class="myDiv2 myDiv">animate-set</div>
-				<div id="myDiv3" class="myDiv3 myDiv">set</div>
-				<div id="myDiv4" class="myDiv4 myDiv">add-class<br/>remove-class<br/>static</div>
+				<div class="myDiv1 myDiv">animate</div>
+				<div class="myDiv2 myDiv">animate-set</div>
+				<div class="myDiv3 myDiv">set</div>
+				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
 			</div>
 			<p>
 				The red rectangle animates to left,top.<br/>
 				The yellow rectangle animates-set to left.<br/>
 				The blue rectangle is set at step 5 and then at step 10.<br/>
 				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-				The green rectangle shows whow set@start and static method works.<br/>
+				The green rectangle shows how set@start method works.<br/>
+				All elements have an opacity animation.<br/>
 				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
+			</p>
+			<h3>Tree structure:</h3>
+			<div id="drawSurface2" class="drawSurface">
+				<div class="myDiv1 myDiv">animate</div>
+				<div class="myDiv2 myDiv">animate-set</div>
+				<div class="myDiv3 myDiv">set</div>
+				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static</div>
+			</div>
+			<p>
+				The red rectangle animates to left,top,opacity and rotation.<br/>
+				The yellow rectangle animates-set to left 2 by 2 steps.<br/>
+				The blue rectangle is set at step 5 and then at step 10.<br/>
+				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+				The green rectangle shows how static method works.<br/>
+				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
+				CSS3 is used for this animations.
 			</p>
 		</div>
 	</body>

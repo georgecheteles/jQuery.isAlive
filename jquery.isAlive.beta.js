@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(0.9.55b)
+jQuery.isAlive(0.9.56b)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 21 September 2013
+Last modification on this file: 22 September 2013
 */
 
 (function(jQuery) {
@@ -1275,7 +1275,7 @@ Last modification on this file: 21 September 2013
 		var inc2 = 1;
 		
 		for(key in thisObj.settings.elements){
-			if(thisObj.settings.elements[key]['group']==true ){
+			if(typeof(thisObj.settings.elements[key]['childrens'])!='undefined' ){
 				jQuery(thisObj.settings.elements[key]['selector']).find(thisObj.settings.elements[key]['childrens']).each(function(k, child){
 					var c = jQuery(child);
 					if (typeof(c.attr('id')) == "undefined"){
@@ -1283,12 +1283,10 @@ Last modification on this file: 21 September 2013
 						inc1++;
 						c.attr('id', newId);
 					}
-					else{
+					else
 						var newId = c.attr('id');
-					}
 					var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 					newElement['selector'] = "#"+newId;
-					delete newElement['group'];
 					delete newElement['childrens'];
 					new_elements.push(newElement);
 				});
