@@ -246,12 +246,12 @@
 							Default: isalive-(random number)<br/>
 							Every animating element will get a class with this value. If none is defined a class is given.
 						</p>
-						resizeType:
+						rebuildOnResize:
 						<p class="exp">
-							Type: String<br/>
-							Default: resize<br/>
-							Values: default | reload | none<br/>
-							Set here the action that you want on a window resize. "resize" means that the layout will be rebuild,"reload" means that the page will be reloaded.(See example)
+							Type: Boolean<br/>
+							Default: true<br/>
+							Values: true | false<br/>
+							Set on TRUE is you want to rebuild the page on window resize.(See example)
 						</p>
 						playPoints:
 						<p class="exp">
@@ -350,6 +350,11 @@
 						<p class="exp">
 							Type: Function<br/>
 							This function will be caled when the animations are ready.(See example)
+						</p>
+						onRebuild:
+						<p class="exp">
+							Type: Function<br/>
+							This function will be called when the rebuild is performed.(See example)
 						</p>
 					</div>
 				</div>
@@ -544,6 +549,22 @@ jQuery('#scroll-over-me').isAlive('create',{
 	elements:animations,
 	onLoadingComplete:function(){
 		// code here
+	}
+});
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">1. onRebuild</p>
+							<p class="blue">
+								This event is called on a rebuild action (resize of the browser)
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('create',{
+	elements:animations,
+	onRebuild:function(params,position,loop){
+		// params: the left/top/width/height of your element, window and document
+		// position: the position that your animation reached
+		// loop: the loop value(if your animation can has loops)
 	}
 });
 						</p>

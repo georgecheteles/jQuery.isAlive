@@ -5,25 +5,46 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(0.9.56b)
+jQuery.isAlive(0.9.61b)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 22 September 2013
+Last modification on this file: 7 Octomber 2013
 */
 
 (function(jQuery) {
 	
 	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS*/
 	var isAliveObjects = [];
+	var isReady = false;
 	var myBrowserObj = null;
 	var ieFound = null;
 	var browserVer = null;
 	var isMobile = false;
 	var indexOf = null;
+	
+	var resizeTimer;
+	var windowWidth;
+	var windowHeight;
+	
+	/*ACTION ON RESIZE*/
+	function onResizeAction(e){
+		var key;
+		clearTimeout(resizeTimer);
+		resizeTimer = setTimeout(function(){
+			if(windowWidth!=jQuery(window).width() || windowHeight!=jQuery(window).height()){
+				windowWidth = jQuery(window).width();
+				windowHeight = jQuery(window).height();
+				for(key in isAliveObjects)
+					if(isAliveObjects[key].settings.rebuildOnResize)
+						isAliveObjects[key].rebuildLayout();
+			}
+				
+		},250);
+	}
 	
 	/*FUNCTION ADD FORMAT*/
 	function addFormat(value,format){
@@ -245,7 +266,6 @@ Last modification on this file: 22 September 2013
 		this.jumpPosition;
 		this.animationType='none';
 		this.mySelector = selector;
-		this.resizeTimer;
 		this.allowScroll = true;
 		this.allowTouch = true;
 		this.scrollbarActive = null;
@@ -304,7 +324,7 @@ Last modification on this file: 22 September 2013
 			wipePoints:[],
 			stopTouch:true,
 			animateClass:'isalive-'+this.uniqId,
-			resizeType:'resize', /*default|reload|none*/
+			rebuildOnResize:true,
 			playPoints:[],
 			CSS3Easing:'linear', /*linear|ease|ease-in|ease-out|ease-in-out*/
 			stepsOnScroll:1,
@@ -318,9 +338,10 @@ Last modification on this file: 22 September 2013
 			scrollbarActiveClass:null,
 			enableScrollbarTouch:false,
 			scrollDelay:250, /*number or false*/
+			enableGPU:"webkit&mobile", /*none|webkit|mozilla|msie|opera|mobile*/
 			onStep:null,
 			onLoadingComplete:null,
-			enableGPU:"webkit&mobile" /*none|webkit|mozilla|msie|opera|mobile*/
+			onRebuild:null
 		},options);
 		
 		/*MAKES THE PLUGIN INITIOALIZATION*/
@@ -543,8 +564,8 @@ Last modification on this file: 22 September 2013
 					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 				}
 				if(property==fixCSS3("transform")){
-					if(indexOf(thisObj.translateArray,selector)!=-1 && value.indexOf('translate3d')==-1)
-						value = 'translate3d(0,0,0) '+value;
+					if(indexOf(thisObj.translateArray,selector)!=-1 && value.indexOf('translateZ')==-1)
+						value = 'translateZ(0) '+value;
 				}
 				else if(property==fixCSS3("transition")){
 					value = thisObj.getTransitionArray(selector,value);
@@ -565,16 +586,22 @@ Last modification on this file: 22 September 2013
 	/*REMAKES PAGE LAYOUT*/
 	isAlive.prototype.rebuildLayout = function(){
 		var thisObj = this;
-		thisObj.params.windowWidth = jQuery(window).width();
-		thisObj.params.windowHeight = jQuery(window).height();
-		thisObj.params.documentWidth = jQuery(document).width();
-		thisObj.params.documentHeight = jQuery(document).height();
-		thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
-		thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
-		thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
-		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-		thisObj.resetStaticCssValues();
-		thisObj.resetDinamicCssValues();
+		if(!thisObj.animating){
+			thisObj.params.windowWidth = jQuery(window).width();
+			thisObj.params.windowHeight = jQuery(window).height();
+			thisObj.params.documentWidth = jQuery(document).width();
+			thisObj.params.documentHeight = jQuery(document).height();
+			thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
+			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
+			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
+			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
+			thisObj.resetStaticCssValues();
+			thisObj.resetDinamicCssValues();
+			if(thisObj.settings.onRebuild!=null)
+				thisObj.settings.onRebuild(thisObj.params,thisObj.getPos(thisObj.step),Math.floor(thisObj.step/(thisObj.settings.max+1)));
+		}
+		else
+			thisObj.rebuildOnStop = true;
 	}
 	
 	/* SET CSS VALUES FOR CSS-STATIC-ELEMENTS ARRAY */
@@ -731,13 +758,10 @@ Last modification on this file: 22 September 2013
 					return thisObj.settings.elements[key]['value-end'];
 				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set" && thisObj.settings.elements[key]['step-from']==pos)
 					return thisObj.settings.elements[key]['value-above'];
-				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set@start")
-					atStart = thisObj.settings.elements[key]['value']; 
+				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set@start" && pos==thisObj.settings.start)
+					return thisObj.settings.elements[key]['value'];
 			}
 		}
-		
-		if (atStart!=null)
-			return atStart;
 		
 		if(typeof(thisObj.functionsArray[thisObj.settings.elements[index]['property']])!="undefined")
 			return 0;
@@ -1022,6 +1046,14 @@ Last modification on this file: 22 September 2013
 		var pointFoundSelector = -1;
 		var thisObj = this;
 		
+		for(key in thisObj.atStartArray){
+			if(typeof(tempArray[key])=="undefined")
+				tempArray[key] = {};
+			for(key2 in thisObj.atStartArray[key])
+				if(typeof(tempArray[key][key2])=="undefined")
+					tempArray[key][key2] = thisObj.atStartArray[key][key2];
+		}
+		
 		for(pos=thisObj.settings.start;pos>=0;pos--){
 
 			if (thisObj.haveStepPoints && pointFoundSelector==-1)
@@ -1062,14 +1094,6 @@ Last modification on this file: 22 September 2013
 							tempArray[key][key2] = thisObj.animPositions[pos][key][key2];
 				}
 			}
-		}
-		
-		for(key in thisObj.atStartArray){
-			if(typeof(tempArray[key])=="undefined")
-				tempArray[key] = {};
-			for(key2 in thisObj.atStartArray[key])
-				if(typeof(tempArray[key][key2])=="undefined")
-					tempArray[key][key2] = thisObj.atStartArray[key][key2];
 		}
 		
 		for(pos=thisObj.settings.start+1;pos<=thisObj.settings.max;pos++){
@@ -1138,9 +1162,10 @@ Last modification on this file: 22 September 2013
 		
 		var thisObj = this;
 		
-		/*Get IE VERSION*/
-		if(myBrowserObj == null){
-
+		/*GET IE VERSION AND BIND RESIZE*/
+		if(!isReady){
+			
+			isReady = true;
 			myBrowserObj = myBrowser();
 			ieFound = (myBrowserObj.msie==true);
 			browserVer = parseInt(myBrowserObj.version);
@@ -1159,7 +1184,13 @@ Last modification on this file: 22 September 2013
 					return -1;	
 				}
 			}
+			
+			/*BINDS RESIZE EVENT*/
+			windowWidth = jQuery(window).width();
+			windowHeight = jQuery(window).height();
+			jQuery(window).bind('resize',onResizeAction);
 		}
+		
 		
 		/*SHOW SCROLL POSITION*/
 		if (thisObj.settings.debug)
@@ -1190,9 +1221,13 @@ Last modification on this file: 22 September 2013
 		thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
 		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
 		
-		/*SET CSS3 EASING*/
+		
+		/*FIX JQUERY/CSS3 EASING*/
 		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier')==-1)	
 			thisObj.settings.CSS3Easing  = "linear";
+			
+		if(typeof(jQuery.easing[thisObj.settings.easing])=='undefined')
+			thisObj.settings.easing = "linear";
 		
 		/*MAKE SURE THAT MAXSCROLL AND MAXTOUCH IS NO BIGGER THEN SCROLLJUMP AND TOUCHJUMP*/
 		if(thisObj.settings.maxScroll<thisObj.settings.stepsOnScroll)
@@ -1397,7 +1432,7 @@ Last modification on this file: 22 September 2013
 			/*MAKES WEBKIT GPU ENABLED*/
 			if (validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(thisObj.translateArray,thisObj.settings.elements[key]['selector'])==-1){
 				var matrix = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'));
-				(matrix == "none") ? jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translate3d(0,0,0)') : jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translate3d(0,0,0)'+' '+matrix);
+				(matrix == "none") ? jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translateZ(0)') : jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translateZ(0)'+' '+matrix);
 				thisObj.translateArray.push(thisObj.settings.elements[key]['selector']);
 			}
 			
@@ -1704,26 +1739,6 @@ Last modification on this file: 22 September 2013
 			}
 		}
 			
-		jQuery(window).resize(function(){
-			if(thisObj.params.windowHeight!=jQuery(window).height() || thisObj.params.windowWidth!=jQuery(window).width()){
-				if (thisObj.settings.resizeType=='resize'){
-					clearTimeout(thisObj.resizeTimer);
-					if(!thisObj.animating){
-						thisObj.resizeTimer = setTimeout(function(){
-							thisObj.rebuildLayout();
-						},250);
-					} else {
-						thisObj.rebuildOnStop = true;
-					}
-				}else if (thisObj.settings.resizeType=='reload'){
-					clearTimeout(thisObj.resizeTimer);
-					thisObj.resizeTimer = setTimeout(function(){
-						document.location.reload();
-					},250);
-				}
-			}
-		});
-		
 		/*CALLS FUNCTION TO BIND MOUSE AND SCROLL EVENTS*/
 		thisObj.bindScrollTouchEvents();
 		
@@ -2310,7 +2325,7 @@ Last modification on this file: 22 September 2013
 		
 		var thisObj = this;
 		var pos,posNext,posPrev;
-
+		
 		if (thisObj.forceAnimation || settings.to==null || settings.to<0 || settings.to>thisObj.settings.max-1)
 			return false;
 		
