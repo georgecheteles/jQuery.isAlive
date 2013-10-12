@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(0.9.61b)
+jQuery.isAlive(0.9.62b)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 7 Octomber 2013
+Last modification on this file: 12 Octomber 2013
 */
 
 (function(jQuery) {
@@ -285,7 +285,6 @@ Last modification on this file: 7 Octomber 2013
 		this.uniqId = Math.round(Math.random()*1000)+1;
 		this.CSS3TransitionArray = {};
 		this.CSS3DefaultTransitionArray = {};
-		this.translateArray = [];
 		this.atStartArray = {};
 		this.functionsArray = {};
 		this.haveStepPoints;
@@ -338,7 +337,7 @@ Last modification on this file: 7 Octomber 2013
 			scrollbarActiveClass:null,
 			enableScrollbarTouch:false,
 			scrollDelay:250, /*number or false*/
-			enableGPU:"webkit&mobile", /*none|webkit|mozilla|msie|opera|mobile*/
+			enableGPU:"none", /*none|webki|chrome|safari|mozilla|msie|opera|mobile*/
 			onStep:null,
 			onLoadingComplete:null,
 			onRebuild:null
@@ -563,10 +562,6 @@ Last modification on this file: 7 Octomber 2013
 					delete thisObj.CSS3TransitionArray[selector][property];
 					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 				}
-				if(property==fixCSS3("transform")){
-					if(indexOf(thisObj.translateArray,selector)!=-1 && value.indexOf('translateZ')==-1)
-						value = 'translateZ(0) '+value;
-				}
 				else if(property==fixCSS3("transition")){
 					value = thisObj.getTransitionArray(selector,value);
 				}
@@ -575,9 +570,6 @@ Last modification on this file: 7 Octomber 2013
 			}
 		}		
 		else{
-			for(key in property)
-				if(key==fixCSS3("transform") && indexOf(thisObj.translateArray,selector)!=-1 && property[key].indexOf('translate3d')==-1)
-					property[key] = 'translate3d(0,0,0) '+property[key];
 			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 			jQuery(selector).css(property);
 		}
@@ -1403,6 +1395,7 @@ Last modification on this file: 7 Octomber 2013
 			var validGPU = validateBrowsers(thisObj.settings.enableGPU);
 		
 		var tempArray = [];
+		var tempArrayGPU = [];
 		for(key in thisObj.settings.elements){
 			
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
@@ -1430,10 +1423,10 @@ Last modification on this file: 7 Octomber 2013
 			}
 			
 			/*MAKES WEBKIT GPU ENABLED*/
-			if (validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(thisObj.translateArray,thisObj.settings.elements[key]['selector'])==-1){
-				var matrix = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'));
-				(matrix == "none") ? jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translateZ(0)') : jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transform'),'translateZ(0)'+' '+matrix);
-				thisObj.translateArray.push(thisObj.settings.elements[key]['selector']);
+			if (validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
+				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden') ;
+				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000') ;
+				tempArrayGPU.push(thisObj.settings.elements[key]['selector']);
 			}
 			
 		}

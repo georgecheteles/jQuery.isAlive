@@ -337,9 +337,9 @@
 						enableGPU:
 						<p class="exp">
 							Type: String<br/>
-							Default: webkit&mobile<br/>
-							Values: none | webkit | mobile | webkit&mobile | webkit!mobile<br/>
-							For webkit browsers you can enable the use of GPU. This will make your animation run smother but may also cause some bugs. By default isAlive enables this on mobile devices, but can use it on desktop too.
+							Default: none<br/>
+							Values: none | webkit | chrome | safari | mobile | webkit&mobile | webkit!mobile | chrome&mobile | safari&mobile | chrome!mobile | safari!mobile<br/>
+							For webkit browsers you can enable the use of GPU. This will make your animation run smother but may also cause some bugs. This is usefull on mobile devices, but can use it on desktop too.
 						</p>
 						onStep:
 						<p class="exp">
@@ -514,7 +514,7 @@
 					</p>
 					<p class="text">
 						<span class="red">*</span> In not added this value is autodetected by the plugin<br/>
-						<span class="red">**</span> The browsers values can be: webkit|mozilla|opera|mobile|msie|msie7-|msie7|msie8|msie9|msie10|msie10+|unknown. But you can also use it like this: webkit+mobile(webkit mobile browsers) or webkit!mobile(non-mobile webkit browsers)
+						<span class="red">**</span> The browsers values can be: webkit|chrome|safari|mozilla|opera|mobile|msie|msie7-|msie7|msie8|msie9|msie10|msie10+|unknown. But you can also use it like this: webkit+mobile(webkit mobile browsers) or webkit!mobile(non-mobile webkit browsers)
 					</p>
 				</div>
 				<div id="section-6" class="section">
