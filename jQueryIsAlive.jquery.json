@@ -10,7 +10,7 @@
     ],
     "version": "0.9.62b",
     "author": {
-        "name": "we-Code-Magic(George Cheteles)",
+        "name": "George Cheteles",
         "url": "http://www.facebook.com/WeCodeMagic"
     },
     "maintainers": [
@@ -29,7 +29,7 @@
     "bugs": "https://github.com/georgecheteles/jQuery.isAlive/issues",
     "homepage": "https://github.com/georgecheteles/jQuery.isAlive",
     "docs": "http://www.we-code-magic.com/software/isAlive/manual/",
-    "download": "http://www.we-code-magic.com/software/isAlive",
+    "download": "https://github.com/georgecheteles/jQuery.isAlive",
     "dependencies": {
         "jquery": ">=1.4"
     }
