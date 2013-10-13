@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(0.9.62b)
+jQuery.isAlive(1.0.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 12 Octomber 2013
+Last modification on this file: 13 Octomber 2013
 */
 
 (function(jQuery) {
@@ -197,7 +197,7 @@ Last modification on this file: 12 Octomber 2013
 	}
 	
 	/*CALCULATE THE CSS PROPERTY AT A POSITION*/
-	function getAtPosValue(pos,valStart,valEnd,scrollStart,scrollEnd,format,type){
+	function getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,format,type){
 		var value,valTemp,formatDetected,splitChar;
 		
 		splitChar = " ";
@@ -234,7 +234,7 @@ Last modification on this file: 12 Octomber 2013
 			valStart[key] = parseFloat(valStart[key]);
 			valEnd[key] = parseFloat(valEnd[key]);
 			
-			valTemp = parseFloat(valStart[key]+((valEnd[key]-valStart[key])*((pos-scrollStart)/(scrollEnd-scrollStart))));
+			valTemp = parseFloat(valStart[key]+((valEnd[key]-valStart[key])*((pos-stepStart)/(stepEnd-stepStart))));
 			
 			if(type=="int")
 				valTemp = Math.round(valTemp);
@@ -611,7 +611,7 @@ Last modification on this file: 12 Octomber 2013
 	
 	/* SET CSS VALUES AND REMAKES ANIMATIONS  */
 	isAlive.prototype.resetDinamicCssValues = function(){
-		var key,key2,key3,keySet,keySetProperty,keySetVal,keySetId,valStart,valEnd,scrollStart,scrollEnd,value,pos;
+		var key,key2,key3,keySet,keySetProperty,keySetVal,keySetId,valStart,valEnd,stepStart,stepEnd,value,pos;
 		var changedElements = [];
 		var keyUnder,keyAbove,valUnder,valAbove;
 		var thisObj = this;
@@ -625,10 +625,10 @@ Last modification on this file: 12 Octomber 2013
 					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-start']=valStart;
 					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-end']=valEnd;
 				}
-				scrollStart = thisObj.cssDinamicElements[key]['step-start']
-				scrollEnd = thisObj.cssDinamicElements[key]['step-end']
-				for(pos=scrollStart;pos<=scrollEnd;pos++){
-					value = getAtPosValue(pos,valStart,valEnd,scrollStart,scrollEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+				stepStart = thisObj.cssDinamicElements[key]['step-start']
+				stepEnd = thisObj.cssDinamicElements[key]['step-end']
+				for(pos=stepStart;pos<=stepEnd;pos++){
+					value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
 					if (value!==null)
 						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
 				}
@@ -666,14 +666,14 @@ Last modification on this file: 12 Octomber 2013
 					valEnd = thisObj.convertParams(valEnd);
 				keySetId = thisObj.cssDinamicElements[key]['selector'];
 				keySetProperty = thisObj.cssDinamicElements[key]['property'];
-				scrollStart = thisObj.cssDinamicElements[key]['step-start'];
-				scrollEnd = thisObj.cssDinamicElements[key]['step-end'];
+				stepStart = thisObj.cssDinamicElements[key]['step-start'];
+				stepEnd = thisObj.cssDinamicElements[key]['step-end'];
 				moveOn = thisObj.cssDinamicElements[key]['move-on'];
-				for(pos=scrollStart;pos<=scrollEnd;pos++){
-					if((pos-scrollStart)%moveOn==0)
+				for(pos=stepStart;pos<=stepEnd;pos++){
+					if((pos-stepStart)%moveOn==0)
 						for(key2 in thisObj.setArray[pos])
 							if(thisObj.setArray[pos][key2]['selector']==keySetId && thisObj.setArray[pos][key2]['property']==keySetProperty)
-								thisObj.setArray[pos][key2]['value'] = getAtPosValue(pos,valStart,valEnd,scrollStart,scrollEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+								thisObj.setArray[pos][key2]['value'] = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
 				}
 			}
 			
@@ -932,7 +932,7 @@ Last modification on this file: 12 Octomber 2013
 		var moveTo;
 		var key;
 		var valStart,valEnd;
-		var scrollStart,scrollEnd;
+		var stepStart,stepEnd;
 		var thisObj = this;
 		
 		/*CREATES ARRAYS FOR ADDCLASS, REMOVECLASS, SET, ANIMATION PROPERTY*/
@@ -941,9 +941,9 @@ Last modification on this file: 12 Octomber 2013
 				if(thisObj.settings.elements[key]['method']=='animate' && pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end']){
 					valStart = thisObj.settings.elements[key]['value-start']; 
 					valEnd = thisObj.settings.elements[key]['value-end'];
-					scrollStart = thisObj.settings.elements[key]['step-start']; 
-					scrollEnd = thisObj.settings.elements[key]['step-end'];
-					value = getAtPosValue(pos,valStart,valEnd,scrollStart,scrollEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
+					stepStart = thisObj.settings.elements[key]['step-start']; 
+					stepEnd = thisObj.settings.elements[key]['step-end'];
+					value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
 					if (value!==null){
 						if (typeof(thisObj.animPositions[pos])=="undefined")
 							thisObj.animPositions[pos]=[];
@@ -956,14 +956,14 @@ Last modification on this file: 12 Octomber 2013
 					if (pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end'] && (pos-thisObj.settings.elements[key]['step-start'])%thisObj.settings.elements[key]['move-on']==0){
 						valStart = thisObj.settings.elements[key]['value-start']; 
 						valEnd = thisObj.settings.elements[key]['value-end'];
-						scrollStart = thisObj.settings.elements[key]['step-start']; 
-						scrollEnd = thisObj.settings.elements[key]['step-end'];
+						stepStart = thisObj.settings.elements[key]['step-start']; 
+						stepEnd = thisObj.settings.elements[key]['step-end'];
 						var temp=new Array();
 						if (typeof(thisObj.setArray[pos])=="undefined")
 							thisObj.setArray[pos] = new Array();
 						temp['selector']=thisObj.settings.elements[key]['selector'];
 						temp['property']=thisObj.settings.elements[key]['property'];
-						temp['value']=getAtPosValue(pos,valStart,valEnd,scrollStart,scrollEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
+						temp['value']=getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
 						temp['forward']=null;
 						thisObj.setArray[pos].push(temp);
 					}
@@ -1212,7 +1212,6 @@ Last modification on this file: 12 Octomber 2013
 		thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
 		thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
 		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-		
 		
 		/*FIX JQUERY/CSS3 EASING*/
 		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier')==-1)	
@@ -2658,6 +2657,9 @@ Last modification on this file: 12 Octomber 2013
 		},
 		getBrowser : function(){
 			return myBrowserObj;
+		},
+		getVersion : function(){
+			return "1.0.0";
 		}
 	};
 	
