@@ -1,0 +1,36 @@
+{
+    "name": "jQueryIsAlive",
+    "title": "jQuery.isAlive",
+    "description": "jQuery plugin for parallax effects and complex animations.",
+    "keywords": [
+        "animation",
+        "parallax",
+		"css3",
+		"html5"
+    ],
+    "version": "0.9.62b",
+    "author": {
+        "name": "we-Code-Magic(George Cheteles)",
+        "url": "http://www.facebook.com/WeCodeMagic"
+    },
+    "maintainers": [
+        {
+            "name": "George Cheteles",
+            "email": "george@we-code-magic.com",
+            "url": "http://we-code-magic.com"
+        }
+    ],
+    "licenses": [
+        {
+            "type": "MIT",
+            "url": "https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt"
+        }
+    ],
+    "bugs": "https://github.com/georgecheteles/jQuery.isAlive/issues",
+    "homepage": "https://github.com/georgecheteles/jQuery.isAlive",
+    "docs": "http://www.we-code-magic.com/software/isAlive/manual/",
+    "download": "http://www.we-code-magic.com/software/isAlive",
+    "dependencies": {
+        "jquery": ">=1.4"
+    }
+}
