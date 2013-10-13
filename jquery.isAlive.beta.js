@@ -368,69 +368,64 @@ Last modification on this file: 13 Octomber 2013
 	}
 	
 	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
-	isAlive.prototype.animate = function(startPos,selector,property,value,duration,easing){
+	isAlive.prototype.myAnimate = function(startPos,selector,property,value,duration,easing){
+		
 		thisObj = this;
-		var notAccepted = ["background-position","color","background-color",fixCSS3('transform')];
-		if(indexOf(notAccepted,property)==-1 && typeof(thisObj.functionsArray[property])=="undefined"){
-			var animObj = {};
-			animObj[property] = value;
-			jQuery(selector).animate(animObj,{duration:duration,easing:easing,queue:false});
-		} else {
-			if(typeof(thisObj.tempCSSValues[selector+'|'+property])=="undefined" || startPos==parseInt(startPos))
-				thisObj.tempCSSValues[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
+		
+		if(typeof(thisObj.tempCSSValues[selector+'|'+property])=="undefined" || startPos==parseInt(startPos))
+			thisObj.tempCSSValues[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
 
-			var start = thisObj.tempCSSValues[selector+'|'+property];
-			var end = value.toString();
+		var start = thisObj.tempCSSValues[selector+'|'+property];
+		var end = value.toString();
 
-			var format = null;
-			if(start.indexOf('(')!=-1){
-				temp = start.split('(');
-				format = temp[0];
-				start = temp[1].replace(")","");
-				temp = end.split('(');
-				end = temp[1].replace(")","");
-			}
-				
-			var splitChar = " ";
-			if(start.indexOf(',')!=-1)
-				splitChar = ",";
-			start = start.split(splitChar);
-			end = end.split(splitChar);
-			
-			if(start.length!=end.length)
-				return false;
-				
-			var tempObj = {};
-			tempObj[property.replace(/-/g,"")+'Timer']="+=100";
-			jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
-				step: function(step,fx){
-					var arrayTemp = [];
-					var val,f,CSSVal;
-					var typeInt = ["color","background-color"]; 
-					step = step-fx.start;
-					for(var key in start){
-						f = ""
-						if(start[key].indexOf("px")!=-1)
-							f = "px";
-						else if(start[key].indexOf("%")!=-1)
-							f = "%";
-						else if(start[key].indexOf("deg")!=-1)
-							f = "deg";
-						startT = parseInt(start[key].replace(f,""));
-						endT = parseInt(end[key].replace(f,""));
-						val = startT + ((endT-startT)*(step/100));
-						if(indexOf(typeInt,property)!=-1)
-							val = Math.round(val);
-						arrayTemp.push(val.toString()+f);
-					}
-					CSSVal = arrayTemp.join(splitChar);
-					if(format!=null)
-						CSSVal = format+"("+CSSVal+")";
-					thisObj.tempCSSValues[selector+'|'+property] = CSSVal;
-					thisObj.setCSS(selector,property,CSSVal);
-				}
-			});
+		var format = null;
+		if(start.indexOf('(')!=-1){
+			temp = start.split('(');
+			format = temp[0];
+			start = temp[1].replace(")","");
+			temp = end.split('(');
+			end = temp[1].replace(")","");
 		}
+			
+		var splitChar = " ";
+		if(start.indexOf(',')!=-1)
+			splitChar = ",";
+		start = start.split(splitChar);
+		end = end.split(splitChar);
+		
+		if(start.length!=end.length)
+			return false;
+			
+		var tempObj = {};
+		tempObj[property.replace(/-/g,"")+'Timer']="+=100";
+		jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
+			step: function(step,fx){
+				var arrayTemp = [];
+				var val,f,CSSVal;
+				var typeInt = ["color","background-color"]; 
+				step = step-fx.start;
+				for(var key in start){
+					f = ""
+					if(start[key].indexOf("px")!=-1)
+						f = "px";
+					else if(start[key].indexOf("%")!=-1)
+						f = "%";
+					else if(start[key].indexOf("deg")!=-1)
+						f = "deg";
+					startT = parseInt(start[key].replace(f,""));
+					endT = parseInt(end[key].replace(f,""));
+					val = startT + ((endT-startT)*(step/100));
+					if(indexOf(typeInt,property)!=-1)
+						val = Math.round(val);
+					arrayTemp.push(val.toString()+f);
+				}
+				CSSVal = arrayTemp.join(splitChar);
+				if(format!=null)
+					CSSVal = format+"("+CSSVal+")";
+				thisObj.tempCSSValues[selector+'|'+property] = CSSVal;
+				thisObj.setCSS(selector,property,CSSVal);
+			}
+		});
 	}
 	
 	/* REPLACES PARAMS */
@@ -1951,6 +1946,7 @@ Last modification on this file: 13 Octomber 2013
 		var CSS3Found = false;
 		var CSS3ValuesArray = {};
 		var lastStep = thisObj.lastStep;
+		var notAccepted = ["background-position","color","background-color",fixCSS3('transform')];
 		
 		/* STARTS ANIMATION */
 		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
@@ -2040,7 +2036,13 @@ Last modification on this file: 13 Octomber 2013
 						    		else if (!directionForward && (thisObj.getPos(value)-animations[step][id][key]['end'])>0)
 						    			delay = animations[step][id][key]['duration']*((thisObj.getPos(value)-animations[step][id][key]['end'])/(thisObj.getPos(step)-animations[step][id][key]['end']));
 							    	if (animations[step][id][key]['CSS3']!=true){
-										thisObj.animate(step,id,key,animations[step][id][key]['to'],delay,animations[step][id][key]['easing']);
+										if(indexOf(notAccepted,key)==-1 && typeof(thisObj.functionsArray[key])=="undefined"){
+											var animObj = {};
+											animObj[key] = animations[step][id][key]['to'];
+											jQuery(id).animate(animObj,{duration:delay,easing:animations[step][id][key]['easing'],queue:false});										
+										}
+										else
+											thisObj.myAnimate(step,id,key,animations[step][id][key]['to'],delay,animations[step][id][key]['easing']);
 							    	}	
 							    	else{
 										CSS3ValuesArray[key] = animations[step][id][key]['to'];
