@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.0.0)
+jQuery.isAlive(1.0.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 13 Octomber 2013
+Last modification on this file: 16 Octomber 2013
 */
 
 (function(jQuery) {
@@ -894,22 +894,26 @@ Last modification on this file: 13 Octomber 2013
 		
 		/* BIND SCROLL EVENTS */
 		if (thisObj.settings.enableScroll){
-			jQuery(thisObj.mySelector).bind('DOMMouseScroll mousewheel', function(e){
-				var scrollDown;
-				if("detail" in e.originalEvent){
-					if(e.originalEvent.detail > 0) {
-						scrollDown=true;				 
-					   } else {
-						   scrollDown=false;
-					   }
-					}	 
-				if("wheelDelta" in e.originalEvent){
-					if(e.originalEvent.wheelDelta < 0) {
-						scrollDown=true;
-					   } else {
-						   scrollDown=false;
-					   }
-					}
+			/*FOR NON FIREFOX*/
+			jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
+				if(e.originalEvent.detail > 0)
+					var scrollDown=true;				 
+				else
+					var scrollDown=false;
+				if(thisObj.settings.scrollType=="scroll")
+					thisObj.doScroll(scrollDown);
+				else
+					thisObj.doJump(scrollDown);
+				if(thisObj.settings.stopScroll)
+					return false;
+			});
+			
+			/*FOR FIREFOX*/
+			jQuery(thisObj.mySelector).bind('mousewheel', function(e){
+				if(e.originalEvent.wheelDelta < 0)
+					scrollDown=true;
+				else
+					scrollDown=false;
 				if(thisObj.settings.scrollType=="scroll")
 					thisObj.doScroll(scrollDown);
 				else
@@ -1151,7 +1155,6 @@ Last modification on this file: 13 Octomber 2013
 		
 		/*GET IE VERSION AND BIND RESIZE*/
 		if(!isReady){
-			
 			isReady = true;
 			myBrowserObj = myBrowser();
 			ieFound = (myBrowserObj.msie==true);
@@ -2530,7 +2533,7 @@ Last modification on this file: 13 Octomber 2013
 		},
 		goTo : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			if (typeof(options) == "undefined")
 				options = {};
@@ -2539,18 +2542,16 @@ Last modification on this file: 13 Octomber 2013
 		},
 		skip : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
-
 			if (typeof(options) == "undefined" || typeof(options['to']) == "undefined")
 				return false;
-				
 			isAliveObjects[selector].skip(options['to']);
 			return thisObj;
 		},
 		play : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			var playPoints = isAliveObjects[selector].settings.playPoints;
 			if (playPoints.length<=1)
@@ -2577,7 +2578,7 @@ Last modification on this file: 13 Octomber 2013
 		},
 		rewind : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			var playPoints = isAliveObjects[selector].settings.playPoints;
 			if (playPoints.length<=1)
@@ -2603,28 +2604,28 @@ Last modification on this file: 13 Octomber 2013
 		},
 		stop : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].stop();
 			return thisObj;
 		},
 		rebuild : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].rebuildLayout();
 			return thisObj;
 		},
 		enableScroll : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowScroll = options;
 			return thisObj;
 		},
 		enableTouch : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowTouch = options;
 			if(options==true && isAliveObjects[selector].settings.enableTouch && ieFound && browserVer>=10 && isAliveObjects[selector].settings.stopTouch){
@@ -2637,7 +2638,7 @@ Last modification on this file: 13 Octomber 2013
 		},
 		addOnComplete : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
+			if (typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
 				return false;
 			if(typeof(options)=='function')
 				isAliveObjects[selector].onComplete = options;
@@ -2647,13 +2648,13 @@ Last modification on this file: 13 Octomber 2013
 		},
 		getStepPosition : function(thisObj){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			return isAliveObjects[selector].getPos(isAliveObjects[selector].step);
 		},
 		getMaxStep : function(thisObj){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])=="undefined")
+			if (typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			return (isAliveObjects[selector].settings.max-1);
 		},
@@ -2661,7 +2662,7 @@ Last modification on this file: 13 Octomber 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.0.0";
+			return "1.0.1";
 		}
 	};
 	
