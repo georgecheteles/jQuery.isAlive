@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.0.1)
+jQuery.isAlive(1.1.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 16 Octomber 2013
+Last modification on this file: 23 Octomber 2013
 */
 
 (function(jQuery) {
@@ -57,14 +57,14 @@ Last modification on this file: 16 Octomber 2013
 	function validateBrowsers(exp){
 		var isValid = function(browser){
 			var validBrowser = false;
-			if (myBrowserObj[browser]) validBrowser = true;
-			if (browser=="msie7-" && ieFound && browserVer<7) validBrowser = true;
-			if (browser=="msie7" && ieFound && browserVer==7) validBrowser = true;
-			if (browser=="msie8" && ieFound && browserVer==8) validBrowser = true;
-			if (browser=="msie9" && ieFound && browserVer==9) validBrowser = true;
-			if (browser=="msie10" && ieFound && browserVer==10) validBrowser = true;
-			if (browser=="msie10+" && ieFound && browserVer>10) validBrowser = true;
-			if (browser=="unknown" && typeof(myBrowserObj.webkit)=="undefined" && typeof(myBrowserObj.mozilla)=="undefined" && typeof(myBrowserObj.opera)=="undefined" && typeof(myBrowserObj.msie)=="undefined") validBrowser = true;
+			if(myBrowserObj[browser]) validBrowser = true;
+			if(browser=="msie7-" && ieFound && browserVer<7) validBrowser = true;
+			if(browser=="msie7" && ieFound && browserVer==7) validBrowser = true;
+			if(browser=="msie8" && ieFound && browserVer==8) validBrowser = true;
+			if(browser=="msie9" && ieFound && browserVer==9) validBrowser = true;
+			if(browser=="msie10" && ieFound && browserVer==10) validBrowser = true;
+			if(browser=="msie10+" && ieFound && browserVer>10) validBrowser = true;
+			if(browser=="unknown" && typeof(myBrowserObj.webkit)=="undefined" && typeof(myBrowserObj.mozilla)=="undefined" && typeof(myBrowserObj.opera)=="undefined" && typeof(myBrowserObj.msie)=="undefined") validBrowser = true;
 			return validBrowser;
 		}
 		var valid = false;
@@ -153,13 +153,13 @@ Last modification on this file: 16 Octomber 2013
 		if(mobile)
 			browser.mobile = true;
 		
-		if ( matched.browser ) {
+		if( matched.browser ) {
 			browser[ matched.browser ] = true;
 			browser.version = matched.version;
 		}
-		if ( browser.chrome ) {
+		if( browser.chrome ) {
 			browser.webkit = true;
-		} else if ( browser.webkit ) {
+		} else if( browser.webkit ) {
 			browser.safari = true;
 		}
 		return browser;
@@ -173,9 +173,9 @@ Last modification on this file: 16 Octomber 2013
 	
 	/* CHECKS IF PARAMS ARE DETECTED */
 	function isDinamic(params){
-		if (typeof(params) == "function")
+		if(typeof(params) == "function")
 			return true;
-		if (params.toString().indexOf('eval(')!==-1)
+		if(params.toString().indexOf('eval(')!==-1)
 			return true;
 		return false;
 	}
@@ -183,14 +183,14 @@ Last modification on this file: 16 Octomber 2013
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
 	function fixCSS3(property){
 		var propertyT = property.toLowerCase();
-		if (propertyT=='transform' || propertyT=='filter' || propertyT.indexOf('transition')!=-1){
-			if (myBrowserObj.webkit)
+		if(propertyT=='transform' || propertyT=='filter' || propertyT.indexOf('transition')!=-1){
+			if(myBrowserObj.webkit)
 				return "-webkit-"+property;
-			if (myBrowserObj.mozilla)
+			if(myBrowserObj.mozilla)
 				return "-moz-"+property;
-			if (myBrowserObj.msie)
+			if(myBrowserObj.msie)
 				return "-ms-"+property;
-			if (myBrowserObj.opera)
+			if(myBrowserObj.opera)
 				return "-o-"+property;
 		}
 		return property;
@@ -201,11 +201,11 @@ Last modification on this file: 16 Octomber 2013
 		var value,valTemp,formatDetected,splitChar;
 		
 		splitChar = " ";
-		if (valStart.toString().indexOf(",")!=-1)
+		if(valStart.toString().indexOf(",")!=-1)
 			splitChar = ",";
 			
 		/* IF THE FORMAT DOES NOT MATCH */		
-		if (valStart.toString().split(splitChar).length!=valEnd.toString().split(splitChar).length)
+		if(valStart.toString().split(splitChar).length!=valEnd.toString().split(splitChar).length)
 				return false;
 				
 		valStart = valStart.toString().split(splitChar);
@@ -214,11 +214,11 @@ Last modification on this file: 16 Octomber 2013
 		value = [];
 		for(var key in valStart){
 			
-			if (valStart[key].indexOf("px")!=-1 || valEnd[key].indexOf("px")!=-1)
+			if(valStart[key].indexOf("px")!=-1 || valEnd[key].indexOf("px")!=-1)
 				formatDetected = "px";
-			else if (valStart[key].indexOf("%")!=-1 && valEnd[key].indexOf("%")!=-1)
+			else if(valStart[key].indexOf("%")!=-1 && valEnd[key].indexOf("%")!=-1)
 				formatDetected = "%"; 
-			else if (valStart[key].indexOf("deg")!=-1 && valEnd[key].indexOf("deg")!=-1)
+			else if(valStart[key].indexOf("deg")!=-1 && valEnd[key].indexOf("deg")!=-1)
 				formatDetected = "deg";
 			else
 				formatDetected = "";
@@ -226,7 +226,7 @@ Last modification on this file: 16 Octomber 2013
 			valStart[key] = valStart[key].replace(formatDetected,"");
 			valEnd[key] = valEnd[key].replace(formatDetected,"");
 			
-			if (isNaN(parseFloat(valStart[key])) || isNaN(parseFloat(valEnd[key]))){
+			if(isNaN(parseFloat(valStart[key])) || isNaN(parseFloat(valEnd[key]))){
 				value.push(valStart[key]);
 				continue;
 			}
@@ -245,7 +245,7 @@ Last modification on this file: 16 Octomber 2013
 		value = value.join(splitChar);
 		value = addFormat(value,format);
 		
-		if (isNumber(value))
+		if(isNumber(value))
 			return parseFloat(value);
 		
 		return value;
@@ -273,9 +273,8 @@ Last modification on this file: 16 Octomber 2013
 		this.waitScrollTimer;
 		
 		/* MY CLASS/SET ARRAYS */
-		this.setArray = new Array();
-		this.addClassArray = new Array();
-		this.removeClassArray = new Array();
+		this.setArray = {};
+		this.onOffClassArray = {};
 		
 		this.cssDinamicElements = [];
 		this.cssStaticElements = [];
@@ -285,7 +284,6 @@ Last modification on this file: 16 Octomber 2013
 		this.uniqId = Math.round(Math.random()*1000)+1;
 		this.CSS3TransitionArray = {};
 		this.CSS3DefaultTransitionArray = {};
-		this.atStartArray = {};
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
@@ -350,7 +348,7 @@ Last modification on this file: 16 Octomber 2013
 
 	/* LOGS IN DEBUGER */
 	isAlive.prototype.log = function(value){
-		if (this.settings.debug)
+		if(this.settings.debug)
 			jQuery('#isalive-'+this.uniqId+'-debuger').append('<br/>'+value);
 	}
 
@@ -361,7 +359,7 @@ Last modification on this file: 16 Octomber 2013
 	
 	/* CONVERTS REAL POSITION TO RANGE POSITION */ 
 	isAlive.prototype.getPos = function(val){
-		if (val%this.settings.max<0)
+		if(val%this.settings.max<0)
 			return this.settings.max+(val%this.settings.max);
 		else
 			return val%this.settings.max;
@@ -435,7 +433,7 @@ Last modification on this file: 16 Octomber 2013
 
 		var returnValue,paramsConv,splitParams,key,format,splitChar,evl,lastBracket,bracketCount;
 		
-		if (typeof(params) == "function")
+		if(typeof(params) == "function")
 			return params(thisObj.mySelector,thisObj.params);
 			
 		params = fixSpaces(params);
@@ -454,7 +452,7 @@ Last modification on this file: 16 Octomber 2013
 		paramsConv = paramsConv.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
 		
 		splitChar = " ";
-		if (paramsConv.indexOf(",")!=-1)
+		if(paramsConv.indexOf(",")!=-1)
 			splitChar = ",";
 			
 		splitParams = paramsConv.split(splitChar); 
@@ -484,7 +482,7 @@ Last modification on this file: 16 Octomber 2013
 		
 		paramsConv = splitParams.join(splitChar);
 		
-		if (isNumber(paramsConv))
+		if(isNumber(paramsConv))
 			return parseFloat(paramsConv);
 		else
 			return paramsConv;
@@ -599,16 +597,16 @@ Last modification on this file: 16 Octomber 2013
 			convertValue = thisObj.convertParams(thisObj.cssStaticElements[key]['value']);
 			convertValue = addFormat(convertValue,thisObj.cssStaticElements[key]['format'])
 			thisObj.setCSS(thisObj.cssStaticElements[key]['selector'],thisObj.cssStaticElements[key]['property'],convertValue);
-			if (!isDinamic(thisObj.cssStaticElements[key]['value']))
+			if(!isDinamic(thisObj.cssStaticElements[key]['value']))
 				delete thisObj.cssStaticElements[key];
 		}
 	}
 	
 	/* SET CSS VALUES AND REMAKES ANIMATIONS  */
 	isAlive.prototype.resetDinamicCssValues = function(){
-		var key,key2,key3,keySet,keySetProperty,keySetVal,keySetId,valStart,valEnd,stepStart,stepEnd,value,pos;
+		var key,selector,property,valStart,valEnd,stepStart,stepEnd,value,pos;
 		var changedElements = [];
-		var keyUnder,keyAbove,valUnder,valAbove;
+		var valUnder,valAbove,stepFrom;
 		var thisObj = this;
 		
 		for(key in thisObj.cssDinamicElements){
@@ -616,7 +614,7 @@ Last modification on this file: 16 Octomber 2013
 				/*REPOSITION ANIMATE*/	
 				valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start']);
 				valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end']);
-				if (thisObj.cssDinamicElements[key]['scrollbar']==true){
+				if(thisObj.cssDinamicElements[key]['scrollbar']==true){
 					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-start']=valStart;
 					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-end']=valEnd;
 				}
@@ -624,104 +622,93 @@ Last modification on this file: 16 Octomber 2013
 				stepEnd = thisObj.cssDinamicElements[key]['step-end']
 				for(pos=stepStart;pos<=stepEnd;pos++){
 					value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
-					if (value!==null)
+					if(value!==null)
 						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
 				}
 			}else if(thisObj.cssDinamicElements[key]['method']=="set"){
 				/*REPOSITION SET*/
-				keySetProperty = thisObj.cssDinamicElements[key]['property'];
-				keySetId = thisObj.cssDinamicElements[key]['selector'];
-				keyUnder = thisObj.cssDinamicElements[key]['step-from']-1;
-				if (keyUnder==-1 && thisObj.settings.loop)
-					keyUnder = thisObj.settings.max-1;
-				valUnder = thisObj.cssDinamicElements[key]['value-under'];
-				if (keyUnder>=0 && isDinamic(valUnder)){
-					valUnder = thisObj.convertParams(valUnder);
-					valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format'])
-					for(key2 in thisObj.setArray[keyUnder])
-						if(thisObj.setArray[keyUnder][key2]['selector']==keySetId && thisObj.setArray[keyUnder][key2]['property']==keySetProperty)
-							thisObj.setArray[keyUnder][key2]['value'] = valUnder;
-				}
-				keyAbove = thisObj.cssDinamicElements[key]['step-from'];
+				selector = thisObj.cssDinamicElements[key]['selector'];
+				property = thisObj.cssDinamicElements[key]['property'];
+				stepFrom = thisObj.cssDinamicElements[key]['step-from'];
+
 				valAbove = thisObj.cssDinamicElements[key]['value-above'];
-				if (isDinamic(valAbove)){
+				if(isDinamic(valAbove)){
 					valAbove = thisObj.convertParams(valAbove);
-					valAbove = addFormat(valAbove,thisObj.cssDinamicElements[key]['format'])
-					for(key2 in thisObj.setArray[keyAbove])
-						if(thisObj.setArray[keyAbove][key2]['selector']==keySetId && thisObj.setArray[keyAbove][key2]['property']==keySetProperty)
-							thisObj.setArray[keyAbove][key2]['value'] = valAbove;
+					valAbove = addFormat(valAbove,thisObj.cssDinamicElements[key]['format']);
+					thisObj.setArray['forward'][stepFrom][selector][property] = valAbove;
+				}
+				
+				valUnder = thisObj.cssDinamicElements[key]['value-under'];
+				if(isDinamic(valUnder)){
+					valUnder = thisObj.convertParams(valUnder);
+					valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format']);
+					thisObj.setArray['backward'][stepFrom][selector][property] = valUnder;
 				}
 			}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
 				/*REPOSITION ANIMATE-SET*/
 				valStart = thisObj.cssDinamicElements[key]['value-start'];
 				valEnd = thisObj.cssDinamicElements[key]['value-end'];
-				if (isDinamic(valStart))
+				if(isDinamic(valStart))
 					valStart = thisObj.convertParams(valStart);
-				if (isDinamic(valEnd))
+				if(isDinamic(valEnd))
 					valEnd = thisObj.convertParams(valEnd);
-				keySetId = thisObj.cssDinamicElements[key]['selector'];
-				keySetProperty = thisObj.cssDinamicElements[key]['property'];
+				selector = thisObj.cssDinamicElements[key]['selector'];
+				property = thisObj.cssDinamicElements[key]['property'];
 				stepStart = thisObj.cssDinamicElements[key]['step-start'];
 				stepEnd = thisObj.cssDinamicElements[key]['step-end'];
 				moveOn = thisObj.cssDinamicElements[key]['move-on'];
 				for(pos=stepStart;pos<=stepEnd;pos++){
 					if((pos-stepStart)%moveOn==0)
-						for(key2 in thisObj.setArray[pos])
-							if(thisObj.setArray[pos][key2]['selector']==keySetId && thisObj.setArray[pos][key2]['property']==keySetProperty)
-								thisObj.setArray[pos][key2]['value'] = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+						thisObj.setArray['any'][pos][selector][property] = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
 				}
 			}
 			
-			if (typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+			if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
 				changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
 			
-			if (indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+			if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
 				changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
 		}
 		
 		/* REMAKE THE PAGE LAYOUT */
-		for(key in changedElements){
-			for(key2 in changedElements[key]){
+		for(selector in changedElements){
+			for(key in changedElements[selector]){
+				property = changedElements[selector][key];
 				value = null;
 				for(pos=thisObj.getPos(Math.round(thisObj.lastStep));pos>=0;pos--){
-					if (typeof(thisObj.setArray[pos])!="undefined"){
-						for(key3 in thisObj.setArray[pos])
-							if (thisObj.setArray[pos][key3]['selector']==key && thisObj.setArray[pos][key3]['property']==changedElements[key][key2]){
-								value = thisObj.setArray[pos][key3]['value'];
-							}
-					}
-					if (value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][key])!="undefined" && typeof(thisObj.animPositions[pos][key][changedElements[key][key2]])!="undefined"){
-						value = thisObj.animPositions[pos][key][changedElements[key][key2]];
-					}	
-					if (value!=null){
-						thisObj.setCSS(key,changedElements[key][key2],value);
-						delete changedElements[key][key2];
-						if (lengthObj(changedElements[key])==0)
-							delete changedElements[key];
+					if(typeof(thisObj.setArray['any'][pos])!="undefined" && typeof(thisObj.setArray['any'][pos][selector])!="undefined" && typeof(thisObj.setArray['any'][pos][selector][property])!="undefined")
+						value = thisObj.setArray['any'][pos][selector][property];
+					if(typeof(thisObj.setArray['forward'][pos])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector][property])!="undefined")
+						value = thisObj.setArray['forward'][pos][selector][property];
+					if(value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
+					if(value!=null){
+						thisObj.setCSS(selector,changedElements[selector][key],value);
+						delete changedElements[selector][key];
+						if(lengthObj(changedElements[selector])==0)
+							delete changedElements[selector];
 						break;
 					}
 				}
 			}
 		}
 		
-		for(key in changedElements){
-			for(key2 in changedElements[key]){
+		for(selector in changedElements){
+			for(key in changedElements[selector]){
+				property = changedElements[selector][key];
 				value = null;
-				for(pos=thisObj.getPos(Math.round(thisObj.lastStep));pos<=thisObj.getPos(thisObj.settings.max-1);pos++){
-					if (typeof(thisObj.setArray[pos])!="undefined"){
-						for(key3 in thisObj.setArray[pos])
-							if (thisObj.setArray[pos][key3]['selector']==key && thisObj.setArray[pos][key3]['property']==changedElements[key][key2]){
-								value = thisObj.setArray[pos][key3]['value'];
-							}
-					}
-					if (value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][key])!="undefined" && typeof(thisObj.animPositions[pos][key][changedElements[key][key2]])!="undefined"){
-						value = thisObj.animPositions[pos][key][changedElements[key][key2]];
-					}	
-					if (value!=null){
-						thisObj.setCSS(key,changedElements[key][key2],value);
-						delete changedElements[key][key2];
-						if (lengthObj(changedElements[key])==0)
-							delete changedElements[key];
+				for(pos=thisObj.getPos(Math.round(thisObj.lastStep))+1;pos<=thisObj.getPos(thisObj.settings.max-1);pos++){
+					if(typeof(thisObj.setArray['any'][pos])!="undefined" && typeof(thisObj.setArray['any'][pos][selector])!="undefined" && typeof(thisObj.setArray['any'][pos][selector][property])!="undefined")
+						value = thisObj.setArray['any'][pos][selector][property];
+					if(typeof(thisObj.setArray['backward'][pos])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector][property])!="undefined")
+						value = thisObj.setArray['backward'][pos][selector][property];
+					if(value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
+					if(value!=null){
+						thisObj.setCSS(selector,changedElements[selector][key],value);
+						delete changedElements[selector][key];
+						if(lengthObj(changedElements[selector])==0)
+							delete changedElements[selector];
 						break;
 					}
 				}
@@ -733,9 +720,9 @@ Last modification on this file: 16 Octomber 2013
 	isAlive.prototype.getStartCssValue = function(index){
 		var key,pos,value,posFrom,atStart;
 		var thisObj = this;
-		if (thisObj.settings.elements[index]['method']=='animate' || thisObj.settings.elements[index]['method']=='animate-set')
+		if(thisObj.settings.elements[index]['method']=='animate' || thisObj.settings.elements[index]['method']=='animate-set')
 			posFrom = parseInt(thisObj.settings.elements[index]['step-start']);
-		else if (thisObj.settings.elements[index]['method']=='set')
+		else if(thisObj.settings.elements[index]['method']=='set')
 			posFrom = parseInt(thisObj.settings.elements[index]['step-from']);
 		
 		atStart = null;
@@ -753,13 +740,13 @@ Last modification on this file: 16 Octomber 2013
 		if(typeof(thisObj.functionsArray[thisObj.settings.elements[index]['property']])!="undefined")
 			return 0;
 		
-		if (thisObj.settings.elements[index]['property']=="scrollTop")
+		if(thisObj.settings.elements[index]['property']=="scrollTop")
 			return jQuery(thisObj.settings.elements[index]['selector']).scrollTop();
 		else if(thisObj.settings.elements[index]['property']=="scrollLeft")
 			return jQuery(thisObj.settings.elements[index]['selector']).scrollLeft();
 		else{
 			value = jQuery(thisObj.settings.elements[index]['selector']).css(thisObj.settings.elements[index]['property']);
-			if (value.toString().indexOf(" ")==-1){
+			if(value.toString().indexOf(" ")==-1){
 				value = value.replace(/px/g,'');
 				if(isNumber(value))
 					value = parseFloat(value);
@@ -774,7 +761,7 @@ Last modification on this file: 16 Octomber 2013
 		var thisObj = this;
 		
 		/* BIND TOUCH EVENTS */
-		if (thisObj.settings.enableTouch){
+		if(thisObj.settings.enableTouch){
 
 			var startX;
 			var startY;
@@ -789,7 +776,7 @@ Last modification on this file: 16 Octomber 2013
 						return;
 				
 					if(!ie10) {
-						if (e.touches.length != 1) 
+						if(e.touches.length != 1) 
 							return;
 						startX = e.touches[0].clientX;
 						startY = e.touches[0].clientY;
@@ -835,7 +822,7 @@ Last modification on this file: 16 Octomber 2013
 						}
 						var dx = startX - x;
 						var dy = startY - y;
-						if (thisObj.settings.touchType=='wipe'){
+						if(thisObj.settings.touchType=='wipe'){
 							if(Math.abs(dx) >= thisObj.settings.wipeXFrom) {
 								if(dx > 0 && thisObj.settings.touchActions.left!=0) {
 									cancelTouch();
@@ -883,7 +870,7 @@ Last modification on this file: 16 Octomber 2013
 					}
 				}
 		    	 
-				if ('ontouchstart' in document.documentElement) {
+				if('ontouchstart' in document.documentElement) {
 					this.addEventListener('touchstart', onTouchStart, false);
 				} else if(window.navigator.msPointerEnabled){
 					ie10 = true;
@@ -893,7 +880,7 @@ Last modification on this file: 16 Octomber 2013
 		}
 		
 		/* BIND SCROLL EVENTS */
-		if (thisObj.settings.enableScroll){
+		if(thisObj.settings.enableScroll){
 			/*FOR NON FIREFOX*/
 			jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
 				if(e.originalEvent.detail > 0)
@@ -926,216 +913,224 @@ Last modification on this file: 16 Octomber 2013
 	
 	/*THIS FUNCTION CREATES ANIMATION, SET AND CLASS ARRAYS*/
 	isAlive.prototype.createElementsArray = function(){
+		var thisObj = this;
+		var myElements = jQuery.extend({},thisObj.settings.elements);
 		var pos;
 		var progress;
 		var moveTo;
 		var key;
+		var selector,property,className;
 		var valStart,valEnd;
-		var stepStart,stepEnd;
-		var thisObj = this;
+		var stepStart,stepEnd,value;
+		
+		thisObj.setArray['any'] = {};
+		thisObj.setArray['forward'] = {};
+		thisObj.setArray['backward'] = {};
+		
+		thisObj.onOffClassArray['forward'] = {};
+		thisObj.onOffClassArray['backward'] = {};
 		
 		/*CREATES ARRAYS FOR ADDCLASS, REMOVECLASS, SET, ANIMATION PROPERTY*/
 		for(pos=0;pos<=thisObj.settings.max;pos++){
-			for(key in thisObj.settings.elements){
-				if(thisObj.settings.elements[key]['method']=='animate' && pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end']){
-					valStart = thisObj.settings.elements[key]['value-start']; 
-					valEnd = thisObj.settings.elements[key]['value-end'];
-					stepStart = thisObj.settings.elements[key]['step-start']; 
-					stepEnd = thisObj.settings.elements[key]['step-end'];
-					value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
-					if (value!==null){
-						if (typeof(thisObj.animPositions[pos])=="undefined")
-							thisObj.animPositions[pos]=[];
-						if (typeof(thisObj.animPositions[pos][thisObj.settings.elements[key]['selector']])=="undefined")
-							thisObj.animPositions[pos][thisObj.settings.elements[key]['selector']]=[];
-						thisObj.animPositions[pos][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]=value;
+			for(key in myElements){
+			
+				if((myElements[key]['method']=='animate' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='animate-set' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='set' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='add-class' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='remove-class' && pos>myElements[key]['step-from'])){
+					delete myElements[key];
+					continue;
+				}
+			
+				if(myElements[key]['method']=='animate'){
+					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end']){
+						valStart = myElements[key]['value-start']; 
+						valEnd = myElements[key]['value-end'];
+						stepStart = myElements[key]['step-start']; 
+						stepEnd = myElements[key]['step-end'];
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
+						if(value!==null){
+							if(typeof(thisObj.animPositions[pos])=="undefined")
+								thisObj.animPositions[pos]=[];
+							if(typeof(thisObj.animPositions[pos][myElements[key]['selector']])=="undefined")
+								thisObj.animPositions[pos][myElements[key]['selector']]=[];
+							thisObj.animPositions[pos][myElements[key]['selector']][myElements[key]['property']]=value;
+						}
 					}
 				}
-				else if (thisObj.settings.elements[key]['method']=="animate-set"){
-					if (pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end'] && (pos-thisObj.settings.elements[key]['step-start'])%thisObj.settings.elements[key]['move-on']==0){
-						valStart = thisObj.settings.elements[key]['value-start']; 
-						valEnd = thisObj.settings.elements[key]['value-end'];
-						stepStart = thisObj.settings.elements[key]['step-start']; 
-						stepEnd = thisObj.settings.elements[key]['step-end'];
-						var temp=new Array();
-						if (typeof(thisObj.setArray[pos])=="undefined")
-							thisObj.setArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['property']=thisObj.settings.elements[key]['property'];
-						temp['value']=getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.settings.elements[key]['format'],thisObj.settings.elements[key]['type']);
-						temp['forward']=null;
-						thisObj.setArray[pos].push(temp);
+				else if(myElements[key]['method']=="animate-set"){
+					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end'] && (pos-myElements[key]['step-start'])%myElements[key]['move-on']==0){
+						selector = myElements[key]['selector']; 
+						property = myElements[key]['property']; 
+						valStart = myElements[key]['value-start']; 
+						valEnd = myElements[key]['value-end'];
+						stepStart = myElements[key]['step-start']; 
+						stepEnd = myElements[key]['step-end'];
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
+						if(typeof(thisObj.setArray['any'][pos])=="undefined")
+							thisObj.setArray['any'][pos] = {};
+						if(typeof(thisObj.setArray['any'][pos][selector])=="undefined")
+							thisObj.setArray['any'][pos][selector] = {};
+						thisObj.setArray['any'][pos][selector][property] = value;
 					}
 				}
-				else if (thisObj.settings.elements[key]['method']=="set"){
-					if (pos==(thisObj.settings.elements[key]['step-from']-1) || (thisObj.settings.elements[key]['step-from']==0 && pos==thisObj.settings.max && thisObj.settings.loop)){
-						var temp=new Array();
-						if (typeof(thisObj.setArray[pos])=="undefined")
-							thisObj.setArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['property']=thisObj.settings.elements[key]['property'];
-						temp['value']=thisObj.settings.elements[key]['value-under'];
-						temp['forward']=false;
-						thisObj.setArray[pos].push(temp);
-					}else if(pos==thisObj.settings.elements[key]['step-from']){
-						var temp=new Array();
-						if (typeof(thisObj.setArray[pos])=="undefined")
-							thisObj.setArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['property']=thisObj.settings.elements[key]['property'];
-						temp['value']=thisObj.settings.elements[key]['value-above'];
-						temp['forward']=true;
-						thisObj.setArray[pos].push(temp);
+				else if(myElements[key]['method']=="set"){
+					if(pos==myElements[key]['step-from']){
+						selector = myElements[key]['selector']; 
+						property = myElements[key]['property']; 
+						if(typeof(thisObj.setArray['forward'][pos])=="undefined")
+							thisObj.setArray['forward'][pos] = {};
+						if(typeof(thisObj.setArray['forward'][pos][selector])=="undefined")
+							thisObj.setArray['forward'][pos][selector] = {};
+						thisObj.setArray['forward'][pos][selector][property] = myElements[key]['value-above'];
+						if(typeof(thisObj.setArray['backward'][pos])=="undefined")
+							thisObj.setArray['backward'][pos] = {};
+						if(typeof(thisObj.setArray['backward'][pos][selector])=="undefined")
+							thisObj.setArray['backward'][pos][selector] = {};
+						thisObj.setArray['backward'][pos][selector][property] = myElements[key]['value-under'];
 					}
-				}else if (thisObj.settings.elements[key]['method']=="add-class"){
-					if (pos==(thisObj.settings.elements[key]['step-from']-1) || (thisObj.settings.elements[key]['step-from']==0 && pos==thisObj.settings.max && thisObj.settings.loop)){
-						var temp=new Array();
-						if (typeof(thisObj.removeClassArray[pos])=="undefined")
-							thisObj.removeClassArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['class']=thisObj.settings.elements[key]['class-name'];
-						temp['forward']=false;
-						thisObj.removeClassArray[pos].push(temp);
-					}else if(pos==thisObj.settings.elements[key]['step-from']){
-						var temp=new Array();
-						if (typeof(thisObj.addClassArray[pos])=="undefined")
-							thisObj.addClassArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['class']=thisObj.settings.elements[key]['class-name'];
-						temp['forward']=true;
-						thisObj.addClassArray[pos].push(temp);
+				}else if(myElements[key]['method']=="add-class"){
+					if(pos==myElements[key]['step-from']){
+						selector = myElements[key]['selector']; 
+						className = myElements[key]['class-name']; 
+						if(typeof(thisObj.onOffClassArray['forward'][pos])=="undefined")
+							thisObj.onOffClassArray['forward'][pos] = {};
+						if(typeof(thisObj.onOffClassArray['forward'][pos][selector])=="undefined")
+							thisObj.onOffClassArray['forward'][pos][selector] = {};
+						thisObj.onOffClassArray['forward'][pos][selector][className] = true;
+						if(typeof(thisObj.onOffClassArray['backward'][pos])=="undefined")
+							thisObj.onOffClassArray['backward'][pos] = {};
+						if(typeof(thisObj.onOffClassArray['backward'][pos][selector])=="undefined")
+							thisObj.onOffClassArray['backward'][pos][selector] = {};
+						thisObj.onOffClassArray['backward'][pos][selector][className] = false;
 					}
-				}else if (thisObj.settings.elements[key]['method']=="remove-class"){
-					if (pos==(thisObj.settings.elements[key]['step-from']-1) || (thisObj.settings.elements[key]['step-from']==0 && pos==thisObj.settings.max && thisObj.settings.loop)){
-						var temp=new Array();
-						if (typeof(thisObj.addClassArray[pos])=="undefined")
-							thisObj.addClassArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['class']=thisObj.settings.elements[key]['class-name'];
-						temp['forward']=false;
-						thisObj.addClassArray[pos].push(temp);
-					}else if(pos==thisObj.settings.elements[key]['step-from']){
-						var temp=new Array();
-						if (typeof(thisObj.removeClassArray[pos])=="undefined")
-							thisObj.removeClassArray[pos] = new Array();
-						temp['selector']=thisObj.settings.elements[key]['selector'];
-						temp['class']=thisObj.settings.elements[key]['class-name'];
-						temp['forward']=true;
-						thisObj.removeClassArray[pos].push(temp);
+				}else if(myElements[key]['method']=="remove-class"){
+					if(pos==myElements[key]['step-from']){
+						selector = myElements[key]['selector']; 
+						className = myElements[key]['class-name']; 
+						if(typeof(thisObj.onOffClassArray['forward'][pos])=="undefined")
+							thisObj.onOffClassArray['forward'][pos] = {};
+						if(typeof(thisObj.onOffClassArray['forward'][pos][selector])=="undefined")
+							thisObj.onOffClassArray['forward'][pos][selector] = {};
+						thisObj.onOffClassArray['forward'][pos][selector][className] = false;
+						if(typeof(thisObj.onOffClassArray['backward'][pos])=="undefined")
+							thisObj.onOffClassArray['backward'][pos] = {};
+						if(typeof(thisObj.onOffClassArray['backward'][pos][selector])=="undefined")
+							thisObj.onOffClassArray['backward'][pos][selector] = {};
+						thisObj.onOffClassArray['backward'][pos][selector][className] = true;
 					}
 				}			
 			}
 		}
-		
 	}
 	
 	/*INITS THE STARTING POINTS*/
 	isAlive.prototype.initCSS = function(){
-		var tempArray = {};
-		var classesArray = {};
-		var key,key2,pos;
-		var pointFoundSelector = -1;
 		var thisObj = this;
-		
-		for(key in thisObj.atStartArray){
-			if(typeof(tempArray[key])=="undefined")
-				tempArray[key] = {};
-			for(key2 in thisObj.atStartArray[key])
-				if(typeof(tempArray[key][key2])=="undefined")
-					tempArray[key][key2] = thisObj.atStartArray[key][key2];
-		}
+		var CSSArray = {};
+		var classesArray = {};
+		var pos,selector,property,className;
+		var pointFoundSelector = -1;
 		
 		for(pos=thisObj.settings.start;pos>=0;pos--){
 
-			if (thisObj.haveStepPoints && pointFoundSelector==-1)
+			if(thisObj.haveStepPoints && pointFoundSelector==-1)
 				pointFoundSelector=indexOf(thisObj.settings.stepPoints,pos);
 		
-			if(typeof(thisObj.setArray[pos])!="undefined"){
-				for(key in thisObj.setArray[pos]){
-					if(typeof(tempArray[thisObj.setArray[pos][key]['selector']])=="undefined")
-						tempArray[thisObj.setArray[pos][key]['selector']] = {};
-					if(typeof(tempArray[thisObj.setArray[pos][key]['selector']][thisObj.setArray[pos][key]['property']])=="undefined")
-						tempArray[thisObj.setArray[pos][key]['selector']][thisObj.setArray[pos][key]['property']] = thisObj.setArray[pos][key]['value']; 
+			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
+				for(selector in thisObj.setArray['any'][pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.setArray['any'][pos][selector]){
+						if(typeof(CSSArray[selector][property])=="undefined")
+							CSSArray[selector][property] = thisObj.setArray['any'][pos][selector][property];
+					}
 				}
 			}
-			
-			if(typeof(thisObj.addClassArray[pos])!="undefined"){
-				for(key in thisObj.addClassArray[pos]){
-					if(typeof(classesArray[thisObj.addClassArray[pos][key]['selector']])=="undefined")
-						classesArray[thisObj.addClassArray[pos][key]['selector']] = {};
-						if(typeof(classesArray[thisObj.addClassArray[pos][key]['selector']][thisObj.addClassArray[pos][key]['class']])=="undefined")
-							classesArray[thisObj.addClassArray[pos][key]['selector']][thisObj.addClassArray[pos][key]['class']] = 1; 
+			if(typeof(thisObj.setArray['forward'][pos])!="undefined"){
+				for(selector in thisObj.setArray['forward'][pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.setArray['forward'][pos][selector]){
+						if(typeof(CSSArray[selector][property])=="undefined")
+							CSSArray[selector][property] = thisObj.setArray['forward'][pos][selector][property];
+					}
 				}
 			}
-			
-			if(typeof(thisObj.removeClassArray[pos])!="undefined"){
-				for(key in thisObj.removeClassArray[pos]){
-					if(typeof(classesArray[thisObj.removeClassArray[pos][key]['selector']])=="undefined")
-						classesArray[thisObj.removeClassArray[pos][key]['selector']] = {};
-						if(typeof(classesArray[thisObj.removeClassArray[pos][key]['selector']][thisObj.removeClassArray[pos][key]['class']])=="undefined")
-							classesArray[thisObj.removeClassArray[pos][key]['selector']][thisObj.removeClassArray[pos][key]['class']] = -1; 
+			if(typeof(thisObj.onOffClassArray['forward'][pos])!="undefined"){
+				for(selector in thisObj.onOffClassArray['forward'][pos]){
+					if(typeof(classesArray[selector])=="undefined")
+						classesArray[selector] = {};
+					for(className in thisObj.onOffClassArray['forward'][pos][selector]){
+						if(typeof(classesArray[selector][className])=="undefined")
+							classesArray[selector][className] = thisObj.onOffClassArray['forward'][pos][selector][className]; 
+					}
 				}
 			}
 			if(typeof(thisObj.animPositions[pos])!="undefined"){
-				for(key in thisObj.animPositions[pos]){
-					if(typeof(tempArray[key])=="undefined")
-						tempArray[key] = {};
-					for(key2 in thisObj.animPositions[pos][key])
-						if(typeof(tempArray[key][key2]) == "undefined")
-							tempArray[key][key2] = thisObj.animPositions[pos][key][key2];
+				for(selector in thisObj.animPositions[pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.animPositions[pos][selector])
+						if(typeof(CSSArray[selector][property]) == "undefined")
+							CSSArray[selector][property] = thisObj.animPositions[pos][selector][property];
 				}
 			}
 		}
 		
 		for(pos=thisObj.settings.start+1;pos<=thisObj.settings.max;pos++){
-			if(typeof(thisObj.setArray[pos])!="undefined"){
-				for(key in thisObj.setArray[pos]){
-					if(typeof(tempArray[thisObj.setArray[pos][key]['selector']])=="undefined")
-						tempArray[thisObj.setArray[pos][key]['selector']] = {};
-					if(typeof(tempArray[thisObj.setArray[pos][key]['selector']][thisObj.setArray[pos][key]['property']])=="undefined")
-						tempArray[thisObj.setArray[pos][key]['selector']][thisObj.setArray[pos][key]['property']] = thisObj.setArray[pos][key]['value']; 
+			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
+				for(selector in thisObj.setArray['any'][pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.setArray['any'][pos][selector]){
+						if(typeof(CSSArray[selector][property])=="undefined")
+							CSSArray[selector][property] = thisObj.setArray['any'][pos][selector][property];
+					}
 				}
 			}
-			if(typeof(thisObj.addClassArray[pos])!="undefined"){
-				for(key in thisObj.addClassArray[pos]){
-					if(typeof(classesArray[thisObj.addClassArray[pos][key]['selector']])=="undefined")
-						classesArray[thisObj.addClassArray[pos][key]['selector']] = {};
-						if(typeof(classesArray[thisObj.addClassArray[pos][key]['selector']][thisObj.addClassArray[pos][key]['class']])=="undefined")
-							classesArray[thisObj.addClassArray[pos][key]['selector']][thisObj.addClassArray[pos][key]['class']] = 1; 
+			if(typeof(thisObj.setArray['backward'][pos])!="undefined"){
+				for(selector in thisObj.setArray['backward'][pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.setArray['backward'][pos][selector]){
+						if(typeof(CSSArray[selector][property])=="undefined")
+							CSSArray[selector][property] = thisObj.setArray['backward'][pos][selector][property];
+					}
 				}
 			}
-			
-			if(typeof(thisObj.removeClassArray[pos])!="undefined"){
-				for(key in thisObj.removeClassArray[pos]){
-					if(typeof(classesArray[thisObj.removeClassArray[pos][key]['selector']])=="undefined")
-						classesArray[thisObj.removeClassArray[pos][key]['selector']] = {};
-						if(typeof(classesArray[thisObj.removeClassArray[pos][key]['selector']][thisObj.removeClassArray[pos][key]['class']])=="undefined")
-							classesArray[thisObj.removeClassArray[pos][key]['selector']][thisObj.removeClassArray[pos][key]['class']] = -1; 
+			if(typeof(thisObj.onOffClassArray['backward'][pos])!="undefined"){
+				for(selector in thisObj.onOffClassArray['backward'][pos]){
+					if(typeof(classesArray[selector])=="undefined")
+						classesArray[selector] = {};
+					for(className in thisObj.onOffClassArray['backward'][pos][selector]){
+						if(typeof(classesArray[selector][className])=="undefined")
+							classesArray[selector][className] = thisObj.onOffClassArray['backward'][pos][selector][className]; 
+					}
 				}
 			}
 			if(typeof(thisObj.animPositions[pos])!="undefined"){
-				for(key in thisObj.animPositions[pos]){
-					if(typeof(tempArray[key])=="undefined")
-						tempArray[key] = {};
-					for(key2 in thisObj.animPositions[pos][key])
-						if(typeof(tempArray[key][key2]) == "undefined")
-							tempArray[key][key2] = thisObj.animPositions[pos][key][key2];
+				for(selector in thisObj.animPositions[pos]){
+					if(typeof(CSSArray[selector])=="undefined")
+						CSSArray[selector] = {};
+					for(property in thisObj.animPositions[pos][selector])
+						if(typeof(CSSArray[selector][property]) == "undefined")
+							CSSArray[selector][property] = thisObj.animPositions[pos][selector][property];
 				}
 			}
 		}
 		
-		for(key in tempArray)
-			for(key2 in tempArray[key])
-				thisObj.setCSS(key,key2,tempArray[key][key2]);
+		for(selector in CSSArray)
+			for(property in CSSArray[selector])
+				thisObj.setCSS(selector,property,CSSArray[selector][property]);
 		
-		for(key in classesArray)
-			for(key2 in classesArray[key])
-				if(classesArray[key][key2]==1)
-					jQuery(key).addClass(key2);
-				else if(classesArray[key][key2]==-1)
-					jQuery(key).removeClass(key2);
+		for(selector in classesArray){
+			for(className in classesArray[selector]){
+				if(classesArray[selector][className]==true)
+					jQuery(selector).addClass(className);
+				else 
+					jQuery(selector).removeClass(className);
+			}
+		}
 					
-		if(pointFoundSelector!=-1 ){
+		if(pointFoundSelector!=-1){
 			jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
 			jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
 		}
@@ -1143,7 +1138,6 @@ Last modification on this file: 16 Octomber 2013
 		for(pos=0;pos<=thisObj.settings.start;pos++)
 			if(thisObj.settings.onStep!=null)
 				thisObj.settings.onStep(pos,Math.floor(pos/(thisObj.settings.max+1)),'init');
-				
 	};
 	
 	/*THIS FUNCTION MAKES ALL THE INITIALIZATIONS FOR ANIMATIONS*/
@@ -1162,14 +1156,14 @@ Last modification on this file: 16 Octomber 2013
 			isMobile = (myBrowserObj.mobile==true);
 			
 			/* ARRAY SEARCH FOR IE7&IE8 FIX*/
-			if (!ieFound || (ieFound && browserVer>=9)){
+			if(!ieFound || (ieFound && browserVer>=9)){
 				indexOf = function (myArray,myValue){
 					return myArray.indexOf(myValue);
 				}
 			}else{
 				indexOf = function (myArray,myValue){
 					for(var key in myArray)
-						if (myArray[key]==myValue)
+						if(myArray[key]==myValue)
 							return parseInt(key);
 					return -1;	
 				}
@@ -1183,11 +1177,11 @@ Last modification on this file: 16 Octomber 2013
 		
 		
 		/*SHOW SCROLL POSITION*/
-		if (thisObj.settings.debug)
+		if(thisObj.settings.debug)
 			jQuery(thisObj.mySelector).append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
 		
 		/* CONVERT FROM TREE TO LINEAR STRUCTURE */
-		if (thisObj.settings.elementsType=="tree"){
+		if(thisObj.settings.elementsType=="tree"){
 			var tempObj = {};
 			var i = 0;
 			for(key in thisObj.settings.elements){
@@ -1234,7 +1228,7 @@ Last modification on this file: 16 Octomber 2013
 		}
 		
 		/*SORT TOUCH POINT*/
-		if (thisObj.settings.enableTouch && thisObj.settings.touchType=='wipe')
+		if(thisObj.settings.enableTouch && thisObj.settings.touchType=='wipe')
 			thisObj.settings.wipePoints.sort(function(a,b){return a-b});
 		
 		/*CHECK FOR SCROLL*/
@@ -1242,7 +1236,7 @@ Last modification on this file: 16 Octomber 2013
 			thisObj.settings.enableScroll = false;
 
 		/*SORT AND GET START SCROLL POINT*/
-		if (thisObj.settings.enableScroll && thisObj.settings.scrollType=='jump')
+		if(thisObj.settings.enableScroll && thisObj.settings.scrollType=='jump')
 			thisObj.settings.jumpPoints.sort(function(a,b){return a-b});
 		
 		/*SORT STOP POINTS*/
@@ -1302,7 +1296,7 @@ Last modification on this file: 16 Octomber 2013
 			if(typeof(thisObj.settings.elements[key]['childrens'])!='undefined' ){
 				jQuery(thisObj.settings.elements[key]['selector']).find(thisObj.settings.elements[key]['childrens']).each(function(k, child){
 					var c = jQuery(child);
-					if (typeof(c.attr('id')) == "undefined"){
+					if(typeof(c.attr('id')) == "undefined"){
 						var newId = 'isalive-'+thisObj.uniqId+'-element-' + inc1;
 						inc1++;
 						c.attr('id', newId);
@@ -1326,7 +1320,7 @@ Last modification on this file: 16 Octomber 2013
 		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
-			if (jQuery(thisObj.settings.elements[key]['selector']).length==0 || typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined")
+			if(jQuery(thisObj.settings.elements[key]['selector']).length==0 || typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined")
 				delete thisObj.settings.elements[key];
 			else
 				if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
@@ -1344,13 +1338,13 @@ Last modification on this file: 16 Octomber 2013
 					if(thisObj.settings.elements[key]['property']=='scrollleft') thisObj.settings.elements[key]['property'] = 'scrollLeft';
 					
 					/*CSS3 DOES NOT WORK ON IE7&IE8*/
-					if (isCSS3(thisObj.settings.elements[key]['property']) && ieFound && browserVer<9){
+					if(isCSS3(thisObj.settings.elements[key]['property']) && ieFound && browserVer<9){
 						delete thisObj.settings.elements[key];
 						continue;
 					}
 					
 					/*CSS3 WILL FALLBACK TO JQUERY*/
-					if (thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && ieFound && browserVer<10){
+					if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && ieFound && browserVer<10){
 						delete thisObj.settings.elements[key]['useCSS3'];
 						delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
@@ -1359,7 +1353,7 @@ Last modification on this file: 16 Octomber 2013
 					thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
 					
 					/*DELETES INVALID EASING*/
-					if (typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
+					if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
 						delete thisObj.settings.elements[key]['easing'];
 					
 					/*DELETES INVALID EASING CSS3*/
@@ -1367,20 +1361,25 @@ Last modification on this file: 16 Octomber 2013
 						delete thisObj.settings.elements[key]['CSS3Easing'];
 					
 					/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
-					if (thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
+					if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
 						thisObj.settings.elements[key]['useCSS3'] = false;
 					}
 					
 					/*PUT ANIMATE CLASS FOR ANIMATIONS*/
-					if (thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
+					if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 						jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
 						tempArray.push(thisObj.settings.elements[key]['selector']);
 					}
 					
 					/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
-					if (thisObj.settings.elements[key]["method"]=="animate-set")
+					if(thisObj.settings.elements[key]["method"]=="animate-set")
 						if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
 							thisObj.settings.elements[key]['move-on'] = 1;
+					
+					/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
+					if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS)
+						delete thisObj.settings.elements[key];
+							
 				}
 		}
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
@@ -1397,7 +1396,7 @@ Last modification on this file: 16 Octomber 2013
 			
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
 			if(!ieFound || (ieFound && browserVer>9))
-				if (typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
+				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
 					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-property'));
 					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-duration'));
@@ -1420,7 +1419,7 @@ Last modification on this file: 16 Octomber 2013
 			}
 			
 			/*MAKES WEBKIT GPU ENABLED*/
-			if (validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
+			if(validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
 				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden') ;
 				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000') ;
 				tempArrayGPU.push(thisObj.settings.elements[key]['selector']);
@@ -1428,7 +1427,7 @@ Last modification on this file: 16 Octomber 2013
 			
 		}
 		
-		/* DELETES UNWANTED ELEMENTS FROM TRANSITION ARRAY AND MAKES FORMATS THE ARRAY*/		
+		/* DELETES UNWANTED ELEMENTS FROM TRANSITION ARRAY AND MAKES DEFAULT TRANSITION ARRAY*/		
 		for(key in thisObj.CSS3DefaultTransitionArray){
 			if(thisObj.CSS3DefaultTransitionArray[key]==null){
 				delete thisObj.CSS3DefaultTransitionArray[key];
@@ -1464,15 +1463,15 @@ Last modification on this file: 16 Octomber 2013
 		}
 		
 		/*GETS MAX*/
-		if (thisObj.settings.max==null){
+		if(thisObj.settings.max==null){
 			thisObj.settings.max = 0;
 			for(key in thisObj.settings.elements){
-				if (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set'){
-					if (typeof(thisObj.settings.elements[key]['step-end'])!="undefined" && thisObj.settings.elements[key]['step-end']>thisObj.settings.max)
+				if(thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set'){
+					if(typeof(thisObj.settings.elements[key]['step-end'])!="undefined" && thisObj.settings.elements[key]['step-end']>thisObj.settings.max)
 						thisObj.settings.max = thisObj.settings.elements[key]['step-end'];
 				}
-				else if (thisObj.settings.elements[key]['method']=='set'){
-					if (typeof(thisObj.settings.elements[key]['step-from'])!="undefined" && thisObj.settings.elements[key]['step-from']>thisObj.settings.max)
+				else if(thisObj.settings.elements[key]['method']=='set'){
+					if(typeof(thisObj.settings.elements[key]['step-from'])!="undefined" && thisObj.settings.elements[key]['step-from']>thisObj.settings.max)
 						thisObj.settings.max = thisObj.settings.elements[key]['step-from'];
 				}
 			}
@@ -1484,23 +1483,23 @@ Last modification on this file: 16 Octomber 2013
 			
 		/*GETS STARING VALUES*/
 		for(key in thisObj.settings.elements){
-			if (thisObj.settings.elements[key]['scrollbar']){
-				if (typeof(thisObj.settings.elements[key]['step-start'])=="undefined")
+			if(thisObj.settings.elements[key]['scrollbar']){
+				if(typeof(thisObj.settings.elements[key]['step-start'])=="undefined")
 					thisObj.settings.elements[key]['step-start'] = 0;
-				if (typeof(thisObj.settings.elements[key]['step-end'])=="undefined")
+				if(typeof(thisObj.settings.elements[key]['step-end'])=="undefined")
 					thisObj.settings.elements[key]['step-end'] = thisObj.settings.max;
 			}
-			if ((thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && typeof(thisObj.settings.elements[key]['value-start'])=="undefined")
+			if((thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && typeof(thisObj.settings.elements[key]['value-start'])=="undefined")
 				thisObj.settings.elements[key]['value-start'] = thisObj.getStartCssValue(key);
-			else if (thisObj.settings.elements[key]['method']=='set' && typeof(thisObj.settings.elements[key]['value-under'])=="undefined")
+			else if(thisObj.settings.elements[key]['method']=='set' && typeof(thisObj.settings.elements[key]['value-under'])=="undefined")
 				thisObj.settings.elements[key]['value-under'] = thisObj.getStartCssValue(key);
 		}
 		
 		/* GET VALUES FOR CUSTOM PARAMS */
 		for(key in thisObj.settings.elements){
-			if (thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
-				if (isDinamic(thisObj.settings.elements[key]['value-start']) || isDinamic(thisObj.settings.elements[key]['value-end'])){
-					if (thisObj.settings.elements[key]['scrollbar']==true)
+			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
+				if(isDinamic(thisObj.settings.elements[key]['value-start']) || isDinamic(thisObj.settings.elements[key]['value-end'])){
+					if(thisObj.settings.elements[key]['scrollbar']==true)
 						var tempObj = jQuery.extend(true, {key:parseInt(key)}, thisObj.settings.elements[key]);
 					else
 						var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
@@ -1509,8 +1508,8 @@ Last modification on this file: 16 Octomber 2013
 				thisObj.settings.elements[key]['value-start'] = thisObj.convertParams(thisObj.settings.elements[key]['value-start']);
 				thisObj.settings.elements[key]['value-end'] = thisObj.convertParams(thisObj.settings.elements[key]['value-end']);
 			}
-			else if (thisObj.settings.elements[key]["method"]=="set"){
-				if (isDinamic(thisObj.settings.elements[key]['value-under']) || isDinamic(thisObj.settings.elements[key]['value-above'])){
+			else if(thisObj.settings.elements[key]["method"]=="set"){
+				if(isDinamic(thisObj.settings.elements[key]['value-under']) || isDinamic(thisObj.settings.elements[key]['value-above'])){
 					var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
@@ -1519,20 +1518,15 @@ Last modification on this file: 16 Octomber 2013
 				thisObj.settings.elements[key]['value-under'] = addFormat(thisObj.settings.elements[key]['value-under'],thisObj.settings.elements[key]['format'])
 				thisObj.settings.elements[key]['value-above'] = addFormat(thisObj.settings.elements[key]['value-above'],thisObj.settings.elements[key]['format'])
 			}
-			else if (thisObj.settings.elements[key]["method"]=="static"){
+			else if(thisObj.settings.elements[key]["method"]=="static"){
 				var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 				thisObj.cssStaticElements.push(tempObj);
 				delete thisObj.settings.elements[key];
 			}
-			else if (thisObj.settings.elements[key]["method"]=="set@start"){
+			else if(thisObj.settings.elements[key]["method"]=="set@start"){
 				var convertValue = thisObj.convertParams(thisObj.settings.elements[key]["value"]);
 				convertValue = addFormat(convertValue,thisObj.settings.elements[key]["format"]);
-				if(thisObj.settings.initCSS){
-					if(typeof(thisObj.atStartArray[thisObj.settings.elements[key]["selector"]])=="undefined")
-						thisObj.atStartArray[thisObj.settings.elements[key]["selector"]] = {};
-					thisObj.atStartArray[thisObj.settings.elements[key]["selector"]][thisObj.settings.elements[key]["property"]] = convertValue; 
-				}else
-					thisObj.setCSS(thisObj.settings.elements[key]["selector"],thisObj.settings.elements[key]["property"],convertValue);
+				thisObj.setCSS(thisObj.settings.elements[key]["selector"],thisObj.settings.elements[key]["property"],convertValue);
 				delete thisObj.settings.elements[key];
 			}
 		}
@@ -1546,16 +1540,16 @@ Last modification on this file: 16 Octomber 2013
 		for(key in thisObj.settings.elements){
 			
 			/*DELETES ALL NON ANIMATED ELEMENTS*/
-			if (thisObj.settings.elements[key]['method']!='animate'){
+			if(thisObj.settings.elements[key]['method']!='animate'){
 				delete thisObj.settings.elements[key];
 				continue;
 			}
 			
 			/*DELETES UNUSED ELEMENTS AND FINDS SCROLLBAR*/
-			if (thisObj.settings.elements[key]['scrollbar']!=true){
+			if(thisObj.settings.elements[key]['scrollbar']!=true){
 				delete thisObj.settings.elements[key]['value-start'];
 				delete thisObj.settings.elements[key]['value-end'];
-			}else if (thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
+			}else if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
 				jQuery(thisObj.settings.elements[key]['selector']).attr('isalive-'+thisObj.uniqId+'-scrollbar',key);
 
 				/*BINDS MOUSEEVENTS TO SCROLLBAR*/
@@ -1590,7 +1584,7 @@ Last modification on this file: 16 Octomber 2013
 							jQuery(thisObj.settings.elements[scrollBarElement]['selector']).addClass(thisObj.settings.scrollbarActiveClass);
 						
 						if(eType=="mousedown"){
-							if (thisObj.settings.elements[scrollBarElement]['property']=="top"){
+							if(thisObj.settings.elements[scrollBarElement]['property']=="top"){
 								parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
 								clickPos = e.pageY - jQuery(scrollBarObj).offset().top;
 							}else{
@@ -1598,7 +1592,7 @@ Last modification on this file: 16 Octomber 2013
 								clickPos = e.pageX - jQuery(scrollBarObj).offset().left;
 							}
 						} else if(eType=="touchstart"){
-							if (thisObj.settings.elements[scrollBarElement]['property']=="top"){
+							if(thisObj.settings.elements[scrollBarElement]['property']=="top"){
 								parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
 								clickPos = e.touches[0].pageY - jQuery(scrollBarObj).offset().top;
 							}else{
@@ -1611,18 +1605,18 @@ Last modification on this file: 16 Octomber 2013
 						var mousemoveFunction = function(e,eType){
 	
 							if(eType=='mousemove'){
-								if (thisObj.settings.elements[scrollBarElement]['property']=="top")
+								if(thisObj.settings.elements[scrollBarElement]['property']=="top")
 									var mouseNow = (e.pageY - parentTopLeft)-clickPos;
 								else
 									var mouseNow = (e.pageX - parentTopLeft)-clickPos;
 							} else if(eType=='touchmove'){
-								if (thisObj.settings.elements[scrollBarElement]['property']=="top")
+								if(thisObj.settings.elements[scrollBarElement]['property']=="top")
 									var mouseNow = (e.touches[0].pageY - parentTopLeft)-clickPos;
 								else
 									var mouseNow = (e.touches[0].pageX - parentTopLeft)-clickPos;
 							}
 							
-							if (mouseNow>=thisObj.settings.elements[scrollBarElement]['value-start'] && mouseNow<=thisObj.settings.elements[scrollBarElement]['value-end'])
+							if(mouseNow>=thisObj.settings.elements[scrollBarElement]['value-start'] && mouseNow<=thisObj.settings.elements[scrollBarElement]['value-end'])
 								jQuery(thisObj.settings.elements[scrollBarElement]['selector']).css(thisObj.settings.elements[scrollBarElement]['property'],mouseNow);
 							else if(mouseNow<thisObj.settings.elements[scrollBarElement]['value-start']){
 								jQuery(thisObj.settings.elements[scrollBarElement]['selector']).css(thisObj.settings.elements[scrollBarElement]['property'],thisObj.settings.elements[scrollBarElement]['value-start']);
@@ -1666,9 +1660,9 @@ Last modification on this file: 16 Octomber 2013
 							
 							if(positionValid){
 								scrollBarPosition=positionTo;
-								if (thisObj.getPos(thisObj.lastStep)<positionTo)
+								if(thisObj.getPos(thisObj.lastStep)<positionTo)
 									thisObj.goTo({to:positionTo,orientation:'next',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
-								else if (thisObj.getPos(thisObj.lastStep)>positionTo)
+								else if(thisObj.getPos(thisObj.lastStep)>positionTo)
 									thisObj.goTo({to:positionTo,orientation:'prev',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
 							}
 						}
@@ -1718,7 +1712,7 @@ Last modification on this file: 16 Octomber 2013
 							e.stopPropagation();					
 						});
 					}
-					if ('ontouchstart' in document.documentElement && thisObj.settings.enableScrollbarTouch){
+					if('ontouchstart' in document.documentElement && thisObj.settings.enableScrollbarTouch){
 						scrollBarObj.addEventListener('touchstart',function(e){
 							mousedownFunction(e,'touchstart',this);
 						    e.stopPropagation();					
@@ -1740,7 +1734,7 @@ Last modification on this file: 16 Octomber 2013
 		thisObj.settings.max++;
 		
 		/*CALL ONLOADINGCOMPLETE FUNCTION*/
-		if (this.settings.onLoadingComplete != null)
+		if(this.settings.onLoadingComplete != null)
 			this.settings.onLoadingComplete(thisObj.mySelector);
 		
 	}
@@ -1766,7 +1760,7 @@ Last modification on this file: 16 Octomber 2013
 		var directionForward;
 		var loopFound;
 		
-		if (thisObj.step==thisObj.lastStep){
+		if(thisObj.step==thisObj.lastStep){
 			thisObj.animating=false;
 			thisObj.animationType='none';
 			thisObj.animateDuration = thisObj.settings.duration;
@@ -1776,82 +1770,82 @@ Last modification on this file: 16 Octomber 2013
 		
 		loopFound = (thisObj.l(thisObj.lastStep)!=thisObj.l(thisObj.step));
 		
-		if (thisObj.step>thisObj.lastStep){
+		if(thisObj.step>thisObj.lastStep){
 			/*SCROLL DOWN*/
 			directionForward = true;
 			for(key in thisObj.settings.elements){
 				
-				if (thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
+				if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
 					continue;
 				
-				if ((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.step)==false){
+				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.step)==false){
 					
 					loop = thisObj.l(thisObj.lastStep);
-					if (thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
+					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
 						start=thisObj.lastStep;
 					else
 						start=thisObj.settings.elements[key]['step-start']+loop;
 	
-					if (thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
+					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-end'];
 						
 					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loop)-start))*1;
 					
-					if (typeof(animations[start])=="undefined")
+					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
 
-					if (typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
 
-					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
+					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
-						if (typeof(thisObj.settings.elements[key]['easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
 					}
 					
 				}	
-				if (loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.step)==false){
+				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.step)==false){
 					
 					loop = thisObj.l(thisObj.step);
-					if (thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
+					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
 						start=thisObj.lastStep;
 					else
 						start=thisObj.settings.elements[key]['step-start']+loop;
 	
-					if (thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
+					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-end'];
 	
 					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loop)-start))*1;
 					
-					if (typeof(animations[start])=="undefined")
+					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
 
-					if (typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
 
-					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
+					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
-						if (typeof(thisObj.settings.elements[key]['easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
@@ -1864,40 +1858,40 @@ Last modification on this file: 16 Octomber 2013
 			directionForward = false;
 			for(key in thisObj.settings.elements){
 				
-				if (thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
+				if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
 					continue;
 				
 				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.lastStep)==false){
 					
 					loop = thisObj.l(thisObj.step);
-					if (thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
+					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
 						start=thisObj.lastStep;
 					else
 						start=thisObj.settings.elements[key]['step-end']+loop;
 
-					if (thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
+					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-start'];
 					
 					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loop)))*1;
 					
-					if (typeof(animations[start])=="undefined")
+					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
 
-					if (typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
 						
-					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
+					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
-						if (typeof(thisObj.settings.elements[key]['easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
@@ -1906,34 +1900,34 @@ Last modification on this file: 16 Octomber 2013
 				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.lastStep)==false){
 					
 					loop = thisObj.l(thisObj.lastStep);
-					if (thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
+					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
 						start=thisObj.lastStep;
 					else
 						start=thisObj.settings.elements[key]['step-end']+loop;
 
-					if (thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
+					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-start'];
 					
 					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loop)))*1;
 					
-					if (typeof(animations[start])=="undefined")
+					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
 
-					if (typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
 
-					if ((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
+					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
 						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if (typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
 					}else{
-						if (typeof(thisObj.settings.elements[key]['easing'])!="undefined")
+						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
 						else
 							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
@@ -1970,15 +1964,15 @@ Last modification on this file: 16 Octomber 2013
 					thisObj.rebuildOnStop = false;
 				}
 				
-				if (thisObj.onComplete!==null){
+				if(thisObj.onComplete!==null){
 					thisObj.onComplete();
 					thisObj.onComplete = null;
 				}
 				
 			},
 			step: function(now, fx) {
-				
-				var key,pos,step;
+			
+				var key,pos,step,selector,property,className,direction;
 				
 				var value = Math.round((stepStart+(((stepEnd-stepStart)/100)*(now-fx.start)))*100)/100;
 				
@@ -2009,36 +2003,54 @@ Last modification on this file: 16 Octomber 2013
 					}
 					
 					while((directionForward && step<=pos) || (!directionForward && step>=pos)){
-
-						/*SET,ADD-CLASS,REMOVE-CLASS*/
-						if(step!=lastStep){
-							if (typeof(thisObj.setArray[thisObj.getPos(step)])!="undefined"){ 
-								for(key in thisObj.setArray[thisObj.getPos(step)])
-									if(thisObj.setArray[thisObj.getPos(step)][key]['forward']==directionForward || thisObj.setArray[thisObj.getPos(step)][key]['forward']==null)
-										thisObj.setCSS(thisObj.setArray[thisObj.getPos(step)][key]['selector'],thisObj.setArray[thisObj.getPos(step)][key]['property'],thisObj.setArray[thisObj.getPos(step)][key]['value']);
+						
+						/*ANIMATE-SET*/
+						if(step!=stepStart && typeof(thisObj.setArray['any'][thisObj.getPos(step)])!="undefined")
+							for(selector in thisObj.setArray['any'][thisObj.getPos(step)])
+								for(property in thisObj.setArray['any'][thisObj.getPos(step)][selector])
+									thisObj.setCSS(selector,property,thisObj.setArray['any'][thisObj.getPos(step)][selector][property]);
+						
+						/*SET && ADD/REMOVE CLASS*/
+						if(step==parseInt(step)){
+						
+							direction = null;
+							if(directionForward){
+								if(step!=stepStart)
+									direction = 'forward'
 							}
-							if (typeof(thisObj.addClassArray[thisObj.getPos(step)])!="undefined"){
-								for(key in thisObj.addClassArray[thisObj.getPos(step)])
-									if(thisObj.addClassArray[thisObj.getPos(step)][key]['forward']==directionForward)
-										jQuery(thisObj.addClassArray[thisObj.getPos(step)][key]['selector']).addClass(thisObj.addClassArray[thisObj.getPos(step)][key]['class']);
-							}
-							if (typeof(thisObj.removeClassArray[thisObj.getPos(step)])!="undefined"){
-								for(key in thisObj.removeClassArray[thisObj.getPos(step)])
-									if(thisObj.removeClassArray[thisObj.getPos(step)][key]['forward']==directionForward)
-										jQuery(thisObj.removeClassArray[thisObj.getPos(step)][key]['selector']).removeClass(thisObj.removeClassArray[thisObj.getPos(step)][key]['class']);
+							else if(step!=stepEnd)
+								direction = 'backward';
+							
+							if(direction!==null){
+								if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
+									for(selector in thisObj.setArray[direction][thisObj.getPos(step)]){
+										for(property in thisObj.setArray[direction][thisObj.getPos(step)][selector])
+											thisObj.setCSS(selector,property,thisObj.setArray[direction][thisObj.getPos(step)][selector][property]);
+									}
+								}
+								if(typeof(thisObj.onOffClassArray[direction][thisObj.getPos(step)])!="undefined"){ 
+									for(selector in thisObj.onOffClassArray[direction][thisObj.getPos(step)]){
+										for(className in thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector]){
+											if(thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector][className]==true)
+												jQuery(selector).addClass(className);
+											else
+												jQuery(selector).removeClass(className);
+										}
+									}
+								}
 							}
 						}
 						
-						/*HERE IS WHERE THE ANIMATIONS START*/
-		    			if (step!=stepEnd && typeof(animations[step])!="undefined"){
+						/*ANIMATE*/
+		    			if(step!=stepEnd && typeof(animations[step])!="undefined"){
 					    	for(id in animations[step]){
 						    	for(key in animations[step][id]){
 						    		delay = 0;
-						    		if (directionForward && (animations[step][id][key]['end']-thisObj.getPos(value))>0)
+						    		if(directionForward && (animations[step][id][key]['end']-thisObj.getPos(value))>0)
 						    			delay = animations[step][id][key]['duration']*((animations[step][id][key]['end']-thisObj.getPos(value))/(animations[step][id][key]['end']-thisObj.getPos(step)));
-						    		else if (!directionForward && (thisObj.getPos(value)-animations[step][id][key]['end'])>0)
+						    		else if(!directionForward && (thisObj.getPos(value)-animations[step][id][key]['end'])>0)
 						    			delay = animations[step][id][key]['duration']*((thisObj.getPos(value)-animations[step][id][key]['end'])/(thisObj.getPos(step)-animations[step][id][key]['end']));
-							    	if (animations[step][id][key]['CSS3']!=true){
+							    	if(animations[step][id][key]['CSS3']!=true){
 										if(indexOf(notAccepted,key)==-1 && typeof(thisObj.functionsArray[key])=="undefined"){
 											var animObj = {};
 											animObj[key] = animations[step][id][key]['to'];
@@ -2049,13 +2061,13 @@ Last modification on this file: 16 Octomber 2013
 							    	}	
 							    	else{
 										CSS3ValuesArray[key] = animations[step][id][key]['to'];
-										if (typeof(thisObj.CSS3TransitionArray[id])=="undefined")
+										if(typeof(thisObj.CSS3TransitionArray[id])=="undefined")
 											thisObj.CSS3TransitionArray[id] = {};
 							    		thisObj.CSS3TransitionArray[id][key] = key+' '+parseFloat(delay/1000)+'s '+animations[step][id][key]['easing'];
 							    		CSS3Found = true;
 							    	}
 						    	}
-						    	if (CSS3Found){
+						    	if(CSS3Found){
 									thisObj.setCSS(id,CSS3ValuesArray);
 									CSS3ValuesArray = {};
 									CSS3Found = false;
@@ -2063,16 +2075,16 @@ Last modification on this file: 16 Octomber 2013
 					    	}
 		    			}
 						
-						/*STEP POINTS AND ONSTEP EVENT*/
-						if(step!=lastStep){
-							if (thisObj.haveStepPoints){
+						/*STEP-POINTS AND ON-STEP EVENT*/
+						if(step!=stepStart){
+							if(thisObj.haveStepPoints){
 								var pointFound=indexOf(thisObj.settings.stepPoints,thisObj.getPos(step));
 								if(pointFound!=-1){
 									jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
 									jQuery(thisObj.settings.stepPointsSelector).eq(pointFound).addClass(thisObj.settings.stepPointsActiveClass);
 								}
 							}
-							if (thisObj.settings.onStep!=null)
+							if(thisObj.settings.onStep!=null)
 								thisObj.settings.onStep(thisObj.getPos(step),Math.floor(step/thisObj.settings.max),thisObj.animationType);
 						}
 						
@@ -2127,7 +2139,7 @@ Last modification on this file: 16 Octomber 2013
 						thisObj.jumpPosition=0;
 				}else{
 					for(var i=0;i<=thisObj.settings.jumpPoints.length-2;i++)
-						if (stepPos>thisObj.settings.jumpPoints[i] && stepPos<thisObj.settings.jumpPoints[i+1]){
+						if(stepPos>thisObj.settings.jumpPoints[i] && stepPos<thisObj.settings.jumpPoints[i+1]){
 							if(pos)
 								thisObj.jumpPosition=i;
 							else
@@ -2144,20 +2156,20 @@ Last modification on this file: 16 Octomber 2013
 			}
 		}
 		
-		if (pos){
-			if (thisObj.jumpPosition<(thisObj.settings.jumpPoints.length-1)){
+		if(pos){
+			if(thisObj.jumpPosition<(thisObj.settings.jumpPoints.length-1)){
 				thisObj.jumpPosition++;
 				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'loop',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
-			}else if (thisObj.jumpPosition==(thisObj.settings.jumpPoints.length-1) && thisObj.settings.loop){
+			}else if(thisObj.jumpPosition==(thisObj.settings.jumpPoints.length-1) && thisObj.settings.loop){
 				thisObj.jumpPosition=0;
 				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'loop',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
 			}
 		}
 		else{
-			if (thisObj.jumpPosition>0){
+			if(thisObj.jumpPosition>0){
 				thisObj.jumpPosition--;
 				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'loop',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
-			}else if (thisObj.jumpPosition==0 && thisObj.settings.loop){
+			}else if(thisObj.jumpPosition==0 && thisObj.settings.loop){
 				thisObj.jumpPosition=thisObj.settings.jumpPoints.length-1
 				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'loop',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
 			}
@@ -2172,14 +2184,14 @@ Last modification on this file: 16 Octomber 2013
 		if(!thisObj.allowScroll || thisObj.forceAnimation)
 			return false;
 		
-		if (thisObj.animating && thisObj.animationType!='scroll'){
+		if(thisObj.animating && thisObj.animationType!='scroll'){
 			thisObj.animateDuration=thisObj.settings.duration;
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
 		} else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		if(pos){
-			if ((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep)<=thisObj.settings.maxScroll)
+			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep)<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnScroll;
 			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnScroll>thisObj.settings.max-1 && !thisObj.settings.loop && Math.abs((thisObj.settings.max-1)-thisObj.lastStep)<=thisObj.settings.maxScroll){
 					thisObj.step = thisObj.settings.max-1;
@@ -2194,11 +2206,11 @@ Last modification on this file: 16 Octomber 2013
 				return;
 		}
 		
-		if (thisObj.settings.debug)
+		if(thisObj.settings.debug)
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
 		clearTimeout(thisObj.scrollTimer);
-		if (!thisObj.animating || (thisObj.animating && thisObj.animationType!='scroll')){
+		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='scroll')){
 			thisObj.animationType='scroll';
 			thisObj.animateSite();
 		}
@@ -2230,7 +2242,7 @@ Last modification on this file: 16 Octomber 2013
 						thisObj.touchPosition=0;
 				}else{
 					for(var i=0;i<=thisObj.settings.wipePoints.length-2;i++)
-						if (stepPos>thisObj.settings.wipePoints[i] && stepPos<thisObj.settings.wipePoints[i+1]){
+						if(stepPos>thisObj.settings.wipePoints[i] && stepPos<thisObj.settings.wipePoints[i+1]){
 							if(value==1)
 								thisObj.touchPosition=i;
 							else
@@ -2247,20 +2259,20 @@ Last modification on this file: 16 Octomber 2013
 			}
 		}
 		
-		if (value==1){
-			if (thisObj.touchPosition<(thisObj.settings.wipePoints.length-1)){
+		if(value==1){
+			if(thisObj.touchPosition<(thisObj.settings.wipePoints.length-1)){
 				thisObj.touchPosition++;
 				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
-			}else if (thisObj.touchPosition==(thisObj.settings.wipePoints.length-1) && thisObj.settings.loop){
+			}else if(thisObj.touchPosition==(thisObj.settings.wipePoints.length-1) && thisObj.settings.loop){
 				thisObj.touchPosition=0;
 				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
 			}
 		}
-		if (value==-1){
-			if (thisObj.touchPosition>0){
+		if(value==-1){
+			if(thisObj.touchPosition>0){
 				thisObj.touchPosition--;
 				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
-			}else if (thisObj.touchPosition==0 && thisObj.settings.loop){
+			}else if(thisObj.touchPosition==0 && thisObj.settings.loop){
 				thisObj.touchPosition=thisObj.settings.wipePoints.length-1;
 				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
 			}
@@ -2275,7 +2287,7 @@ Last modification on this file: 16 Octomber 2013
 		if(thisObj.forceAnimation)
 			return false;
 		
-		if (thisObj.animating && thisObj.animationType!='dragTouch'){
+		if(thisObj.animating && thisObj.animationType!='dragTouch'){
 			thisObj.animateDuration=thisObj.settings.duration;
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
@@ -2285,7 +2297,7 @@ Last modification on this file: 16 Octomber 2013
 		}
 		
 		if(value==1){
-			if ((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep)<=thisObj.settings.maxDrag)
+			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep)<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnDrag;
 			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnDrag>thisObj.settings.max-1 && !thisObj.settings.loop && Math.abs((thisObj.settings.max-1)-thisObj.lastStep)<=thisObj.settings.maxDrag)
 					thisObj.step = thisObj.settings.max-1;
@@ -2300,7 +2312,7 @@ Last modification on this file: 16 Octomber 2013
 				return;
 		}
 		
-		if (thisObj.settings.debug)
+		if(thisObj.settings.debug)
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
 		thisObj.animationType='dragTouch';
@@ -2323,7 +2335,7 @@ Last modification on this file: 16 Octomber 2013
 		var thisObj = this;
 		var pos,posNext,posPrev;
 		
-		if (thisObj.forceAnimation || settings.to==null || settings.to<0 || settings.to>thisObj.settings.max-1)
+		if(thisObj.forceAnimation || settings.to==null || settings.to<0 || settings.to>thisObj.settings.max-1)
 			return false;
 		
 		thisObj.animationType = settings.animationType;
@@ -2331,32 +2343,32 @@ Last modification on this file: 16 Octomber 2013
 		
 		pos = settings.to+(Math.floor(thisObj.lastStep/thisObj.settings.max)*thisObj.settings.max);
 		
-		if (Math.abs(pos-thisObj.lastStep)>=thisObj.settings.max*2)
+		if(Math.abs(pos-thisObj.lastStep)>=thisObj.settings.max*2)
 			return;
 
-		if (thisObj.settings.loop){
-			if (settings.orientation=='loop'){
-				if (thisObj.lastStep<=pos)
+		if(thisObj.settings.loop){
+			if(settings.orientation=='loop'){
+				if(thisObj.lastStep<=pos)
 					posNext = pos;
 				else
 					posNext = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)+1)*thisObj.settings.max);
 		
-				if (thisObj.lastStep>=pos)
+				if(thisObj.lastStep>=pos)
 					posPrev = pos;
 				else
 					posPrev = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
 				
-				if (Math.abs(thisObj.lastStep-posNext)>Math.abs(thisObj.lastStep-posPrev))
+				if(Math.abs(thisObj.lastStep-posNext)>Math.abs(thisObj.lastStep-posPrev))
 					pos = posPrev;
 				else
 					pos = posNext;
 			}
-			else if (settings.orientation == 'next'){
-				if (thisObj.lastStep>pos)
+			else if(settings.orientation == 'next'){
+				if(thisObj.lastStep>pos)
 					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)+1)*thisObj.settings.max);
 			}
-			else if (settings.orientation == 'prev'){
-				if (thisObj.lastStep<pos)
+			else if(settings.orientation == 'prev'){
+				if(thisObj.lastStep<pos)
 					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
 			}
 		}
@@ -2369,20 +2381,20 @@ Last modification on this file: 16 Octomber 2013
 		else
 			var minStep = settings.minStepDuration;
 			
-		if (settings.durationType=='step' && settings.duration!=null){
-			if (settings.duration<minStep)
+		if(settings.durationType=='step' && settings.duration!=null){
+			if(settings.duration<minStep)
 				thisObj.animateDuration=Math.abs(thisObj.lastStep-thisObj.step)*minStep;
 			else
 				thisObj.animateDuration=Math.abs(thisObj.lastStep-thisObj.step)*settings.duration;
 		}
 		else{
-			if (settings.duration==null){
-				if (thisObj.settings.duration/Math.abs(thisObj.lastStep-thisObj.step)<minStep)
+			if(settings.duration==null){
+				if(thisObj.settings.duration/Math.abs(thisObj.lastStep-thisObj.step)<minStep)
 					thisObj.animateDuration = Math.abs(thisObj.lastStep-thisObj.step)*minStep;
 				else
 					thisObj.animateDuration = thisObj.settings.duration;
 			}else{
-				if (settings.duration/Math.abs(thisObj.lastStep-thisObj.step)<minStep)
+				if(settings.duration/Math.abs(thisObj.lastStep-thisObj.step)<minStep)
 					thisObj.animateDuration = Math.abs(thisObj.lastStep-thisObj.step)*minStep;
 				else
 					thisObj.animateDuration = settings.duration;
@@ -2390,7 +2402,7 @@ Last modification on this file: 16 Octomber 2013
 		}
 		
 		thisObj.onComplete=null;
-		if (settings.onComplete!==null && typeof(settings.onComplete)=='function')
+		if(settings.onComplete!==null && typeof(settings.onComplete)=='function')
 			thisObj.onComplete = settings.onComplete; 
 		thisObj.animateSite();
 	}
@@ -2400,7 +2412,7 @@ Last modification on this file: 16 Octomber 2013
 		
 		var thisObj = this;
 		
-		if (step<0 || step>thisObj.settings.max-1)
+		if(step<0 || step>thisObj.settings.max-1)
 			return false;
 			
 		thisObj.stop();
@@ -2408,81 +2420,85 @@ Last modification on this file: 16 Octomber 2013
 		if(thisObj.getPos(thisObj.step) == step)
 			return false;
 		
-		var key,key2,pos;
-		var pointFound,pointFoundSelector;
+		var key,pos;
+		var pointFound,pointFoundSelector,direction;
 		var valuesCSS = {};
 		var valuesClasses = {};
 		var id = 0;
+		var selector,property,className;
 		
-		if(step>thisObj.step)
-			pos = thisObj.getPos(thisObj.step)+1;
-		else
-			pos = thisObj.getPos(thisObj.step)-1;
-			
+		pos = thisObj.step;
 		pointFoundSelector = -1;
 		pointFound = -1;
 			
 		while((pos<=step && thisObj.getPos(thisObj.step)<step) || (pos>=step && thisObj.getPos(thisObj.step)>step)){
 			
-			if (thisObj.haveStepPoints){
+			if(thisObj.haveStepPoints){
 				pointFound=indexOf(thisObj.settings.stepPoints,pos);
 				if(pointFound!=-1)
 					pointFoundSelector = pointFound;
 			}
 			
-			if(typeof(thisObj.setArray[pos])!="undefined"){
-				for(key in thisObj.setArray[pos]){
-					if(typeof(valuesCSS[thisObj.setArray[pos][key]['selector']]) == "undefined")
-						valuesCSS[thisObj.setArray[pos][key]['selector']] = {};
-					valuesCSS[thisObj.setArray[pos][key]['selector']][thisObj.setArray[pos][key]['property']] = thisObj.setArray[pos][key]['value'];	
+			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
+				for(selector in thisObj.setArray['any'][pos]){
+					for(property in thisObj.setArray['any'][pos][selector]){
+						if(typeof(valuesCSS[selector]) == "undefined")
+							valuesCSS[selector] = {};
+						valuesCSS[selector][property] = thisObj.setArray['any'][pos][selector][property];
+					}
 				}
 			}
 
-			if(typeof(thisObj.addClassArray[pos])!="undefined"){
-				for(key in thisObj.addClassArray[pos]){
-					if(typeof(valuesClasses[thisObj.addClassArray[pos][key]['selector']]) == "undefined")
-						valuesClasses[thisObj.addClassArray[pos][key]['selector']] = {}
-					valuesClasses[thisObj.addClassArray[pos][key]['selector']][thisObj.addClassArray[pos][key]['class']] = 1;
+			(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = null);
+			if(direction!=null){
+				if(typeof(thisObj.setArray[direction][pos])!="undefined"){
+					for(selector in thisObj.setArray[direction][pos]){
+						if(typeof(valuesCSS[selector]) == "undefined")
+							valuesCSS[selector] = {};
+						for(property in thisObj.setArray[direction][pos][selector])
+							valuesCSS[selector][property] = thisObj.setArray[direction][pos][selector][property];
+					}
 				}
-			}
-
-			if(typeof(thisObj.removeClassArray[pos])!="undefined"){
-				for(key in thisObj.removeClassArray[pos]){
-					if(typeof(valuesClasses[thisObj.removeClassArray[pos][key]['selector']]) == "undefined")
-						valuesClasses[thisObj.removeClassArray[pos][key]['selector']] = {}
-					valuesClasses[thisObj.removeClassArray[pos][key]['selector']][thisObj.removeClassArray[pos][key]['class']] = -1;
+				
+				if(typeof(thisObj.onOffClassArray[direction][pos])!="undefined"){
+					for(selector in thisObj.onOffClassArray[direction][pos]){
+						if(typeof(valuesClasses[selector]) == "undefined")
+							valuesClasses[selector] = {}						
+						for(className in thisObj.onOffClassArray[direction][pos][selector])
+							valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
+					}
 				}
 			}
 			
 			if(typeof(thisObj.animPositions[pos])!="undefined"){
-				for(key in thisObj.animPositions[pos]){
-					if(typeof(valuesCSS[key]) == "undefined")
-						valuesCSS[key] = {};
-					for(key2 in thisObj.animPositions[pos][key])
-						valuesCSS[key][key2] = thisObj.animPositions[pos][key][key2];
+				for(selector in thisObj.animPositions[pos]){
+					if(typeof(valuesCSS[selector]) == "undefined")
+						valuesCSS[selector] = {};
+					for(property in thisObj.animPositions[pos][selector])
+						valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
 				}
 			}
 			
 			if(thisObj.settings.onStep!=null)
 				thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
 			
-			if (thisObj.getPos(thisObj.step)<step)
+			if(thisObj.getPos(thisObj.step)<step)
 				pos = pos + 1;
 			else
 				pos = pos - 1;
 		}
 		
-		for(key in valuesClasses)
-			for(key2 in valuesClasses[key]){
-				if(valuesClasses[key][key2]==1)
-					jQuery(key).addClass(key2);	
-				if(valuesClasses[key][key2]==-1)
-					jQuery(key).removeClass(key2);	
+		for(selector in valuesClasses)
+			for(className in valuesClasses[selector]){
+				if(valuesClasses[selector][className]==true)
+					jQuery(selector).addClass(className);	
+				else
+					jQuery(selector).removeClass(className);	
 			}
 			
-		for(key in valuesCSS)
-			for(key2 in valuesCSS[key])
-				thisObj.setCSS(key,key2,valuesCSS[key][key2]);
+		for(selector in valuesCSS)
+			for(property in valuesCSS[selector])
+				thisObj.setCSS(selector,property,valuesCSS[selector][property]);
 
 		if(pointFoundSelector!=-1 ){
 			jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
@@ -2503,7 +2519,7 @@ Last modification on this file: 16 Octomber 2013
 		thisObj.forceAnimation = false;
 		thisObj.animationType='none';
 		thisObj.animateDuration = thisObj.settings.duration;	
-		thisObj.step = Math.round(thisObj.lastStep);
+		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 		thisObj.onComplete = null;
 		
 		for(var key in thisObj.CSS3TransitionArray){
@@ -2524,51 +2540,51 @@ Last modification on this file: 16 Octomber 2013
 	var methods = {
 		create : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (jQuery(selector).length==0 || typeof(isAliveObjects[selector])!="undefined")
+			if(jQuery(selector).length==0 || typeof(isAliveObjects[selector])!="undefined")
 				return false;
-			if (typeof(options) == "undefined")
+			if(typeof(options) == "undefined")
 				options = {};
 			isAliveObjects[selector] = new isAlive(selector,options);
 			return thisObj;
 		},
 		goTo : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if (typeof(options) == "undefined")
+			if(typeof(options) == "undefined")
 				options = {};
 			isAliveObjects[selector].goTo(options);
 			return thisObj;
 		},
 		skip : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if (typeof(options) == "undefined" || typeof(options['to']) == "undefined")
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined")
 				return false;
 			isAliveObjects[selector].skip(options['to']);
 			return thisObj;
 		},
 		play : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			var playPoints = isAliveObjects[selector].settings.playPoints;
-			if (playPoints.length<=1)
+			if(playPoints.length<=1)
 				return false;
-			if (typeof(options) == "undefined")
+			if(typeof(options) == "undefined")
 				options = {};
 			var pos = Math.floor(isAliveObjects[selector].getPos(isAliveObjects[selector].lastStep));
 			var max = isAliveObjects[selector].settings.max-1;
 			var found = null; 
 			for(var i=pos+1;i<=max;i++)
-				if (indexOf(playPoints,i)!=-1){
+				if(indexOf(playPoints,i)!=-1){
 					found = i;
 					break
 				}
-			if (found==null && isAliveObjects[selector].settings.loop)
+			if(found==null && isAliveObjects[selector].settings.loop)
 				found = playPoints[0];
-			if (found==null)
+			if(found==null)
 				return false;
 			options['to'] = found;
 			options['orientation'] = 'next';
@@ -2578,23 +2594,23 @@ Last modification on this file: 16 Octomber 2013
 		},
 		rewind : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			var playPoints = isAliveObjects[selector].settings.playPoints;
-			if (playPoints.length<=1)
+			if(playPoints.length<=1)
 				return false;
-			if (typeof(options) == "undefined")
+			if(typeof(options) == "undefined")
 				options = {};
 			var pos = Math.ceil(isAliveObjects[selector].getPos(isAliveObjects[selector].lastStep));
 			var found = null; 
 			for(var i=pos-1;i>=0;i--)
-				if (indexOf(playPoints,i)!=-1){
+				if(indexOf(playPoints,i)!=-1){
 					found = i;
 					break
 				}
-			if (found==null && isAliveObjects[selector].settings.loop)
+			if(found==null && isAliveObjects[selector].settings.loop)
 				found = playPoints[playPoints.length-1];
-			if (found==null)
+			if(found==null)
 				return false;
 			options['to'] = found;
 			options['orientation'] = 'prev';
@@ -2604,28 +2620,28 @@ Last modification on this file: 16 Octomber 2013
 		},
 		stop : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].stop();
 			return thisObj;
 		},
 		rebuild : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].rebuildLayout();
 			return thisObj;
 		},
 		enableScroll : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowScroll = options;
 			return thisObj;
 		},
 		enableTouch : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowTouch = options;
 			if(options==true && isAliveObjects[selector].settings.enableTouch && ieFound && browserVer>=10 && isAliveObjects[selector].settings.stopTouch){
@@ -2638,7 +2654,7 @@ Last modification on this file: 16 Octomber 2013
 		},
 		addOnComplete : function(thisObj,options){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
+			if(typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
 				return false;
 			if(typeof(options)=='function')
 				isAliveObjects[selector].onComplete = options;
@@ -2648,13 +2664,13 @@ Last modification on this file: 16 Octomber 2013
 		},
 		getStepPosition : function(thisObj){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			return isAliveObjects[selector].getPos(isAliveObjects[selector].step);
 		},
 		getMaxStep : function(thisObj){
 			var selector = thisObj.selector;
-			if (typeof(isAliveObjects[selector])=="undefined")
+			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			return (isAliveObjects[selector].settings.max-1);
 		},
@@ -2662,12 +2678,12 @@ Last modification on this file: 16 Octomber 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.0.1";
+			return "1.1.0";
 		}
 	};
 	
 	jQuery.fn.isAlive = function(method,options) {
-		if (methods[method]){
+		if(methods[method]){
 			var mFunc = methods[method];
 			return mFunc(this,options);
 		}

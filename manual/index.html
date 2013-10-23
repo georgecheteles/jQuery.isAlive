@@ -30,9 +30,9 @@
 				<div id="section-1" class="section">
 					<h3>1. What is jQuery.isAlive?</h3>
 					<p class="text">
-						jQuery.isAlive is a complex jQuery plugin that allows you to create advance javascript animation for your site using jQuery animation function and CSS3 transitions.<br/>
-						jQuery.isAlive is compatible with the all modern browsers, but also old ones, starting with IE7 and higher.<br/>
-						Building animations with this plugin is simple and does not require codind skils.<br/>
+						jQuery.isAlive is a complex jQuery plugin that allows you to create advance javascript animations for your site using jQuery animation function and CSS3 transitions.<br/>
+						jQuery.isAlive is compatible with the all modern browsers, but also old ones, starting with IE7.<br/>
+						Building animations with this plugin is simple and does not require coding skils.<br/>
 						jQuery.isAlive works on all browser starting with IE7+,Chrome,Forefox,Opera,Safari and all mobile browsers including IE10.<br/>
 						jQuery.isAlive was tested with jQuery 1.4+.<br/>
 					</p>
@@ -40,18 +40,19 @@
 				<div id="section-2" class="section">
 					<h3>2. How to install?</h3>
 					<p class="text">
-						To install jQuery.isAlive simple include in your HEAD block the js file.<br/>
-						The plug in comes with some extra files(optional) that you can include in your project if you need them.
+						To install jQuery.isAlive simple include in your HEAD block this js files.<br/>
+						The plugin comes with some extra files(optional) that you can include in your project if you need them.
 					</p>
 					<p class="code">
-&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
-&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.isAlive.beta.min.js&quot;&gt;&lt;/script&gt;
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.js&quot;&gt;&lt;/script&gt; //jQuery Library
+&lt;script type=&quot;text/javascript&quot; src=&quot;jquery.isAlive.beta.min.js&quot;&gt;&lt;/script&gt; //jQuery.isAlive plugin
+&lt;script type=&quot;text/javascript&quot; src=&quot;easing.js&quot;&gt;&lt;/script&gt;  //for animations that need easing(optional)
 					</p>
 				</div>
 				<div id="section-3" class="section">
 					<h3>3. Plugin setup</h3>
 					<p class="text">
-						Initializing the plug in is very simple and is done with a single coding line:
+						Initializing the plugin is very simple and is done with a single coding line:
 					</p>
 					<p class="code">
 &lt;script type=&quot;text/javascript&quot;&gt;
@@ -362,8 +363,8 @@
 				<div id="section-5" class="section">
 					<h3>5. Building animations</h3>
 					<p class="text">
-						Once you setup your the plugin to work better with your project it's time to start creating the animation object.<br/>
-						Depending on the "elementsType" option, you can create a linear type array or a tree type one. In this chapter we will work with "linear" type.<br/>
+						Once you setup your the plugin to work better with your project it's time to start creating the animations object.<br/>
+						Depending on the "elementsType" option, you can create a linear type object or a tree type one. In this chapter we will work with "linear" type.<br/>
 						Every animation from your project will be an element in this object.<br/>
 					</p>
 
@@ -453,7 +454,7 @@
 					<p class="text">
 						<p class="imp">5. set@start</p>
 							<p class="blue">
-								Will set a CSS value at the start of the load of the page.
+								Will set a CSS value at the starting point of your animation. This works only if "initCSS" is set to FALSE.
 							</p>
 						<p class="code">
 0: {
@@ -732,7 +733,23 @@ jQuery().isAlive('getVersion');
 				<div id="section-8" class="section">
 					<h3>8. Known problems</h3>
 					<p class="text">
-						This chapter is still under construction.
+						<p class="imp">1. On mobile devices the layout will break when the keyboard is open.</p>
+							<p class="blue">
+								Fix: Add in the HEAD block of your HTML this "meta" tag.
+							</p>
+						<p class="code">
+&lt;meta name=&quot;viewport&quot; content=&quot;user-scalable=no&quot;/&gt;
+						</p>
+					</p>
+						<p class="imp">2. On Internet Explorer the mouse scroll event does not work.</p>
+							<p class="blue">
+								Fix: This happens when the wrapper used for mouse scroll events does not have a background property set. Add this code in your CSS.
+							</p>
+						<p class="code">
+#my-wrapper{
+	background-image: url("about:blank");						
+}						
+						</p>
 					</p>
 				</div>
 				<div id="section-9" class="section">

@@ -1,2 +1,9 @@
+jQuery isAlive Changelog
+
+ver. 1.1.0 (23 Octomber 2013)
+ - speed improvements
+ - set@start method no longer works if initCSS is enabled
+ - set / add-class / remove-class were change to do both actions(forward and backward) on the same step.
+
 ver. 1.0.1 (16 Octomber 2013)
  - small improvements
