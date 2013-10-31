@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.1.1 (31 Octomber 2013)
+ - speed improvements
+ - animate-set is now working like set property, jumping back and forward on the same step(without the delay)
+
 ver. 1.1.0 (23 Octomber 2013)
  - speed improvements
  - set@start method no longer works if initCSS is enabled

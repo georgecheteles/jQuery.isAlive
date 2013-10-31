@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.0)
+jQuery.isAlive(1.1.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 23 Octomber 2013
+Last modification on this file: 31 Octomber 2013
 */
 
 (function(jQuery) {
@@ -277,7 +277,6 @@ Last modification on this file: 23 Octomber 2013
 		this.onOffClassArray = {};
 		
 		this.cssDinamicElements = [];
-		this.cssStaticElements = [];
 		
 		this.params = {};
 		this.onComplete = null;
@@ -580,7 +579,6 @@ Last modification on this file: 23 Octomber 2013
 			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
 			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
 			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-			thisObj.resetStaticCssValues();
 			thisObj.resetDinamicCssValues();
 			if(thisObj.settings.onRebuild!=null)
 				thisObj.settings.onRebuild(thisObj.params,thisObj.getPos(thisObj.step),Math.floor(thisObj.step/(thisObj.settings.max+1)));
@@ -589,28 +587,21 @@ Last modification on this file: 23 Octomber 2013
 			thisObj.rebuildOnStop = true;
 	}
 	
-	/* SET CSS VALUES FOR CSS-STATIC-ELEMENTS ARRAY */
-	isAlive.prototype.resetStaticCssValues = function(){
-		var thisObj = this;
-		var convertValue;
-		for(var key in thisObj.cssStaticElements){
-			convertValue = thisObj.convertParams(thisObj.cssStaticElements[key]['value']);
-			convertValue = addFormat(convertValue,thisObj.cssStaticElements[key]['format'])
-			thisObj.setCSS(thisObj.cssStaticElements[key]['selector'],thisObj.cssStaticElements[key]['property'],convertValue);
-			if(!isDinamic(thisObj.cssStaticElements[key]['value']))
-				delete thisObj.cssStaticElements[key];
-		}
-	}
-	
 	/* SET CSS VALUES AND REMAKES ANIMATIONS  */
 	isAlive.prototype.resetDinamicCssValues = function(){
 		var key,selector,property,valStart,valEnd,stepStart,stepEnd,value,pos;
 		var changedElements = [];
-		var valUnder,valAbove,stepFrom;
+		var valUnder,valAbove,stepFrom,convertValue,value,oldValue;
 		var thisObj = this;
 		
 		for(key in thisObj.cssDinamicElements){
-			if(thisObj.cssDinamicElements[key]['method']=="animate"){
+		
+			if(thisObj.cssDinamicElements[key]['method']=="static"){
+				/*REPOSITION STATIC ELEMNTS*/
+				convertValue = thisObj.convertParams(thisObj.cssDinamicElements[key]['value']);
+				convertValue = addFormat(convertValue,thisObj.cssDinamicElements[key]['format'])
+				thisObj.setCSS(thisObj.cssDinamicElements[key]['selector'],thisObj.cssDinamicElements[key]['property'],convertValue);
+			} else if(thisObj.cssDinamicElements[key]['method']=="animate"){
 				/*REPOSITION ANIMATE*/	
 				valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start']);
 				valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end']);
@@ -625,6 +616,10 @@ Last modification on this file: 23 Octomber 2013
 					if(value!==null)
 						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
 				}
+				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
 			}else if(thisObj.cssDinamicElements[key]['method']=="set"){
 				/*REPOSITION SET*/
 				selector = thisObj.cssDinamicElements[key]['selector'];
@@ -644,6 +639,10 @@ Last modification on this file: 23 Octomber 2013
 					valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format']);
 					thisObj.setArray['backward'][stepFrom][selector][property] = valUnder;
 				}
+				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
 			}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
 				/*REPOSITION ANIMATE-SET*/
 				valStart = thisObj.cssDinamicElements[key]['value-start'];
@@ -658,16 +657,19 @@ Last modification on this file: 23 Octomber 2013
 				stepEnd = thisObj.cssDinamicElements[key]['step-end'];
 				moveOn = thisObj.cssDinamicElements[key]['move-on'];
 				for(pos=stepStart;pos<=stepEnd;pos++){
-					if((pos-stepStart)%moveOn==0)
-						thisObj.setArray['any'][pos][selector][property] = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+					if((pos-stepStart)%moveOn==0){
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+						thisObj.setArray['forward'][pos][selector][property] = value;
+						if(pos>stepStart)
+							thisObj.setArray['backward'][pos][selector][property] = oldValue;
+						oldValue = value;
+					}
 				}
+				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
 			}
-			
-			if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-				changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-			
-			if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-				changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
 		}
 		
 		/* REMAKE THE PAGE LAYOUT */
@@ -676,17 +678,13 @@ Last modification on this file: 23 Octomber 2013
 				property = changedElements[selector][key];
 				value = null;
 				for(pos=thisObj.getPos(Math.round(thisObj.lastStep));pos>=0;pos--){
-					if(typeof(thisObj.setArray['any'][pos])!="undefined" && typeof(thisObj.setArray['any'][pos][selector])!="undefined" && typeof(thisObj.setArray['any'][pos][selector][property])!="undefined")
-						value = thisObj.setArray['any'][pos][selector][property];
 					if(typeof(thisObj.setArray['forward'][pos])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector][property])!="undefined")
 						value = thisObj.setArray['forward'][pos][selector][property];
-					if(value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+					else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
 						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
 					if(value!=null){
 						thisObj.setCSS(selector,changedElements[selector][key],value);
 						delete changedElements[selector][key];
-						if(lengthObj(changedElements[selector])==0)
-							delete changedElements[selector];
 						break;
 					}
 				}
@@ -698,17 +696,12 @@ Last modification on this file: 23 Octomber 2013
 				property = changedElements[selector][key];
 				value = null;
 				for(pos=thisObj.getPos(Math.round(thisObj.lastStep))+1;pos<=thisObj.getPos(thisObj.settings.max-1);pos++){
-					if(typeof(thisObj.setArray['any'][pos])!="undefined" && typeof(thisObj.setArray['any'][pos][selector])!="undefined" && typeof(thisObj.setArray['any'][pos][selector][property])!="undefined")
-						value = thisObj.setArray['any'][pos][selector][property];
 					if(typeof(thisObj.setArray['backward'][pos])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector][property])!="undefined")
 						value = thisObj.setArray['backward'][pos][selector][property];
-					if(value==null && typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+					else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
 						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
 					if(value!=null){
 						thisObj.setCSS(selector,changedElements[selector][key],value);
-						delete changedElements[selector][key];
-						if(lengthObj(changedElements[selector])==0)
-							delete changedElements[selector];
 						break;
 					}
 				}
@@ -921,9 +914,8 @@ Last modification on this file: 23 Octomber 2013
 		var key;
 		var selector,property,className;
 		var valStart,valEnd;
-		var stepStart,stepEnd,value;
+		var stepStart,stepEnd,value,oldValue;
 		
-		thisObj.setArray['any'] = {};
 		thisObj.setArray['forward'] = {};
 		thisObj.setArray['backward'] = {};
 		
@@ -964,11 +956,19 @@ Last modification on this file: 23 Octomber 2013
 						stepStart = myElements[key]['step-start']; 
 						stepEnd = myElements[key]['step-end'];
 						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
-						if(typeof(thisObj.setArray['any'][pos])=="undefined")
-							thisObj.setArray['any'][pos] = {};
-						if(typeof(thisObj.setArray['any'][pos][selector])=="undefined")
-							thisObj.setArray['any'][pos][selector] = {};
-						thisObj.setArray['any'][pos][selector][property] = value;
+						if(typeof(thisObj.setArray['forward'][pos])=="undefined")
+							thisObj.setArray['forward'][pos] = {};
+						if(typeof(thisObj.setArray['forward'][pos][selector])=="undefined")
+							thisObj.setArray['forward'][pos][selector] = {};
+						thisObj.setArray['forward'][pos][selector][property] = value;
+						if(pos>myElements[key]['step-start']){
+							if(typeof(thisObj.setArray['backward'][pos])=="undefined")
+								thisObj.setArray['backward'][pos] = {};
+							if(typeof(thisObj.setArray['backward'][pos][selector])=="undefined")
+								thisObj.setArray['backward'][pos][selector] = {};
+							thisObj.setArray['backward'][pos][selector][property] = oldValue;
+						}
+						oldValue = value;
 					}
 				}
 				else if(myElements[key]['method']=="set"){
@@ -1034,16 +1034,6 @@ Last modification on this file: 23 Octomber 2013
 			if(thisObj.haveStepPoints && pointFoundSelector==-1)
 				pointFoundSelector=indexOf(thisObj.settings.stepPoints,pos);
 		
-			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
-				for(selector in thisObj.setArray['any'][pos]){
-					if(typeof(CSSArray[selector])=="undefined")
-						CSSArray[selector] = {};
-					for(property in thisObj.setArray['any'][pos][selector]){
-						if(typeof(CSSArray[selector][property])=="undefined")
-							CSSArray[selector][property] = thisObj.setArray['any'][pos][selector][property];
-					}
-				}
-			}
 			if(typeof(thisObj.setArray['forward'][pos])!="undefined"){
 				for(selector in thisObj.setArray['forward'][pos]){
 					if(typeof(CSSArray[selector])=="undefined")
@@ -1076,16 +1066,6 @@ Last modification on this file: 23 Octomber 2013
 		}
 		
 		for(pos=thisObj.settings.start+1;pos<=thisObj.settings.max;pos++){
-			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
-				for(selector in thisObj.setArray['any'][pos]){
-					if(typeof(CSSArray[selector])=="undefined")
-						CSSArray[selector] = {};
-					for(property in thisObj.setArray['any'][pos][selector]){
-						if(typeof(CSSArray[selector][property])=="undefined")
-							CSSArray[selector][property] = thisObj.setArray['any'][pos][selector][property];
-					}
-				}
-			}
 			if(typeof(thisObj.setArray['backward'][pos])!="undefined"){
 				for(selector in thisObj.setArray['backward'][pos]){
 					if(typeof(CSSArray[selector])=="undefined")
@@ -1519,8 +1499,13 @@ Last modification on this file: 23 Octomber 2013
 				thisObj.settings.elements[key]['value-above'] = addFormat(thisObj.settings.elements[key]['value-above'],thisObj.settings.elements[key]['format'])
 			}
 			else if(thisObj.settings.elements[key]["method"]=="static"){
-				var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
-				thisObj.cssStaticElements.push(tempObj);
+				if(isDinamic(thisObj.settings.elements[key]['value'])){
+					var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
+					thisObj.cssDinamicElements.push(tempObj);
+				}
+				convertValue = thisObj.convertParams(thisObj.settings.elements[key]['value']);
+				convertValue = addFormat(convertValue,thisObj.settings.elements[key]['format'])
+				thisObj.setCSS(thisObj.settings.elements[key]['selector'],thisObj.settings.elements[key]['property'],convertValue);
 				delete thisObj.settings.elements[key];
 			}
 			else if(thisObj.settings.elements[key]["method"]=="set@start"){
@@ -1530,9 +1515,6 @@ Last modification on this file: 23 Octomber 2013
 				delete thisObj.settings.elements[key];
 			}
 		}
-		
-		/*THIS RESETS THE CSS VALUES FROM CSS ELEMENTS ARRAY*/
-		thisObj.resetStaticCssValues();
 		
 		/*THIS FUNCTION CREATES ANIMATION, SET AND CLASS ARRAYS*/
 		thisObj.createElementsArray();
@@ -2004,24 +1986,10 @@ Last modification on this file: 23 Octomber 2013
 					
 					while((directionForward && step<=pos) || (!directionForward && step>=pos)){
 						
-						/*ANIMATE-SET*/
-						if(step!=stepStart && typeof(thisObj.setArray['any'][thisObj.getPos(step)])!="undefined")
-							for(selector in thisObj.setArray['any'][thisObj.getPos(step)])
-								for(property in thisObj.setArray['any'][thisObj.getPos(step)][selector])
-									thisObj.setCSS(selector,property,thisObj.setArray['any'][thisObj.getPos(step)][selector][property]);
-						
-						/*SET && ADD/REMOVE CLASS*/
+						/*ANIMATE-SET && SET && ADD && REMOVE CLASS*/
 						if(step==parseInt(step)){
-						
-							direction = null;
-							if(directionForward){
-								if(step!=stepStart)
-									direction = 'forward'
-							}
-							else if(step!=stepEnd)
-								direction = 'backward';
-							
-							if(direction!==null){
+							if((directionForward && step!=stepStart) || (!directionForward && step!=stepEnd)){
+								(directionForward)?direction = 'forward':direction = 'backward';
 								if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
 									for(selector in thisObj.setArray[direction][thisObj.getPos(step)]){
 										for(property in thisObj.setArray[direction][thisObj.getPos(step)][selector])
@@ -2439,34 +2407,21 @@ Last modification on this file: 23 Octomber 2013
 					pointFoundSelector = pointFound;
 			}
 			
-			if(typeof(thisObj.setArray['any'][pos])!="undefined"){
-				for(selector in thisObj.setArray['any'][pos]){
-					for(property in thisObj.setArray['any'][pos][selector]){
-						if(typeof(valuesCSS[selector]) == "undefined")
-							valuesCSS[selector] = {};
-						valuesCSS[selector][property] = thisObj.setArray['any'][pos][selector][property];
-					}
+			(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = 'forward');
+			if(typeof(thisObj.setArray[direction][pos])!="undefined"){
+				for(selector in thisObj.setArray[direction][pos]){
+					if(typeof(valuesCSS[selector]) == "undefined")
+						valuesCSS[selector] = {};
+					for(property in thisObj.setArray[direction][pos][selector])
+						valuesCSS[selector][property] = thisObj.setArray[direction][pos][selector][property];
 				}
 			}
-
-			(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = null);
-			if(direction!=null){
-				if(typeof(thisObj.setArray[direction][pos])!="undefined"){
-					for(selector in thisObj.setArray[direction][pos]){
-						if(typeof(valuesCSS[selector]) == "undefined")
-							valuesCSS[selector] = {};
-						for(property in thisObj.setArray[direction][pos][selector])
-							valuesCSS[selector][property] = thisObj.setArray[direction][pos][selector][property];
-					}
-				}
-				
-				if(typeof(thisObj.onOffClassArray[direction][pos])!="undefined"){
-					for(selector in thisObj.onOffClassArray[direction][pos]){
-						if(typeof(valuesClasses[selector]) == "undefined")
-							valuesClasses[selector] = {}						
-						for(className in thisObj.onOffClassArray[direction][pos][selector])
-							valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
-					}
+			if(typeof(thisObj.onOffClassArray[direction][pos])!="undefined"){
+				for(selector in thisObj.onOffClassArray[direction][pos]){
+					if(typeof(valuesClasses[selector]) == "undefined")
+						valuesClasses[selector] = {}						
+					for(className in thisObj.onOffClassArray[direction][pos][selector])
+						valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
 				}
 			}
 			
@@ -2478,7 +2433,7 @@ Last modification on this file: 23 Octomber 2013
 						valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
 				}
 			}
-			
+
 			if(thisObj.settings.onStep!=null)
 				thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
 			
@@ -2509,6 +2464,7 @@ Last modification on this file: 23 Octomber 2013
 		
 		thisObj.step = step;
 		thisObj.lastStep = step;
+		
 	}
 	
 	/*STOPS ANIMATIONS*/	
@@ -2678,7 +2634,7 @@ Last modification on this file: 23 Octomber 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.1.0";
+			return "1.1.1";
 		}
 	};
 	
