@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.1)
+jQuery.isAlive(1.1.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1988,22 +1988,20 @@ Last modification on this file: 31 Octomber 2013
 						
 						/*ANIMATE-SET && SET && ADD && REMOVE CLASS*/
 						if(step==parseInt(step)){
-							if((directionForward && step!=stepStart) || (!directionForward && step!=stepEnd)){
-								(directionForward)?direction = 'forward':direction = 'backward';
-								if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
-									for(selector in thisObj.setArray[direction][thisObj.getPos(step)]){
-										for(property in thisObj.setArray[direction][thisObj.getPos(step)][selector])
-											thisObj.setCSS(selector,property,thisObj.setArray[direction][thisObj.getPos(step)][selector][property]);
-									}
+							(directionForward)?direction = 'forward':((step!=stepEnd)?direction = 'backward':direction = 'forward');
+							if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
+								for(selector in thisObj.setArray[direction][thisObj.getPos(step)]){
+									for(property in thisObj.setArray[direction][thisObj.getPos(step)][selector])
+										thisObj.setCSS(selector,property,thisObj.setArray[direction][thisObj.getPos(step)][selector][property]);
 								}
-								if(typeof(thisObj.onOffClassArray[direction][thisObj.getPos(step)])!="undefined"){ 
-									for(selector in thisObj.onOffClassArray[direction][thisObj.getPos(step)]){
-										for(className in thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector]){
-											if(thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector][className]==true)
-												jQuery(selector).addClass(className);
-											else
-												jQuery(selector).removeClass(className);
-										}
+							}
+							if(typeof(thisObj.onOffClassArray[direction][thisObj.getPos(step)])!="undefined"){ 
+								for(selector in thisObj.onOffClassArray[direction][thisObj.getPos(step)]){
+									for(className in thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector]){
+										if(thisObj.onOffClassArray[direction][thisObj.getPos(step)][selector][className]==true)
+											jQuery(selector).addClass(className);
+										else
+											jQuery(selector).removeClass(className);
 									}
 								}
 							}
@@ -2634,7 +2632,7 @@ Last modification on this file: 31 Octomber 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.1.1";
+			return "1.1.2";
 		}
 	};
 	
