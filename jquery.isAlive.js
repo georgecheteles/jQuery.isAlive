@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.2)
+jQuery.isAlive(1.1.3)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 31 Octomber 2013
+Last modification on this file: 3 November 2013
 */
 
 (function(jQuery) {
@@ -570,6 +570,9 @@ Last modification on this file: 31 Octomber 2013
 	/*REMAKES PAGE LAYOUT*/
 	isAlive.prototype.rebuildLayout = function(){
 		var thisObj = this;
+		var key,selector,property,valStart,valEnd,stepStart,stepEnd,value,pos,valUnder,valAbove,stepFrom,oldValue;
+		var changedElements = [];
+		
 		if(!thisObj.animating){
 			thisObj.params.windowWidth = jQuery(window).width();
 			thisObj.params.windowHeight = jQuery(window).height();
@@ -579,7 +582,122 @@ Last modification on this file: 31 Octomber 2013
 			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
 			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
 			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-			thisObj.resetDinamicCssValues();
+			
+			/* RESET ALL DINAMIC ELEMENTS*/
+			for(key in thisObj.cssDinamicElements){
+				if(thisObj.cssDinamicElements[key]['method']=="static"){
+					/*REPOSITION STATIC ELEMNTS*/
+					value = thisObj.convertParams(thisObj.cssDinamicElements[key]['value']);
+					value = addFormat(value,thisObj.cssDinamicElements[key]['format'])
+					thisObj.setCSS(thisObj.cssDinamicElements[key]['selector'],thisObj.cssDinamicElements[key]['property'],value);
+				} else if(thisObj.cssDinamicElements[key]['method']=="animate"){
+					/*REPOSITION ANIMATE*/	
+					valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start']);
+					valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end']);
+					if(thisObj.cssDinamicElements[key]['scrollbar']==true){
+						thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-start']=valStart;
+						thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-end']=valEnd;
+					}
+					stepStart = thisObj.cssDinamicElements[key]['step-start']
+					stepEnd = thisObj.cssDinamicElements[key]['step-end']
+					for(pos=stepStart;pos<=stepEnd;pos++){
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
+					}
+					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+				}else if(thisObj.cssDinamicElements[key]['method']=="set"){
+					/*REPOSITION SET*/
+					selector = thisObj.cssDinamicElements[key]['selector'];
+					property = thisObj.cssDinamicElements[key]['property'];
+					stepFrom = thisObj.cssDinamicElements[key]['step-from'];
+
+					valAbove = thisObj.cssDinamicElements[key]['value-above'];
+					if(isDinamic(valAbove)){
+						valAbove = thisObj.convertParams(valAbove);
+						valAbove = addFormat(valAbove,thisObj.cssDinamicElements[key]['format']);
+						thisObj.setArray['forward'][stepFrom][selector][property] = valAbove;
+					}
+					
+					valUnder = thisObj.cssDinamicElements[key]['value-under'];
+					if(isDinamic(valUnder)){
+						valUnder = thisObj.convertParams(valUnder);
+						valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format']);
+						thisObj.setArray['backward'][stepFrom][selector][property] = valUnder;
+					}
+					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+				}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
+					/*REPOSITION ANIMATE-SET*/
+					valStart = thisObj.cssDinamicElements[key]['value-start'];
+					valEnd = thisObj.cssDinamicElements[key]['value-end'];
+					if(isDinamic(valStart))
+						valStart = thisObj.convertParams(valStart);
+					if(isDinamic(valEnd))
+						valEnd = thisObj.convertParams(valEnd);
+					selector = thisObj.cssDinamicElements[key]['selector'];
+					property = thisObj.cssDinamicElements[key]['property'];
+					stepStart = thisObj.cssDinamicElements[key]['step-start'];
+					stepEnd = thisObj.cssDinamicElements[key]['step-end'];
+					moveOn = thisObj.cssDinamicElements[key]['move-on'];
+					for(pos=stepStart;pos<=stepEnd;pos++){
+						if((pos-stepStart)%moveOn==0){
+							value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+							if(pos>stepStart){
+								thisObj.setArray['forward'][pos][selector][property] = value;
+								thisObj.setArray['backward'][pos][selector][property] = oldValue;
+							}
+							oldValue = value;
+						}
+					}
+					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
+						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
+					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
+						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+				}
+			}
+			
+			/* REMAKE THE PAGE LAYOUT */
+			for(selector in changedElements){
+				for(key in changedElements[selector]){
+					property = changedElements[selector][key];
+					value = null;
+					for(pos=thisObj.getPos(Math.round(thisObj.lastStep));pos>=0;pos--){
+						if(typeof(thisObj.setArray['forward'][pos])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector][property])!="undefined")
+							value = thisObj.setArray['forward'][pos][selector][property];
+						else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+							value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
+						if(value!=null){
+							thisObj.setCSS(selector,changedElements[selector][key],value);
+							delete changedElements[selector][key];
+							break;
+						}
+					}
+				}
+			}
+			
+			for(selector in changedElements){
+				for(key in changedElements[selector]){
+					property = changedElements[selector][key];
+					value = null;
+					for(pos=thisObj.getPos(Math.round(thisObj.lastStep))+1;pos<=thisObj.getPos(thisObj.settings.max-1);pos++){
+						if(typeof(thisObj.setArray['backward'][pos])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector][property])!="undefined")
+							value = thisObj.setArray['backward'][pos][selector][property];
+						else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
+							value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
+						if(value!=null){
+							thisObj.setCSS(selector,changedElements[selector][key],value);
+							break;
+						}
+					}
+				}
+			}
+
+			/*CALLS THE ONREBUILD EVENT*/
 			if(thisObj.settings.onRebuild!=null)
 				thisObj.settings.onRebuild(thisObj.params,thisObj.getPos(thisObj.step),Math.floor(thisObj.step/(thisObj.settings.max+1)));
 		}
@@ -587,127 +705,6 @@ Last modification on this file: 31 Octomber 2013
 			thisObj.rebuildOnStop = true;
 	}
 	
-	/* SET CSS VALUES AND REMAKES ANIMATIONS  */
-	isAlive.prototype.resetDinamicCssValues = function(){
-		var key,selector,property,valStart,valEnd,stepStart,stepEnd,value,pos;
-		var changedElements = [];
-		var valUnder,valAbove,stepFrom,convertValue,value,oldValue;
-		var thisObj = this;
-		
-		for(key in thisObj.cssDinamicElements){
-		
-			if(thisObj.cssDinamicElements[key]['method']=="static"){
-				/*REPOSITION STATIC ELEMNTS*/
-				convertValue = thisObj.convertParams(thisObj.cssDinamicElements[key]['value']);
-				convertValue = addFormat(convertValue,thisObj.cssDinamicElements[key]['format'])
-				thisObj.setCSS(thisObj.cssDinamicElements[key]['selector'],thisObj.cssDinamicElements[key]['property'],convertValue);
-			} else if(thisObj.cssDinamicElements[key]['method']=="animate"){
-				/*REPOSITION ANIMATE*/	
-				valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start']);
-				valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end']);
-				if(thisObj.cssDinamicElements[key]['scrollbar']==true){
-					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-start']=valStart;
-					thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-end']=valEnd;
-				}
-				stepStart = thisObj.cssDinamicElements[key]['step-start']
-				stepEnd = thisObj.cssDinamicElements[key]['step-end']
-				for(pos=stepStart;pos<=stepEnd;pos++){
-					value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
-					if(value!==null)
-						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
-				}
-				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
-			}else if(thisObj.cssDinamicElements[key]['method']=="set"){
-				/*REPOSITION SET*/
-				selector = thisObj.cssDinamicElements[key]['selector'];
-				property = thisObj.cssDinamicElements[key]['property'];
-				stepFrom = thisObj.cssDinamicElements[key]['step-from'];
-
-				valAbove = thisObj.cssDinamicElements[key]['value-above'];
-				if(isDinamic(valAbove)){
-					valAbove = thisObj.convertParams(valAbove);
-					valAbove = addFormat(valAbove,thisObj.cssDinamicElements[key]['format']);
-					thisObj.setArray['forward'][stepFrom][selector][property] = valAbove;
-				}
-				
-				valUnder = thisObj.cssDinamicElements[key]['value-under'];
-				if(isDinamic(valUnder)){
-					valUnder = thisObj.convertParams(valUnder);
-					valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format']);
-					thisObj.setArray['backward'][stepFrom][selector][property] = valUnder;
-				}
-				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
-			}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
-				/*REPOSITION ANIMATE-SET*/
-				valStart = thisObj.cssDinamicElements[key]['value-start'];
-				valEnd = thisObj.cssDinamicElements[key]['value-end'];
-				if(isDinamic(valStart))
-					valStart = thisObj.convertParams(valStart);
-				if(isDinamic(valEnd))
-					valEnd = thisObj.convertParams(valEnd);
-				selector = thisObj.cssDinamicElements[key]['selector'];
-				property = thisObj.cssDinamicElements[key]['property'];
-				stepStart = thisObj.cssDinamicElements[key]['step-start'];
-				stepEnd = thisObj.cssDinamicElements[key]['step-end'];
-				moveOn = thisObj.cssDinamicElements[key]['move-on'];
-				for(pos=stepStart;pos<=stepEnd;pos++){
-					if((pos-stepStart)%moveOn==0){
-						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
-						thisObj.setArray['forward'][pos][selector][property] = value;
-						if(pos>stepStart)
-							thisObj.setArray['backward'][pos][selector][property] = oldValue;
-						oldValue = value;
-					}
-				}
-				if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-					changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-				if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-					changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
-			}
-		}
-		
-		/* REMAKE THE PAGE LAYOUT */
-		for(selector in changedElements){
-			for(key in changedElements[selector]){
-				property = changedElements[selector][key];
-				value = null;
-				for(pos=thisObj.getPos(Math.round(thisObj.lastStep));pos>=0;pos--){
-					if(typeof(thisObj.setArray['forward'][pos])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector])!="undefined" && typeof(thisObj.setArray['forward'][pos][selector][property])!="undefined")
-						value = thisObj.setArray['forward'][pos][selector][property];
-					else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
-						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
-					if(value!=null){
-						thisObj.setCSS(selector,changedElements[selector][key],value);
-						delete changedElements[selector][key];
-						break;
-					}
-				}
-			}
-		}
-		
-		for(selector in changedElements){
-			for(key in changedElements[selector]){
-				property = changedElements[selector][key];
-				value = null;
-				for(pos=thisObj.getPos(Math.round(thisObj.lastStep))+1;pos<=thisObj.getPos(thisObj.settings.max-1);pos++){
-					if(typeof(thisObj.setArray['backward'][pos])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector])!="undefined" && typeof(thisObj.setArray['backward'][pos][selector][property])!="undefined")
-						value = thisObj.setArray['backward'][pos][selector][property];
-					else if(typeof(thisObj.animPositions[pos])!="undefined" && typeof(thisObj.animPositions[pos][selector])!="undefined" && typeof(thisObj.animPositions[pos][selector][changedElements[selector][key]])!="undefined")
-						value = thisObj.animPositions[pos][selector][changedElements[selector][key]];
-					if(value!=null){
-						thisObj.setCSS(selector,changedElements[selector][key],value);
-						break;
-					}
-				}
-			}
-		}
-	}
 	
 	/*GETS START VALUES*/
 	isAlive.prototype.getStartCssValue = function(index){
@@ -721,10 +718,10 @@ Last modification on this file: 31 Octomber 2013
 		atStart = null;
 		for(pos=posFrom;pos>=0;pos--){
 			for(key in thisObj.settings.elements){
-				if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && (thisObj.settings.elements[key]['method']=="animate" || thisObj.settings.elements[key]['method']=="animate-set") && thisObj.settings.elements[key]['step-end']==pos)
-					return thisObj.settings.elements[key]['value-end'];
-				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set" && thisObj.settings.elements[key]['step-from']==pos)
+				if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set" && thisObj.settings.elements[key]['step-from']==pos)
 					return thisObj.settings.elements[key]['value-above'];
+				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && (thisObj.settings.elements[key]['method']=="animate" || thisObj.settings.elements[key]['method']=="animate-set") && thisObj.settings.elements[key]['step-end']==pos)
+					return thisObj.settings.elements[key]['value-end'];
 				else if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set@start" && pos==thisObj.settings.start)
 					return thisObj.settings.elements[key]['value'];
 			}
@@ -914,7 +911,8 @@ Last modification on this file: 31 Octomber 2013
 		var key;
 		var selector,property,className;
 		var valStart,valEnd;
-		var stepStart,stepEnd,value,oldValue;
+		var stepStart,stepEnd,value;
+		var oldValue = {};
 		
 		thisObj.setArray['forward'] = {};
 		thisObj.setArray['backward'] = {};
@@ -938,17 +936,16 @@ Last modification on this file: 31 Octomber 2013
 						stepStart = myElements[key]['step-start']; 
 						stepEnd = myElements[key]['step-end'];
 						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
-						if(value!==null){
-							if(typeof(thisObj.animPositions[pos])=="undefined")
-								thisObj.animPositions[pos]=[];
-							if(typeof(thisObj.animPositions[pos][myElements[key]['selector']])=="undefined")
-								thisObj.animPositions[pos][myElements[key]['selector']]=[];
-							thisObj.animPositions[pos][myElements[key]['selector']][myElements[key]['property']]=value;
-						}
+						if(typeof(thisObj.animPositions[pos])=="undefined")
+							thisObj.animPositions[pos]=[];
+						if(typeof(thisObj.animPositions[pos][myElements[key]['selector']])=="undefined")
+							thisObj.animPositions[pos][myElements[key]['selector']]=[];
+						thisObj.animPositions[pos][myElements[key]['selector']][myElements[key]['property']]=value;
 					}
 				}
 				else if(myElements[key]['method']=="animate-set"){
 					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end'] && (pos-myElements[key]['step-start'])%myElements[key]['move-on']==0){
+
 						selector = myElements[key]['selector']; 
 						property = myElements[key]['property']; 
 						valStart = myElements[key]['value-start']; 
@@ -956,19 +953,19 @@ Last modification on this file: 31 Octomber 2013
 						stepStart = myElements[key]['step-start']; 
 						stepEnd = myElements[key]['step-end'];
 						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
-						if(typeof(thisObj.setArray['forward'][pos])=="undefined")
-							thisObj.setArray['forward'][pos] = {};
-						if(typeof(thisObj.setArray['forward'][pos][selector])=="undefined")
-							thisObj.setArray['forward'][pos][selector] = {};
-						thisObj.setArray['forward'][pos][selector][property] = value;
-						if(pos>myElements[key]['step-start']){
+						if(pos>stepStart){
+							if(typeof(thisObj.setArray['forward'][pos])=="undefined")
+								thisObj.setArray['forward'][pos] = {};
+							if(typeof(thisObj.setArray['forward'][pos][selector])=="undefined")
+								thisObj.setArray['forward'][pos][selector] = {};
+							thisObj.setArray['forward'][pos][selector][property] = value;
 							if(typeof(thisObj.setArray['backward'][pos])=="undefined")
 								thisObj.setArray['backward'][pos] = {};
 							if(typeof(thisObj.setArray['backward'][pos][selector])=="undefined")
 								thisObj.setArray['backward'][pos][selector] = {};
-							thisObj.setArray['backward'][pos][selector][property] = oldValue;
+							thisObj.setArray['backward'][pos][selector][property] = oldValue[selector+'-'+property];
 						}
-						oldValue = value;
+						oldValue[selector+'-'+property] = value;
 					}
 				}
 				else if(myElements[key]['method']=="set"){
@@ -1447,12 +1444,10 @@ Last modification on this file: 31 Octomber 2013
 			thisObj.settings.max = 0;
 			for(key in thisObj.settings.elements){
 				if(thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set'){
-					if(typeof(thisObj.settings.elements[key]['step-end'])!="undefined" && thisObj.settings.elements[key]['step-end']>thisObj.settings.max)
-						thisObj.settings.max = thisObj.settings.elements[key]['step-end'];
+					thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-end']);
 				}
-				else if(thisObj.settings.elements[key]['method']=='set'){
-					if(typeof(thisObj.settings.elements[key]['step-from'])!="undefined" && thisObj.settings.elements[key]['step-from']>thisObj.settings.max)
-						thisObj.settings.max = thisObj.settings.elements[key]['step-from'];
+				else if(thisObj.settings.elements[key]['method']=='set' || thisObj.settings.elements[key]['method']=='add-class' || thisObj.settings.elements[key]['method']=='remove-class'){
+					thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-from']);
 				}
 			}
 		}
@@ -2632,7 +2627,7 @@ Last modification on this file: 31 Octomber 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.1.2";
+			return "1.1.3";
 		}
 	};
 	
