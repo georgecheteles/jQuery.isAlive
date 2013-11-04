@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.4)
+jQuery.isAlive(1.1.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 4 November 2013
+Last modification on this file: 5 November 2013
 */
 
 (function(jQuery) {
@@ -255,7 +255,6 @@ Last modification on this file: 4 November 2013
 	
 	function isAlive(selector,options){
 		
-		this.myTimer;
 		this.step=0;
 		this.lastStep=0;
 		this.animating = false;
@@ -320,7 +319,7 @@ Last modification on this file: 4 November 2013
 			wipeYFrom:20,
 			wipePoints:[],
 			stopTouch:true,
-			animateClass:'isalive-item-'+this.uniqId,
+			animateClass:'isalive-'+this.uniqId,
 			rebuildOnResize:true,
 			playPoints:[],
 			CSS3Easing:'linear', /*linear|ease|ease-in|ease-out|ease-in-out*/
@@ -1360,7 +1359,7 @@ Last modification on this file: 4 November 2013
 							
 				}
 		}
-		jQuery(thisObj.mySelector).addClass('isAlive-master-'+thisObj.uniqId);
+		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
 		
 		/*CHECKS IF ENABLE GPU IS VALID*/
 		if(thisObj.settings.enableGPU=="none" || typeof(myBrowserObj.webkit)=="undefined")
@@ -1726,7 +1725,6 @@ Last modification on this file: 4 November 2013
 		
 		//console.log('lastScroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Duration:'+thisObj.animateDuration);
 
-		clearInterval(thisObj.myTimer);
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating=true;
 		
@@ -1927,12 +1925,38 @@ Last modification on this file: 4 November 2013
 		var notAccepted = ["background-position","color","background-color",fixCSS3('transform')];
 		
 		/* STARTS ANIMATION */
-		thisObj.startTimer(thisObj.animateDuration,
-			function(now){
+		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
+			complete : function(){
+				var selector;
+				thisObj.animating = false;
+				thisObj.animationType='none';
+				thisObj.animateDuration = thisObj.settings.duration;
+				thisObj.forceAnimation = false;
+				
+				for(selector in thisObj.CSS3TransitionArray){
+					delete thisObj.CSS3TransitionArray[selector];
+					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+				}
+
+				if(thisObj.rebuildOnStop){
+					thisObj.rebuildLayout();
+					thisObj.rebuildOnStop = false;
+				}
+				
+				if(thisObj.onComplete!==null){
+					thisObj.onComplete();
+					thisObj.onComplete = null;
+				}
+				
+			},
+			step: function(now, fx) {
+			
 				var key,pos,step,selector,property,className,direction;
 				
-				var value = Math.round((stepStart+(((stepEnd-stepStart)/100)*now))*100)/100;
+				var value = Math.round((stepStart+(((stepEnd-stepStart)/100)*(now-fx.start)))*100)/100;
+				
 				thisObj.lastStep = value;
+				
 				var valid = false;
 				
 				if(firstTime){
@@ -2036,46 +2060,8 @@ Last modification on this file: 4 November 2013
 						}
 					}
 				}
-			},
-			function(){
-				var selector;
-				thisObj.animating = false;
-				thisObj.animationType='none';
-				thisObj.animateDuration = thisObj.settings.duration;
-				thisObj.forceAnimation = false;
-				
-				for(selector in thisObj.CSS3TransitionArray){
-					delete thisObj.CSS3TransitionArray[selector];
-					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
-				}
-
-				if(thisObj.rebuildOnStop){
-					thisObj.rebuildLayout();
-					thisObj.rebuildOnStop = false;
-				}
-				
-				if(thisObj.onComplete!==null){
-					thisObj.onComplete();
-					thisObj.onComplete = null;
-				}
 			}
-		);
-	}
-	
-	isAlive.prototype.startTimer = function(duration,onStep,onComplete){
-		var thisObj = this;
-		var start = new Date().getTime();
-		onStep(0);
-		thisObj.myTimer = setInterval(function(){
-			var now = new Date().getTime() - start;
-			if(now<duration)
-				onStep(Math.floor((now/duration)*100));
-			else{
-				clearInterval(thisObj.myTimer);
-				onStep(100);
-				onComplete();
-			}
-		},13);
+		});
 	}
 	
 	/* FUNCTION FOR JUMP */
@@ -2479,7 +2465,6 @@ Last modification on this file: 4 November 2013
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
-		clearInterval(thisObj.myTimer);
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating = false;
 		thisObj.forceAnimation = false;
@@ -2644,7 +2629,7 @@ Last modification on this file: 4 November 2013
 			return myBrowserObj;
 		},
 		getVersion : function(){
-			return "1.1.4";
+			return "1.1.5";
 		}
 	};
 	

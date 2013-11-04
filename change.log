@@ -1,5 +1,8 @@
 jQuery isAlive Changelog
 
+ver. 1.1.5 (5 November 2013)
+ - animated items get back the same class as the master element (isAlive-[random])
+
 ver. 1.1.4 (4 November 2013)
  - speed improvements
  - animated items now get a new kind of class (isAlive-item-[random])
