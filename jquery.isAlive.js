@@ -1445,10 +1445,12 @@ Last modification on this file: 4 November 2013
 			thisObj.settings.max = 0;
 			for(key in thisObj.settings.elements){
 				if(thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set'){
-					thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-end']);
+					if(typeof(thisObj.settings.elements[key]['step-end'])!='undefined')
+						thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-end']);
 				}
 				else if(thisObj.settings.elements[key]['method']=='set' || thisObj.settings.elements[key]['method']=='add-class' || thisObj.settings.elements[key]['method']=='remove-class'){
-					thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-from']);
+					if(typeof(thisObj.settings.elements[key]['step-from'])!='undefined')
+						thisObj.settings.max = Math.max(thisObj.settings.max,thisObj.settings.elements[key]['step-from']);
 				}
 			}
 		}
