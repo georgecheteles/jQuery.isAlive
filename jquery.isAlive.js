@@ -2634,7 +2634,7 @@ Last modification on this file: 5 November 2013
 			return mFunc(this,options);
 		}
 		else
-			return isReady;
+			return (typeof(method)=='undefined')?isReady:false;
 	};
 	   
 /*JQUERY PLUGIN PART:END*/
