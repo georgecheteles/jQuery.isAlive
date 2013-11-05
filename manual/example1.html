@@ -8,6 +8,7 @@
 		<script src="../jquery-1.9.1.min.js"></script>
 		<script src="../jquery.isAlive.js"></script>
 		<script src="../easing.js"></script>
+		<script src="../jquery.isAlive.helper.js"></script>
 		<script>
 			var animations1 = {
 				0:{
@@ -88,6 +89,7 @@
 					"property":"left",
 					"value":"eval((elementWidth/2)-50)"
 				}
+				
 			};
 			var animations2 = {
 				"#drawSurface2 .myDiv1":{
@@ -174,7 +176,17 @@
 						"method":"static",
 						"property":"left",
 						"value":"eval((elementWidth/2)-50)"
+					},
+					4:{
+						"method":"animate",
+						"property":rotateIE, /*A FUNCTION FROM JQUERY.ISALIVE.HELPER.JS*/
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":90,
+						"+browsers":"msie7|msie8" /*THIS WILL WORK ONLY ON IE7 & IE8*/
 					}
+					
 				}
 			};
 
@@ -222,14 +234,14 @@
 				<div class="myDiv1 myDiv">animate</div>
 				<div class="myDiv2 myDiv">animate-set</div>
 				<div class="myDiv3 myDiv">set</div>
-				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static</div>
+				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
 			</div>
 			<p>
 				The red rectangle animates to left,top,opacity and rotation.<br/>
 				The yellow rectangle animates-set to left 2 by 2 steps.<br/>
 				The blue rectangle is set at step 5 and then at step 10.<br/>
 				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-				The green rectangle shows how static method works.<br/>
+				The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
 				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
 				CSS3 is used for this animations.
 			</p>

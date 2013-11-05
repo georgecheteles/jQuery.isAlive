@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.1.6 (5 November 2013)
+ - bug fixed
+ - added the jquery.isAlive.helper.js(0.0.1) | a collection of functions that can be used with the plugin
+
 ver. 1.1.5 (5 November 2013)
  - animated items get back the same class as the master element (isAlive-[random])
 

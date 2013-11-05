@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.5)
+jQuery.isAlive(1.1.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -20,10 +20,7 @@ Last modification on this file: 5 November 2013
 	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS*/
 	var isAliveObjects = [];
 	var isReady = false;
-	var myBrowserObj = null;
-	var ieFound = null;
-	var browserVer = null;
-	var isMobile = false;
+	var browserObj = null;
 	var indexOf = null;
 	
 	var resizeTimer;
@@ -57,14 +54,14 @@ Last modification on this file: 5 November 2013
 	function validateBrowsers(exp){
 		var isValid = function(browser){
 			var validBrowser = false;
-			if(myBrowserObj[browser]) validBrowser = true;
-			if(browser=="msie7-" && ieFound && browserVer<7) validBrowser = true;
-			if(browser=="msie7" && ieFound && browserVer==7) validBrowser = true;
-			if(browser=="msie8" && ieFound && browserVer==8) validBrowser = true;
-			if(browser=="msie9" && ieFound && browserVer==9) validBrowser = true;
-			if(browser=="msie10" && ieFound && browserVer==10) validBrowser = true;
-			if(browser=="msie10+" && ieFound && browserVer>10) validBrowser = true;
-			if(browser=="unknown" && typeof(myBrowserObj.webkit)=="undefined" && typeof(myBrowserObj.mozilla)=="undefined" && typeof(myBrowserObj.opera)=="undefined" && typeof(myBrowserObj.msie)=="undefined") validBrowser = true;
+			if(browserObj[browser]) validBrowser = true;
+			if(browser=="msie7-" && browserObj.msie && parseInt(browserObj.version)<7) validBrowser = true;
+			if(browser=="msie7" && browserObj.msie && parseInt(browserObj.version)==7) validBrowser = true;
+			if(browser=="msie8" && browserObj.msie && parseInt(browserObj.version)==8) validBrowser = true;
+			if(browser=="msie9" && browserObj.msie && parseInt(browserObj.version)==9) validBrowser = true;
+			if(browser=="msie10" && browserObj.msie && parseInt(browserObj.version)==10) validBrowser = true;
+			if(browser=="msie10+" && browserObj.msie && parseInt(browserObj.version)>10) validBrowser = true;
+			if(browser=="unknown" && typeof(browserObj.webkit)=="undefined" && typeof(browserObj.mozilla)=="undefined" && typeof(browserObj.opera)=="undefined" && typeof(browserObj.msie)=="undefined") validBrowser = true;
 			return validBrowser;
 		}
 		var valid = false;
@@ -128,7 +125,7 @@ Last modification on this file: 5 November 2013
 	}
 	
 	/* DETECTS BROWSER / ENGINE / VERSION */
-	function myBrowser(){
+	function getBrowser(){
 		/* DEPRECATED FUNCTION COPIED FROM "jQuery JavaScript Library v1.8.2"*/ 
 		var matched, browser;
 		var userAgent = (navigator.userAgent||navigator.vendor||window.opera);
@@ -184,13 +181,13 @@ Last modification on this file: 5 November 2013
 	function fixCSS3(property){
 		var propertyT = property.toLowerCase();
 		if(propertyT=='transform' || propertyT=='filter' || propertyT.indexOf('transition')!=-1){
-			if(myBrowserObj.webkit)
+			if(browserObj.webkit)
 				return "-webkit-"+property;
-			if(myBrowserObj.mozilla)
+			if(browserObj.mozilla)
 				return "-moz-"+property;
-			if(myBrowserObj.msie)
+			if(browserObj.msie)
 				return "-ms-"+property;
-			if(myBrowserObj.opera)
+			if(browserObj.opera)
 				return "-o-"+property;
 		}
 		return property;
@@ -1126,14 +1123,12 @@ Last modification on this file: 5 November 2013
 		
 		/*GET IE VERSION AND BIND RESIZE*/
 		if(!isReady){
+			
 			isReady = true;
-			myBrowserObj = myBrowser();
-			ieFound = (myBrowserObj.msie==true);
-			browserVer = parseInt(myBrowserObj.version);
-			isMobile = (myBrowserObj.mobile==true);
+			browserObj = getBrowser();
 			
 			/* ARRAY SEARCH FOR IE7&IE8 FIX*/
-			if(!ieFound || (ieFound && browserVer>=9)){
+			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>=9)){
 				indexOf = function (myArray,myValue){
 					return myArray.indexOf(myValue);
 				}
@@ -1199,7 +1194,7 @@ Last modification on this file: 5 November 2013
 		if(thisObj.settings.enableTouch && (thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
 			thisObj.settings.enableTouch = false;
 
-		if(thisObj.settings.enableTouch && ieFound && browserVer>=10 && thisObj.settings.stopTouch){
+		if(thisObj.settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && thisObj.settings.stopTouch){
 			thisObj.msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');			
 			jQuery(thisObj.mySelector).css('-ms-touch-action',"none");			
 		}
@@ -1245,7 +1240,7 @@ Last modification on this file: 5 November 2013
 		thisObj.settings.touchActions = jQuery.extend({up:1,down:-1,right:0,left:0},thisObj.settings.touchActions);
 			
 		/*IE9 AND LOWER FIX FOR CSS3*/
-		if(ieFound && browserVer<10 && thisObj.settings.useCSS3)
+		if(browserObj.msie && parseInt(browserObj.version)<10 && thisObj.settings.useCSS3)
 			thisObj.settings.useCSS3 = false;
 		
 		/*SORT AND INIT STEP POINTS*/	
@@ -1315,13 +1310,13 @@ Last modification on this file: 5 November 2013
 					if(thisObj.settings.elements[key]['property']=='scrollleft') thisObj.settings.elements[key]['property'] = 'scrollLeft';
 					
 					/*CSS3 DOES NOT WORK ON IE7&IE8*/
-					if(isCSS3(thisObj.settings.elements[key]['property']) && ieFound && browserVer<9){
+					if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
 						delete thisObj.settings.elements[key];
 						continue;
 					}
 					
 					/*CSS3 WILL FALLBACK TO JQUERY*/
-					if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && ieFound && browserVer<10){
+					if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && browserObj.msie && parseInt(browserObj.version)<10){
 						delete thisObj.settings.elements[key]['useCSS3'];
 						delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
@@ -1362,7 +1357,7 @@ Last modification on this file: 5 November 2013
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
 		
 		/*CHECKS IF ENABLE GPU IS VALID*/
-		if(thisObj.settings.enableGPU=="none" || typeof(myBrowserObj.webkit)=="undefined")
+		if(thisObj.settings.enableGPU=="none" || typeof(browserObj.webkit)=="undefined")
 			var validGPU = false;
 		else
 			var validGPU = validateBrowsers(thisObj.settings.enableGPU);
@@ -1372,7 +1367,7 @@ Last modification on this file: 5 November 2013
 		for(key in thisObj.settings.elements){
 			
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
-			if(!ieFound || (ieFound && browserVer>9))
+			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
 					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-property'));
@@ -1389,7 +1384,7 @@ Last modification on this file: 5 November 2013
 				}
 			
 			/*FIXES IE OPACITY BUG*/
-			if(ieFound && browserVer<9 && thisObj.settings.elements[key]['property']=='opacity' && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){		
+			if(browserObj.msie && parseInt(browserObj.version)<9 && thisObj.settings.elements[key]['property']=='opacity' && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){		
 				var cssValue=parseFloat(jQuery(thisObj.settings.elements[key]['selector']).css('opacity'));
 				jQuery(thisObj.settings.elements[key]['selector']).css('opacity',cssValue);
 				tempArray.push(thisObj.settings.elements[key]['selector']);
@@ -2595,11 +2590,11 @@ Last modification on this file: 5 November 2013
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowTouch = options;
-			if(options==true && isAliveObjects[selector].settings.enableTouch && ieFound && browserVer>=10 && isAliveObjects[selector].settings.stopTouch){
+			if(options==true && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.stopTouch){
 				isAliveObjects[selector].msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');
 				jQuery(selector).css('-ms-touch-action',"none");				
 			}
-			else if(options==false && isAliveObjects[selector].settings.enableTouch && ieFound && browserVer>=10 && isAliveObjects[selector].settings.stopTouch)
+			else if(options==false && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.stopTouch)
 				jQuery(selector).css('-ms-touch-action',isAliveObjects[selector].msTouchAction);
 			return thisObj;
 		},
@@ -2626,10 +2621,10 @@ Last modification on this file: 5 November 2013
 			return (isAliveObjects[selector].settings.max-1);
 		},
 		getBrowser : function(){
-			return myBrowserObj;
+			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.1.5";
+			return "1.1.6";
 		}
 	};
 	
@@ -2639,7 +2634,7 @@ Last modification on this file: 5 November 2013
 			return mFunc(this,options);
 		}
 		else
-			return false;
+			return isReady;
 	};
 	   
 /*JQUERY PLUGIN PART:END*/
