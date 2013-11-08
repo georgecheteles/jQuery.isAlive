@@ -1,5 +1,11 @@
 jQuery isAlive Changelog
 
+ver. 1.1.8 (8 November 2013)
+ - small code chamges
+
+ver. 1.1.7 (6 November 2013)
+ - bug fixed
+ 
 ver. 1.1.6 (5 November 2013)
  - bug fixed
  - added the jquery.isAlive.helper.js(0.0.1) | a collection of functions that can be used with the plugin

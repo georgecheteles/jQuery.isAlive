@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.6)
+jQuery.isAlive(1.1.8)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 5 November 2013
+Last modification on this file: 8 November 2013
 */
 
 (function(jQuery) {
@@ -1946,7 +1946,7 @@ Last modification on this file: 5 November 2013
 			},
 			step: function(now, fx) {
 			
-				var key,pos,step,selector,property,className,direction;
+				var pos,step,selector,property,className,direction;
 				
 				var value = Math.round((stepStart+(((stepEnd-stepStart)/100)*(now-fx.start)))*100)/100;
 				
@@ -2001,32 +2001,32 @@ Last modification on this file: 5 November 2013
 						
 						/*ANIMATE*/
 		    			if(step!=stepEnd && typeof(animations[step])!="undefined"){
-					    	for(id in animations[step]){
-						    	for(key in animations[step][id]){
+					    	for(selector in animations[step]){
+						    	for(property in animations[step][selector]){
 						    		delay = 0;
-						    		if(directionForward && (animations[step][id][key]['end']-thisObj.getPos(value))>0)
-						    			delay = animations[step][id][key]['duration']*((animations[step][id][key]['end']-thisObj.getPos(value))/(animations[step][id][key]['end']-thisObj.getPos(step)));
-						    		else if(!directionForward && (thisObj.getPos(value)-animations[step][id][key]['end'])>0)
-						    			delay = animations[step][id][key]['duration']*((thisObj.getPos(value)-animations[step][id][key]['end'])/(thisObj.getPos(step)-animations[step][id][key]['end']));
-							    	if(animations[step][id][key]['CSS3']!=true){
-										if(indexOf(notAccepted,key)==-1 && typeof(thisObj.functionsArray[key])=="undefined"){
+						    		if(directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0)
+						    			delay = animations[step][selector][property]['duration']*((animations[step][selector][property]['end']-thisObj.getPos(value))/(animations[step][selector][property]['end']-thisObj.getPos(step)));
+						    		else if(!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0)
+						    			delay = animations[step][selector][property]['duration']*((thisObj.getPos(value)-animations[step][selector][property]['end'])/(thisObj.getPos(step)-animations[step][selector][property]['end']));
+							    	if(animations[step][selector][property]['CSS3']!=true){
+										if(indexOf(notAccepted,property)==-1 && typeof(thisObj.functionsArray[property])=="undefined"){
 											var animObj = {};
-											animObj[key] = animations[step][id][key]['to'];
-											jQuery(id).animate(animObj,{duration:delay,easing:animations[step][id][key]['easing'],queue:false});										
+											animObj[property] = animations[step][selector][property]['to'];
+											jQuery(selector).animate(animObj,{duration:delay,easing:animations[step][selector][property]['easing'],queue:false});										
 										}
 										else
-											thisObj.myAnimate(step,id,key,animations[step][id][key]['to'],delay,animations[step][id][key]['easing']);
+											thisObj.myAnimate(step,selector,property,animations[step][selector][property]['to'],delay,animations[step][selector][property]['easing']);
 							    	}	
 							    	else{
-										CSS3ValuesArray[key] = animations[step][id][key]['to'];
-										if(typeof(thisObj.CSS3TransitionArray[id])=="undefined")
-											thisObj.CSS3TransitionArray[id] = {};
-							    		thisObj.CSS3TransitionArray[id][key] = key+' '+parseFloat(delay/1000)+'s '+animations[step][id][key]['easing'];
+										CSS3ValuesArray[property] = animations[step][selector][property]['to'];
+										if(typeof(thisObj.CSS3TransitionArray[selector])=="undefined")
+											thisObj.CSS3TransitionArray[selector] = {};
+							    		thisObj.CSS3TransitionArray[selector][property] = property+' '+parseFloat(delay/1000)+'s '+animations[step][selector][property]['easing'];
 							    		CSS3Found = true;
 							    	}
 						    	}
 						    	if(CSS3Found){
-									thisObj.setCSS(id,CSS3ValuesArray);
+									thisObj.setCSS(selector,CSS3ValuesArray);
 									CSS3ValuesArray = {};
 									CSS3Found = false;
 						    	}
@@ -2378,11 +2378,9 @@ Last modification on this file: 5 November 2013
 		if(thisObj.getPos(thisObj.step) == step)
 			return false;
 		
-		var key,pos;
-		var pointFound,pointFoundSelector,direction;
+		var pos,pointFound,pointFoundSelector,direction;
 		var valuesCSS = {};
 		var valuesClasses = {};
-		var id = 0;
 		var selector,property,className;
 		
 		pos = thisObj.step;
@@ -2478,6 +2476,56 @@ Last modification on this file: 5 November 2013
 			thisObj.rebuildOnStop = false;
 		}
 	}
+
+	/*PLAYS ANIMATIONS TO THE NEXT PLAY POINT*/	
+	isAlive.prototype.play = function(options){
+		var thisObj = this;
+		if(thisObj.settings.playPoints.length<=1)
+			return false;
+		if(typeof(options) == "undefined")
+			options = {};
+		var pos = Math.floor(thisObj.getPos(thisObj.lastStep));
+		var max = thisObj.settings.max-1;
+		var found = null; 
+		for(var i=pos+1;i<=max;i++)
+			if(indexOf(thisObj.settings.playPoints,i)!=-1){
+				found = i;
+				break
+			}
+		if(found==null && thisObj.settings.loop)
+			found = thisObj.settings.playPoints[0];
+		if(found==null)
+			return false;
+		options['to'] = found;
+		options['orientation'] = 'next';
+		options['animationType'] = 'play';
+		thisObj.goTo(options);
+	}
+
+	/*PLAYS BACK ANIMATIONS TO THE PREV PLAY POINT*/
+	isAlive.prototype.rewind = function(options){
+		var thisObj = this;
+		if(thisObj.settings.playPoints.length<=1)
+			return false;
+		if(typeof(options) == "undefined")
+			options = {};
+		var pos = Math.ceil(thisObj.getPos(thisObj.lastStep));
+		var found = null; 
+		for(var i=pos-1;i>=0;i--)
+			if(indexOf(thisObj.settings.playPoints,i)!=-1){
+				found = i;
+				break
+			}
+		if(found==null && thisObj.settings.loop)
+			found = thisObj.settings.playPoints[thisObj.settings.playPoints.length-1];
+		if(found==null)
+			return false;
+		options['to'] = found;
+		options['orientation'] = 'prev';
+		options['animationType'] = 'rewind';
+		thisObj.goTo(options);
+	}
+
 	
 /*ISALIVE MAIN OBJECT:END*/
 	
@@ -2515,53 +2563,14 @@ Last modification on this file: 5 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			var playPoints = isAliveObjects[selector].settings.playPoints;
-			if(playPoints.length<=1)
-				return false;
-			if(typeof(options) == "undefined")
-				options = {};
-			var pos = Math.floor(isAliveObjects[selector].getPos(isAliveObjects[selector].lastStep));
-			var max = isAliveObjects[selector].settings.max-1;
-			var found = null; 
-			for(var i=pos+1;i<=max;i++)
-				if(indexOf(playPoints,i)!=-1){
-					found = i;
-					break
-				}
-			if(found==null && isAliveObjects[selector].settings.loop)
-				found = playPoints[0];
-			if(found==null)
-				return false;
-			options['to'] = found;
-			options['orientation'] = 'next';
-			options['animationType'] = 'play';
-			isAliveObjects[selector].goTo(options);
+			isAliveObjects[selector].play(options);
 			return thisObj;
 		},
 		rewind : function(thisObj,options){
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			var playPoints = isAliveObjects[selector].settings.playPoints;
-			if(playPoints.length<=1)
-				return false;
-			if(typeof(options) == "undefined")
-				options = {};
-			var pos = Math.ceil(isAliveObjects[selector].getPos(isAliveObjects[selector].lastStep));
-			var found = null; 
-			for(var i=pos-1;i>=0;i--)
-				if(indexOf(playPoints,i)!=-1){
-					found = i;
-					break
-				}
-			if(found==null && isAliveObjects[selector].settings.loop)
-				found = playPoints[playPoints.length-1];
-			if(found==null)
-				return false;
-			options['to'] = found;
-			options['orientation'] = 'prev';
-			options['animationType'] = 'rewind';
-			isAliveObjects[selector].goTo(options);
+			isAliveObjects[selector].rewind(options);
 			return thisObj;
 		},
 		stop : function(thisObj,options){
@@ -2624,7 +2633,7 @@ Last modification on this file: 5 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.1.6";
+			return "1.1.7";
 		}
 	};
 	
