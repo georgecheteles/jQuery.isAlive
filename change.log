@@ -1,5 +1,8 @@
 jQuery isAlive Changelog
 
+ver. 1.1.10 (9 November 2013)
+ - removed the jquery.isAlive scrollbar attribute
+
 ver. 1.1.9 (9 November 2013)
  - bug fixed
 

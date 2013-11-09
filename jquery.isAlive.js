@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.9)
+jQuery.isAlive(1.1.10)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 9 November 2013
+Last modification on this file: 10 November 2013
 */
 
 (function(jQuery) {
@@ -1511,6 +1511,171 @@ Last modification on this file: 9 November 2013
 		/*THIS FUNCTION CREATES ANIMATION, SET AND CLASS ARRAYS*/
 		thisObj.createElementsArray();
 		
+		/*SCROLLBAR EVENTS*/
+		var addScrollbarEvents = function(scrollBarObj,scrollbarKey){
+
+			var mousedownFunction = function(e,eType,myObj){
+			
+				if(thisObj.forceAnimation)
+					return false;
+					
+				if(window.navigator.msPointerEnabled && !thisObj.settings.enableScrollbarTouch)
+					if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
+						return false;
+				
+				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
+				
+				thisObj.scrollbarActive = scrollbarKey; 						
+				
+				if(eType=="mousedown"){
+					jQuery('body').bind("selectstart.disableSelection",function(e){
+						e.preventDefault();
+					});
+					htmlUnselectableAttr = jQuery('body').attr('unselectable');
+					cssUserSelect = jQuery('body').css('user-select');
+					jQuery('body').attr('unselectable', 'on').css('user-select', 'none');
+				}
+				
+				if(thisObj.settings.scrollbarActiveClass!=null)
+					jQuery(thisObj.settings.elements[scrollbarKey]['selector']).addClass(thisObj.settings.scrollbarActiveClass);
+				
+				if(eType=="mousedown"){
+					if(thisObj.settings.elements[scrollbarKey]['property']=="top"){
+						parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
+						clickPos = e.pageY - jQuery(scrollBarObj).offset().top;
+					}else{
+						parentTopLeft = jQuery(scrollBarObj).parent().offset().left;
+						clickPos = e.pageX - jQuery(scrollBarObj).offset().left;
+					}
+				} else if(eType=="touchstart"){
+					if(thisObj.settings.elements[scrollbarKey]['property']=="top"){
+						parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
+						clickPos = e.touches[0].pageY - jQuery(scrollBarObj).offset().top;
+					}else{
+						parentTopLeft = jQuery(scrollBarObj).parent().offset().left;
+						clickPos = e.touches[0].pageX - jQuery(scrollBarObj).offset().left;
+					}
+				}
+				
+				scrollBarPosition = thisObj.getPos(Math.round(thisObj.lastStep));
+				var mousemoveFunction = function(e,eType){
+
+					if(eType=='mousemove'){
+						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
+							var mouseNow = (e.pageY - parentTopLeft)-clickPos;
+						else
+							var mouseNow = (e.pageX - parentTopLeft)-clickPos;
+					} else if(eType=='touchmove'){
+						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
+							var mouseNow = (e.touches[0].pageY - parentTopLeft)-clickPos;
+						else
+							var mouseNow = (e.touches[0].pageX - parentTopLeft)-clickPos;
+					}
+					
+					if(mouseNow>=thisObj.settings.elements[scrollbarKey]['value-start'] && mouseNow<=thisObj.settings.elements[scrollbarKey]['value-end'])
+						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],mouseNow);
+					else if(mouseNow<thisObj.settings.elements[scrollbarKey]['value-start']){
+						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],thisObj.settings.elements[scrollbarKey]['value-start']);
+						mouseNow = thisObj.settings.elements[scrollbarKey]['value-start'];
+					}
+					else if(mouseNow>thisObj.settings.elements[scrollbarKey]['value-end']){
+						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],thisObj.settings.elements[scrollbarKey]['value-end']);
+						mouseNow = thisObj.settings.elements[scrollbarKey]['value-end'];
+					}
+					
+					positionValid = false;
+					position = thisObj.settings.elements[scrollbarKey]['step-start']+Math.round(Math.abs(thisObj.settings.elements[scrollbarKey]['step-end']-thisObj.settings.elements[scrollbarKey]['step-start'])*((mouseNow-thisObj.settings.elements[scrollbarKey]['value-start'])/Math.abs(thisObj.settings.elements[scrollbarKey]['value-end']-thisObj.settings.elements[scrollbarKey]['value-start'])));
+					
+					if(thisObj.settings.scrollbarType=="scroll"){
+						positionTo = thisObj.settings.elements[scrollbarKey]['step-start']+(Math.round((position-thisObj.settings.elements[scrollbarKey]['step-start'])/thisObj.settings.stepsOnScrollbar)*thisObj.settings.stepsOnScrollbar);
+						if(Math.abs(scrollBarPosition-positionTo)>=thisObj.settings.stepsOnScrollbar)
+							positionValid = true;
+						else if(position!=scrollBarPosition && (position==thisObj.settings.elements[scrollbarKey]['step-start'] || position==thisObj.settings.elements[scrollbarKey]['step-end'])){
+							positionValid = true;
+							positionTo = position;
+						}
+					}else{
+						if(scrollBarPosition<position){
+							for(var i=position;i>=scrollBarPosition+1;i--){
+								if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
+									positionValid = true;
+									positionTo = i;
+									break;
+								}
+							}
+						}else if(scrollBarPosition>position){
+							for(var i=position;i<=scrollBarPosition-1;i++){
+								if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
+									positionValid = true;
+									positionTo = i;
+									break;
+								}
+							}
+						}
+					}
+					
+					if(positionValid){
+						scrollBarPosition=positionTo;
+						if(thisObj.getPos(thisObj.lastStep)<positionTo)
+							thisObj.goTo({to:positionTo,orientation:'next',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
+						else if(thisObj.getPos(thisObj.lastStep)>positionTo)
+							thisObj.goTo({to:positionTo,orientation:'prev',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
+					}
+				}
+				
+				if(eType=="mousedown"){
+					jQuery(document).bind('mousemove.myEventMouseMove',function(e){
+						mousemoveFunction(e,'mousemove');
+					});
+					jQuery(document).bind('mouseup.myEventMouseUp',function(){
+						jQuery(document).unbind('mousemove.myEventMouseMove');
+						jQuery(document).unbind('mouseup.myEventMouseUp');
+						jQuery('body').unbind("selectstart.disableSelection");
+						(typeof(htmlUnselectableAttr)!='undefined') ? jQuery('body').attr('unselectable',htmlUnselectableAttr) : jQuery('body').removeAttr('unselectable');  
+						(typeof(cssUserSelect)!='undefined') ? jQuery('body').css('user-select', cssUserSelect) : false;  
+						if(thisObj.settings.scrollbarActiveClass!=null)
+							jQuery(thisObj.settings.elements[scrollbarKey]['selector']).removeClass(thisObj.settings.scrollbarActiveClass);
+					});
+				}
+
+				if(eType=="touchstart"){
+					var touchmoveFunction = function(e){
+						e.preventDefault();
+						mousemoveFunction(e,'touchmove');
+					}
+					scrollBarObj.addEventListener('touchmove',touchmoveFunction,false);
+					var touchendFunction = function(e){
+						scrollBarObj.removeEventListener('touchmove',touchmoveFunction);
+						scrollBarObj.removeEventListener('touchend',touchendFunction);
+						if(thisObj.settings.scrollbarActiveClass!=null)
+							jQuery(thisObj.settings.elements[scrollbarKey]['selector']).removeClass(thisObj.settings.scrollbarActiveClass);
+					}
+					scrollBarObj.addEventListener('touchend',touchendFunction,false);
+				}
+			}
+			
+			if(window.navigator.msPointerEnabled){
+				if(thisObj.settings.enableScrollbarTouch)
+					jQuery(scrollBarObj).css('-ms-touch-action',"none");
+				scrollBarObj.addEventListener('MSPointerDown',function(e){
+					mousedownFunction(e,'mousedown',this);
+					e.stopPropagation();					
+				}, false);
+					
+			} else if('onmousedown' in document.documentElement){
+				jQuery(scrollBarObj).bind('mousedown',function(e){
+					mousedownFunction(e,'mousedown',this);
+					e.stopPropagation();					
+				});
+			}
+			if('ontouchstart' in document.documentElement && thisObj.settings.enableScrollbarTouch){
+				scrollBarObj.addEventListener('touchstart',function(e){
+					mousedownFunction(e,'touchstart',this);
+					e.stopPropagation();					
+				}, false);
+			}
+		}
+		
 		for(key in thisObj.settings.elements){
 			
 			/*DELETES ALL NON ANIMATED ELEMENTS*/
@@ -1524,175 +1689,9 @@ Last modification on this file: 9 November 2013
 				delete thisObj.settings.elements[key]['value-start'];
 				delete thisObj.settings.elements[key]['value-end'];
 			}else if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
-				jQuery(thisObj.settings.elements[key]['selector']).attr('isalive-'+thisObj.uniqId+'-scrollbar',key);
-
 				/*BINDS MOUSEEVENTS TO SCROLLBAR*/
 				jQuery(thisObj.settings.elements[key]['selector']).each(function(){
-					
-					var scrollBarObj = this;
-					
-					var mousedownFunction = function(e,eType,myObj){
-						
-						if(thisObj.forceAnimation)
-							return false;
-							
-						if(window.navigator.msPointerEnabled && !thisObj.settings.enableScrollbarTouch)
-							if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
-								return false;
-						
-						var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
-						
-						var scrollBarElement = jQuery(myObj).attr('isalive-'+thisObj.uniqId+'-scrollbar');
-						thisObj.scrollbarActive = scrollBarElement; 						
-						
-						if(eType=="mousedown"){
-							jQuery('body').bind("selectstart.disableSelection",function(e){
-								e.preventDefault();
-							});
-							htmlUnselectableAttr = jQuery('body').attr('unselectable');
-							cssUserSelect = jQuery('body').css('user-select');
-							jQuery('body').attr('unselectable', 'on').css('user-select', 'none');
-						}
-						
-						if(thisObj.settings.scrollbarActiveClass!=null)
-							jQuery(thisObj.settings.elements[scrollBarElement]['selector']).addClass(thisObj.settings.scrollbarActiveClass);
-						
-						if(eType=="mousedown"){
-							if(thisObj.settings.elements[scrollBarElement]['property']=="top"){
-								parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
-								clickPos = e.pageY - jQuery(scrollBarObj).offset().top;
-							}else{
-								parentTopLeft = jQuery(scrollBarObj).parent().offset().left;
-								clickPos = e.pageX - jQuery(scrollBarObj).offset().left;
-							}
-						} else if(eType=="touchstart"){
-							if(thisObj.settings.elements[scrollBarElement]['property']=="top"){
-								parentTopLeft = jQuery(scrollBarObj).parent().offset().top;
-								clickPos = e.touches[0].pageY - jQuery(scrollBarObj).offset().top;
-							}else{
-								parentTopLeft = jQuery(scrollBarObj).parent().offset().left;
-								clickPos = e.touches[0].pageX - jQuery(scrollBarObj).offset().left;
-							}
-						}
-						
-						scrollBarPosition = thisObj.getPos(Math.round(thisObj.lastStep));
-						var mousemoveFunction = function(e,eType){
-	
-							if(eType=='mousemove'){
-								if(thisObj.settings.elements[scrollBarElement]['property']=="top")
-									var mouseNow = (e.pageY - parentTopLeft)-clickPos;
-								else
-									var mouseNow = (e.pageX - parentTopLeft)-clickPos;
-							} else if(eType=='touchmove'){
-								if(thisObj.settings.elements[scrollBarElement]['property']=="top")
-									var mouseNow = (e.touches[0].pageY - parentTopLeft)-clickPos;
-								else
-									var mouseNow = (e.touches[0].pageX - parentTopLeft)-clickPos;
-							}
-							
-							if(mouseNow>=thisObj.settings.elements[scrollBarElement]['value-start'] && mouseNow<=thisObj.settings.elements[scrollBarElement]['value-end'])
-								jQuery(thisObj.settings.elements[scrollBarElement]['selector']).css(thisObj.settings.elements[scrollBarElement]['property'],mouseNow);
-							else if(mouseNow<thisObj.settings.elements[scrollBarElement]['value-start']){
-								jQuery(thisObj.settings.elements[scrollBarElement]['selector']).css(thisObj.settings.elements[scrollBarElement]['property'],thisObj.settings.elements[scrollBarElement]['value-start']);
-								mouseNow = thisObj.settings.elements[scrollBarElement]['value-start'];
-							}
-							else if(mouseNow>thisObj.settings.elements[scrollBarElement]['value-end']){
-								jQuery(thisObj.settings.elements[scrollBarElement]['selector']).css(thisObj.settings.elements[scrollBarElement]['property'],thisObj.settings.elements[scrollBarElement]['value-end']);
-								mouseNow = thisObj.settings.elements[scrollBarElement]['value-end'];
-							}
-							
-							positionValid = false;
-							position = thisObj.settings.elements[scrollBarElement]['step-start']+Math.round(Math.abs(thisObj.settings.elements[scrollBarElement]['step-end']-thisObj.settings.elements[scrollBarElement]['step-start'])*((mouseNow-thisObj.settings.elements[scrollBarElement]['value-start'])/Math.abs(thisObj.settings.elements[scrollBarElement]['value-end']-thisObj.settings.elements[scrollBarElement]['value-start'])));
-							
-							if(thisObj.settings.scrollbarType=="scroll"){
-								positionTo = thisObj.settings.elements[scrollBarElement]['step-start']+(Math.round((position-thisObj.settings.elements[scrollBarElement]['step-start'])/thisObj.settings.stepsOnScrollbar)*thisObj.settings.stepsOnScrollbar);
-								if(Math.abs(scrollBarPosition-positionTo)>=thisObj.settings.stepsOnScrollbar)
-									positionValid = true;
-								else if(position!=scrollBarPosition && (position==thisObj.settings.elements[scrollBarElement]['step-start'] || position==thisObj.settings.elements[scrollBarElement]['step-end'])){
-									positionValid = true;
-									positionTo = position;
-								}
-							}else{
-								if(scrollBarPosition<position){
-									for(var i=position;i>=scrollBarPosition+1;i--){
-										if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
-											positionValid = true;
-											positionTo = i;
-											break;
-										}
-									}
-								}else if(scrollBarPosition>position){
-									for(var i=position;i<=scrollBarPosition-1;i++){
-										if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
-											positionValid = true;
-											positionTo = i;
-											break;
-										}
-									}
-								}
-							}
-							
-							if(positionValid){
-								scrollBarPosition=positionTo;
-								if(thisObj.getPos(thisObj.lastStep)<positionTo)
-									thisObj.goTo({to:positionTo,orientation:'next',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
-								else if(thisObj.getPos(thisObj.lastStep)>positionTo)
-									thisObj.goTo({to:positionTo,orientation:'prev',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
-							}
-						}
-						
-						if(eType=="mousedown"){
-							jQuery(document).bind('mousemove.myEventMouseMove',function(e){
-								mousemoveFunction(e,'mousemove');
-							});
-							jQuery(document).bind('mouseup.myEventMouseUp',function(){
-								jQuery(document).unbind('mousemove.myEventMouseMove');
-								jQuery(document).unbind('mouseup.myEventMouseUp');
-								jQuery('body').unbind("selectstart.disableSelection");
-								(typeof(htmlUnselectableAttr)!='undefined') ? jQuery('body').attr('unselectable',htmlUnselectableAttr) : jQuery('body').removeAttr('unselectable');  
-								(typeof(cssUserSelect)!='undefined') ? jQuery('body').css('user-select', cssUserSelect) : false;  
-								if(thisObj.settings.scrollbarActiveClass!=null)
-									jQuery(thisObj.settings.elements[scrollBarElement]['selector']).removeClass(thisObj.settings.scrollbarActiveClass);
-							});
-						}
-	
-						if(eType=="touchstart"){
-							var touchmoveFunction = function(e){
-							    e.preventDefault();
-								mousemoveFunction(e,'touchmove');
-							}
-							scrollBarObj.addEventListener('touchmove',touchmoveFunction,false);
-							var touchendFunction = function(e){
-								scrollBarObj.removeEventListener('touchmove',touchmoveFunction);
-								scrollBarObj.removeEventListener('touchend',touchendFunction);
-								if(thisObj.settings.scrollbarActiveClass!=null)
-									jQuery(thisObj.settings.elements[scrollBarElement]['selector']).removeClass(thisObj.settings.scrollbarActiveClass);
-							}
-							scrollBarObj.addEventListener('touchend',touchendFunction,false);
-						}
-					}
-					
-					if(window.navigator.msPointerEnabled){
-						if(thisObj.settings.enableScrollbarTouch)
-							jQuery(scrollBarObj).css('-ms-touch-action',"none");
-						scrollBarObj.addEventListener('MSPointerDown',function(e){
-							mousedownFunction(e,'mousedown',this);
-						    e.stopPropagation();					
-						}, false);
-							
-					} else if('onmousedown' in document.documentElement){
-						jQuery(scrollBarObj).bind('mousedown',function(e){
-							mousedownFunction(e,'mousedown',this);
-							e.stopPropagation();					
-						});
-					}
-					if('ontouchstart' in document.documentElement && thisObj.settings.enableScrollbarTouch){
-						scrollBarObj.addEventListener('touchstart',function(e){
-							mousedownFunction(e,'touchstart',this);
-						    e.stopPropagation();					
-						}, false);
-					}
-					
+					addScrollbarEvents(this,key);
 				});
 			}
 		}
@@ -2629,7 +2628,7 @@ Last modification on this file: 9 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.1.9";
+			return "1.1.10";
 		}
 	};
 	
