@@ -1,3 +1,51 @@
+/*RESET*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+a {
+	text-decoration: none;
+	outline:none;
+}
+
+input[type=submit]{
+	outline:none;
+	padding:0;
+	margin:0;
+	border:0;
+}
+
 #wrapper{
 	margin:auto;
 	width:80%;
@@ -5,6 +53,10 @@
 
 .drawSurface{
 	position:relative;height:340px;background:#ccc;
+}
+
+#drawSurface2 {
+	margin-bottom:50px;
 }
 
 .myDiv{color:white;font-size:14px;text-align:center;}
@@ -17,6 +69,9 @@
 
 .myDiv4{position:absolute;top:0px;left:0px;width:100px;height:100px;background:green;color:white;}
 
+#drawSurface1 .myDiv5{position:absolute;top:0px;right:-50px;width:50px;height:50px;background:pink;color:white;cursor:pointer;}
+#drawSurface2 .myDiv5{position:absolute;bottom:-50px;left:0px;width:50px;height:50px;background:pink;color:white;cursor:pointer;}
+
 body.example-1 .myDiv2{
 	top:120px;
 }
@@ -27,4 +82,46 @@ body.example-1 .myDiv3{
 
 body.example-1 .myDiv4.round{
 	border-radius:100%;
+}
+
+a.action{
+	position:absolute;
+	display:block;
+	font-size:13px;
+	height:20px;
+	line-height:20px;
+	border:1px solid green;
+	border-radius:5px;
+	width:100px;
+	text-align:center;
+}
+
+a.action.btn1{
+	right:5px;
+	bottom:30px;
+}
+
+a.action.btn2{
+	right:5px;
+	bottom:5px;
+}
+
+h1{
+	font-size:24px;
+	font-weight:bold;
+}
+
+
+h2{
+	font-size:20px;
+	font-weight:bold;
+}
+
+h3{
+	font-size:16px;
+	font-weight:bold;
+}
+
+.example-wrapper{
+	padding:25px 0px;
 }

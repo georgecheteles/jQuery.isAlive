@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.8)
+jQuery.isAlive(1.1.9)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 8 November 2013
+Last modification on this file: 9 November 2013
 */
 
 (function(jQuery) {
@@ -285,7 +285,7 @@ Last modification on this file: 8 November 2013
 		this.rebuildOnStop = false;
 		this.newDragStarted = false;
 		this.msTouchAction;
-		this.tempCSSValues = {};
+		this.lastCSS = {};
 		
 		this.settings = jQuery.extend({}, {
 			elements:{},
@@ -362,14 +362,14 @@ Last modification on this file: 8 November 2013
 	}
 	
 	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
-	isAlive.prototype.myAnimate = function(startPos,selector,property,value,duration,easing){
+	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
 		
 		thisObj = this;
 		
-		if(typeof(thisObj.tempCSSValues[selector+'|'+property])=="undefined" || startPos==parseInt(startPos))
-			thisObj.tempCSSValues[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
+		if(startPos==parseInt(startPos) || typeof(thisObj.lastCSS[selector+'|'+property])=="undefined")
+			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
 
-		var start = thisObj.tempCSSValues[selector+'|'+property];
+		var start = thisObj.lastCSS[selector+'|'+property];
 		var end = value.toString();
 
 		var format = null;
@@ -416,7 +416,7 @@ Last modification on this file: 8 November 2013
 				CSSVal = arrayTemp.join(splitChar);
 				if(format!=null)
 					CSSVal = format+"("+CSSVal+")";
-				thisObj.tempCSSValues[selector+'|'+property] = CSSVal;
+				thisObj.lastCSS[selector+'|'+property] = CSSVal;
 				thisObj.setCSS(selector,property,CSSVal);
 			}
 		});
@@ -1729,7 +1729,6 @@ Last modification on this file: 8 November 2013
 		var end;
 		var timing;
 		var easing;
-		var delay;
 		var loop;
 		var directionForward;
 		var loopFound;
@@ -1946,7 +1945,7 @@ Last modification on this file: 8 November 2013
 			},
 			step: function(now, fx) {
 			
-				var pos,step,selector,property,className,direction;
+				var pos,step,selector,property,className,direction,duration;
 				
 				var value = Math.round((stepStart+(((stepEnd-stepStart)/100)*(now-fx.start)))*100)/100;
 				
@@ -1977,7 +1976,6 @@ Last modification on this file: 8 November 2013
 					}
 					
 					while((directionForward && step<=pos) || (!directionForward && step>=pos)){
-						
 						/*ANIMATE-SET && SET && ADD && REMOVE CLASS*/
 						if(step==parseInt(step)){
 							(directionForward)?direction = 'forward':((step!=stepEnd)?direction = 'backward':direction = 'forward');
@@ -2003,25 +2001,24 @@ Last modification on this file: 8 November 2013
 		    			if(step!=stepEnd && typeof(animations[step])!="undefined"){
 					    	for(selector in animations[step]){
 						    	for(property in animations[step][selector]){
-						    		delay = 0;
-						    		if(directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0)
-						    			delay = animations[step][selector][property]['duration']*((animations[step][selector][property]['end']-thisObj.getPos(value))/(animations[step][selector][property]['end']-thisObj.getPos(step)));
-						    		else if(!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0)
-						    			delay = animations[step][selector][property]['duration']*((thisObj.getPos(value)-animations[step][selector][property]['end'])/(thisObj.getPos(step)-animations[step][selector][property]['end']));
+						    		duration = 0;
+						    		if ((directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0) || (!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0))
+						    			duration = animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step)));
+										
 							    	if(animations[step][selector][property]['CSS3']!=true){
 										if(indexOf(notAccepted,property)==-1 && typeof(thisObj.functionsArray[property])=="undefined"){
 											var animObj = {};
 											animObj[property] = animations[step][selector][property]['to'];
-											jQuery(selector).animate(animObj,{duration:delay,easing:animations[step][selector][property]['easing'],queue:false});										
+											jQuery(selector).animate(animObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
 										}
 										else
-											thisObj.myAnimate(step,selector,property,animations[step][selector][property]['to'],delay,animations[step][selector][property]['easing']);
+											thisObj.animateCSS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
 							    	}	
 							    	else{
 										CSS3ValuesArray[property] = animations[step][selector][property]['to'];
 										if(typeof(thisObj.CSS3TransitionArray[selector])=="undefined")
 											thisObj.CSS3TransitionArray[selector] = {};
-							    		thisObj.CSS3TransitionArray[selector][property] = property+' '+parseFloat(delay/1000)+'s '+animations[step][selector][property]['easing'];
+							    		thisObj.CSS3TransitionArray[selector][property] = property+' '+parseFloat(duration/1000)+'s '+animations[step][selector][property]['easing'];
 							    		CSS3Found = true;
 							    	}
 						    	}
@@ -2525,7 +2522,6 @@ Last modification on this file: 8 November 2013
 		options['animationType'] = 'rewind';
 		thisObj.goTo(options);
 	}
-
 	
 /*ISALIVE MAIN OBJECT:END*/
 	
@@ -2633,7 +2629,7 @@ Last modification on this file: 8 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.1.7";
+			return "1.1.9";
 		}
 	};
 	

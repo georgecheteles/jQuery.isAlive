@@ -18,7 +18,7 @@
 					"step-start":0,
 					"step-end":10,
 					"value-start":0,
-					"value-end":450
+					"value-end":"eval(elementWidth-100)"
 				},
 				1:{
 					"selector":"#drawSurface1 .myDiv1",
@@ -88,7 +88,18 @@
 					"method":"set@start",
 					"property":"left",
 					"value":"eval((elementWidth/2)-50)"
-				}
+				},
+				10:{
+					"selector":"#drawSurface1 .myDiv5",
+					"method":"animate",
+					"property":"top",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":"eval(elementHeight-50)",
+					"easing":"linear",
+					"scrollbar":true
+				},
 				
 			};
 			var animations2 = {
@@ -186,7 +197,19 @@
 						"value-end":90,
 						"+browsers":"msie7|msie8" /*THIS WILL WORK ONLY ON IE7 & IE8*/
 					}
-					
+				},
+				"#drawSurface2 .myDiv5":{
+					0:{
+						"method":"animate",
+						"property":"left",
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":function(selector,dim){
+							return dim.elementWidth-50;
+						},
+						"scrollbar":true
+					}
 				}
 			};
 
@@ -195,56 +218,111 @@
 					elements:animations1,
 					elementsType:"linear",
 					easing:"easeOutBounce",
-					debug:true
+					scrollType:"scroll",
+					useCSS3:false,
+					enableTouch:true,
+					scrollbarType:"scrolll",
+					touchType:'drag',
+					enableScrollbarTouch:true,
+					debug:true,
+					dragYFrom:40
 				});
-			});
-			$(document).ready(function(){
+
 				jQuery('#drawSurface2').isAlive('create',{
 					elements:animations2,
 					elementsType:"tree",
-					useCSS3:true,
 					CSS3Easing:"ease-in",
-					debug:true
+					scrollType:"jump",
+					useCSS3:true,
+					enableTouch:true,
+					scrollbarType:"jump",
+					touchType:'wipe',
+					enableScrollbarTouch:true,
+					debug:false,
+					jumpPoints:[0,4,8,10],
+					wipePoints:[0,4,8,10],
+					playPoints:[0,4,8,10],
+					scrollbarPoints:[0,4,8,10],
+					
 				});
+
+				$('#drawSurface1 a.btn1').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:10,duration:2000});
+					return false;
+				});
+
+				$('#drawSurface1 a.btn2').click(function(){
+					jQuery('#drawSurface1').isAlive('skip',{to:5});
+					return false;
+				});
+
+				$('#drawSurface2 a.btn1').click(function(){
+					jQuery('#drawSurface2').isAlive('play',{duration:1000});
+					return false;
+				});
+
+				$('#drawSurface2 a.btn2').click(function(){
+					jQuery('#drawSurface2').isAlive('rewind',{duration:1000});
+					return false;
+				});
+
+				
+
 			});
+			
+			
 		</script>
 	</head>
 	<body class="example-1">
 		<div id="wrapper">
 			<h2 align="center">Simple jQuery.isAlive animation example</h2>
-			<h2 align="center">(scroll over the gray rectangles)</h2>
-			<h3>Linear structure:</h3>
-			<div id="drawSurface1" class="drawSurface">
-				<div class="myDiv1 myDiv">animate</div>
-				<div class="myDiv2 myDiv">animate-set</div>
-				<div class="myDiv3 myDiv">set</div>
-				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
+			<h2 align="center">(scroll or drag over the gray rectangles)</h2>
+			<div class="example-wrapper">
+				<h3>Linear structure:</h3>
+				<div id="drawSurface1" class="drawSurface">
+					<div class="myDiv1 myDiv">animate</div>
+					<div class="myDiv2 myDiv">animate-set</div>
+					<div class="myDiv3 myDiv">set</div>
+					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
+					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
+					<a href="#" class="action btn1">Go To Step 10</a>
+					<a href="#" class="action btn2">Skip Step 5</a>
+				</div>
+				<p>
+					The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
+					The "touchType" option is set to default "drag", this mean that the animations will play on each touch move.<br/>
+					The red rectangle animates to left,top.<br/>
+					The yellow rectangle animates-set to left and animates opacity to 20%.<br/>
+					The blue rectangle is set at step 5 and then at step 10.<br/>
+					The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+					The green rectangle shows how set@start method works.<br/>
+					All elements have an opacity animation.<br/>
+					The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
+				</p>
 			</div>
-			<p>
-				The red rectangle animates to left,top.<br/>
-				The yellow rectangle animates-set to left and animates opacity to 20%.<br/>
-				The blue rectangle is set at step 5 and then at step 10.<br/>
-				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-				The green rectangle shows how set@start method works.<br/>
-				All elements have an opacity animation.<br/>
-				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
-			</p>
-			<h3>Tree structure:</h3>
-			<div id="drawSurface2" class="drawSurface">
-				<div class="myDiv1 myDiv">animate</div>
-				<div class="myDiv2 myDiv">animate-set</div>
-				<div class="myDiv3 myDiv">set</div>
-				<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
+			<div class="example-wrapper">
+				<h3>Tree structure:</h3>
+				<div id="drawSurface2" class="drawSurface">
+					<div class="myDiv1 myDiv">animate</div>
+					<div class="myDiv2 myDiv">animate-set</div>
+					<div class="myDiv3 myDiv">set</div>
+					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
+					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
+					<a href="#" class="action btn1">Play</a>
+					<a href="#" class="action btn2">Rewind</a>
+				</div>
+				<p>
+					The "scrollType" option is set to "jump", this mean that the animations will jump on the steps indicated in "jumpPoints".<br/>
+					The "touchType" option is set to "wipe", this mean that the animations will jump on the steps indicated in "wipePoints".<br/>
+					The red rectangle animates to left,top,opacity and rotation.<br/>
+					The yellow rectangle animates-set to left 2 by 2 steps.<br/>
+					The blue rectangle is set at step 5 and then at step 10.<br/>
+					The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+					The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
+					The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
+					CSS3 is used for this animations.
+				</p>
 			</div>
-			<p>
-				The red rectangle animates to left,top,opacity and rotation.<br/>
-				The yellow rectangle animates-set to left 2 by 2 steps.<br/>
-				The blue rectangle is set at step 5 and then at step 10.<br/>
-				The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-				The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
-				The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
-				CSS3 is used for this animations.
-			</p>
 		</div>
 	</body>
 </html>
