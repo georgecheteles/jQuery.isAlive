@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.2.0 (11 November 2013)
+ - bug fixed
+ - adds "useIdAttribute" & "use-id-attribute" options
+
 ver. 1.1.10 (9 November 2013)
  - removed the jquery.isAlive scrollbar attribute
 

@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.1.X Manual</h1>
+				<h1>jQuery.isAlive 1.2.X Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -343,6 +343,13 @@
 							Values: none | webkit | chrome | safari | mobile | webkit&mobile | webkit!mobile | chrome&mobile | safari&mobile | chrome!mobile | safari!mobile<br/>
 							For webkit browsers you can enable the use of GPU. This will make your animation run smother but may also cause some bugs. This is usefull on mobile devices, but can use it on desktop too.
 						</p>
+						useIdAttribute:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: false<br/>
+							Values: true | false<br/>
+							If this is set to TRUE the plugin will use the "id" HTML attribute as a selector. If one is not avalaible then it will generate an ID. This is used for faster animations and prevent CSS3 bugs.
+						</p>
 						onStep:
 						<p class="exp">
 							Type: Function<br/>
@@ -387,6 +394,7 @@
 	"useCSS3": > true | false > force to use CSS3 or not
 	"easing": > easing for jQuery animations
 	"CSS3Easing": > easing for CSS3 animations
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 	"scrollbar": > true or false, if you want this element to act as a scrollbar. "property" setting must be "top" or "left".
@@ -407,6 +415,7 @@
 	"value-under": > CSS value at under this step<span class="red">*</span>
 	"value-above": > CSS value at above this step
 	"format": > this is used for special cases like working with CSS3 transform
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 }
@@ -427,6 +436,7 @@
 	"value-start": > CSS value at start<span class="red">*</span>
 	"value-end": > CSS value at end
 	"format": > this is used for special cases like animating CSS3
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 	"type" : > can be float or int, by default is float
@@ -446,6 +456,7 @@
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
 	"format": > this is used for special cases like working with CSS3 transform
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 }
@@ -463,6 +474,7 @@
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
 	"format": > this is used for special cases like working with CSS3 transform
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 }
@@ -479,6 +491,7 @@
 	"method": "add-class" > use "add-class" if you want to add a class to an element
 	"step-from": > step where the class will be added
 	"class-name": > the name of the class
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 }
@@ -495,6 +508,7 @@
 	"method": "remove-class" > use "remove-class" if you want to remove a class from an element
 	"step-from": > step where the class will be removed
 	"class-name": > the name of the class
+	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
 }
@@ -677,7 +691,7 @@ jQuery('#scroll-over-me').isAlive('enableScroll',false); //to disable
 					<p class="text">
 						<p class="imp">9. enableTouch</p>
 							<p class="blue">
-								Enables or dsiables touch events.
+								Enables or disables touch events.
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('enableTouch',true); //to enable
@@ -687,7 +701,7 @@ jQuery('#scroll-over-me').isAlive('enableTouch',false); //to disable
 					<p class="text">
 						<p class="imp">10. addOnComplete</p>
 							<p class="blue">
-								Adds a function that will be called when the animation in progres will end.
+								Adds a function that will be called when the animation in progress will end.
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('addOnComplete',myFunction); 

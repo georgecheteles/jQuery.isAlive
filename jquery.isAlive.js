@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.1.10)
+jQuery.isAlive(1.2.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 10 November 2013
+Last modification on this file: 11 November 2013
 */
 
 (function(jQuery) {
@@ -332,6 +332,7 @@ Last modification on this file: 10 November 2013
 			enableScrollbarTouch:false,
 			scrollDelay:250, /*number or false*/
 			enableGPU:"none", /*none|webki|chrome|safari|mozilla|msie|opera|mobile*/
+			useIdAttribute:false,
 			onStep:null,
 			onLoadingComplete:null,
 			onRebuild:null
@@ -1261,40 +1262,57 @@ Last modification on this file: 10 November 2013
 
 		/*FOR GROUP ELEMENTS CREATES NEW ELEMENTS*/
 		var new_elements = [];
-		var inc1 = 1;
-		var inc2 = 1;
+		var idIndex = 0;
+		var keyIndex = 0;
 		
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['childrens'])!='undefined' ){
 				jQuery(thisObj.settings.elements[key]['selector']).find(thisObj.settings.elements[key]['childrens']).each(function(k, child){
-					var c = jQuery(child);
-					if(typeof(c.attr('id')) == "undefined"){
-						var newId = 'isalive-'+thisObj.uniqId+'-element-' + inc1;
-						inc1++;
-						c.attr('id', newId);
+					if(typeof(jQuery(child).attr('id')) == "undefined"){
+						var id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+						jQuery(child).attr('id', id);
+						idIndex++;
 					}
 					else
-						var newId = c.attr('id');
+						var id = jQuery(child).attr('id');
 					var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
-					newElement['selector'] = "#"+newId;
+					newElement['selector'] = "#"+id;
+					newElement['use-id-attribute'] = false;
 					delete newElement['childrens'];
 					new_elements.push(newElement);
 				});
 				delete thisObj.settings.elements[key];
 			}
 		}
-		
 		for(key in new_elements){
-			thisObj.settings.elements["ISALIVE_OBJECT_"+inc2] = new_elements[key];
-			inc2++;
+			thisObj.settings.elements["ISALIVE_OBJECT_"+keyIndex] = new_elements[key];
+			keyIndex++;
+
 		}
 		
 		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
-			if(jQuery(thisObj.settings.elements[key]['selector']).length==0 || typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined")
+			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined" || jQuery(thisObj.settings.elements[key]['selector']).length==0)
 				delete thisObj.settings.elements[key];
-			else
+			else{
+				/*IF USE-ID-ATTRIBUTE IS ON THE SELECTOR IS NOW CHANGED*/
+				if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
+					if(jQuery(thisObj.settings.elements[key]['selector']).length==1){
+						var id = jQuery(thisObj.settings.elements[key]['selector']).attr('id');
+						if(typeof(id)=='undefined'){
+							id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+							idIndex++;
+							jQuery(thisObj.settings.elements[key]['selector']).attr('id', id);
+							thisObj.settings.elements[key]['selector'] = '#'+id;
+						}
+						else
+							thisObj.settings.elements[key]['selector'] = '#'+id;
+					}
+				}
+				if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
+					delete thisObj.settings.elements[key]['use-id-attribute'];
+			
 				if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
 					/*BUILD FUNCTIONS ARRAY*/
 					if(typeof(thisObj.settings.elements[key]['property'])=='function'){
@@ -1353,6 +1371,7 @@ Last modification on this file: 10 November 2013
 						delete thisObj.settings.elements[key];
 							
 				}
+			}
 		}
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
 		
@@ -2628,7 +2647,7 @@ Last modification on this file: 10 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.1.10";
+			return "1.2.0";
 		}
 	};
 	
