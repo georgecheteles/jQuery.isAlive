@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.2.1)
+jQuery.isAlive(1.2.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 11 November 2013
+Last modification on this file: 12 November 2013
 */
 
 (function(jQuery) {
@@ -1270,6 +1270,10 @@ Last modification on this file: 11 November 2013
 				delete thisObj.settings.elements[key];
 			else{
 				if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
+				
+					if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
+						delete thisObj.settings.elements[key]['use-id-attribute'];			
+				
 					if(jQuery(thisObj.settings.elements[key]['selector']).length==1){
 						var id = jQuery(thisObj.settings.elements[key]['selector']).attr('id');
 						if(typeof(id)=='undefined'){
@@ -1695,8 +1699,6 @@ Last modification on this file: 11 November 2013
 				delete thisObj.settings.elements[key];
 				continue;
 			}
-			if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
-				delete thisObj.settings.elements[key]['use-id-attribute'];			
 			
 			/*DELETES UNUSED ELEMENTS AND FINDS SCROLLBAR*/
 			if(thisObj.settings.elements[key]['scrollbar']!=true){
@@ -2641,7 +2643,7 @@ Last modification on this file: 11 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.2.1";
+			return "1.2.2";
 		}
 	};
 	
