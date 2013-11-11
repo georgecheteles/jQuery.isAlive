@@ -2,6 +2,7 @@ jQuery isAlive Changelog
 
 ver. 1.2.2 (12 November 2013)
  - small changes
+ - scrollLeft on CSS3 bug fixed
 
 ver. 1.2.1 (11 November 2013)
  - bug fixed

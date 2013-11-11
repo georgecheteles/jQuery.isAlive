@@ -1337,9 +1337,6 @@ Last modification on this file: 12 November 2013
 					delete thisObj.settings.elements[key]['CSS3Easing'];
 				}
 				
-				/*PUTS PREFIX FOR CSS3*/
-				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
-				
 				/*DELETES INVALID EASING*/
 				if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
 					delete thisObj.settings.elements[key]['easing'];
@@ -1349,7 +1346,7 @@ Last modification on this file: 12 November 2013
 					delete thisObj.settings.elements[key]['CSS3Easing'];
 				
 				/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
-				if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
+				if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft')){
 					thisObj.settings.elements[key]['useCSS3'] = false;
 				}
 				
@@ -1368,6 +1365,8 @@ Last modification on this file: 12 November 2013
 				if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS)
 					delete thisObj.settings.elements[key];
 						
+				/*PUTS PREFIX FOR CSS3*/
+				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
 			}
 		}
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
