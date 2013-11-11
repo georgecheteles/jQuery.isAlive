@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.2.1 (11 November 2013)
+ - bug fixed
+ - "group"/"childrens" option is no longer suported. instead adding "use-id-attribute" will use/add an ID attribute to all the children of that element
+
 ver. 1.2.0 (11 November 2013)
  - bug fixed
  - adds "useIdAttribute" & "use-id-attribute" options

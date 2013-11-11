@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.2.0)
+jQuery.isAlive(1.2.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1260,43 +1260,15 @@ Last modification on this file: 11 November 2013
 			}
 		}
 
-		/*FOR GROUP ELEMENTS CREATES NEW ELEMENTS*/
+		/*ADDS ID AND DUPLICATES ELEMENTS IF USE_ID_ATTRIBUTE OPTION IS ON*/
 		var new_elements = [];
 		var idIndex = 0;
 		var keyIndex = 0;
-		
-		for(key in thisObj.settings.elements){
-			if(typeof(thisObj.settings.elements[key]['childrens'])!='undefined' ){
-				jQuery(thisObj.settings.elements[key]['selector']).find(thisObj.settings.elements[key]['childrens']).each(function(k, child){
-					if(typeof(jQuery(child).attr('id')) == "undefined"){
-						var id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
-						jQuery(child).attr('id', id);
-						idIndex++;
-					}
-					else
-						var id = jQuery(child).attr('id');
-					var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
-					newElement['selector'] = "#"+id;
-					newElement['use-id-attribute'] = false;
-					delete newElement['childrens'];
-					new_elements.push(newElement);
-				});
-				delete thisObj.settings.elements[key];
-			}
-		}
-		for(key in new_elements){
-			thisObj.settings.elements["ISALIVE_OBJECT_"+keyIndex] = new_elements[key];
-			keyIndex++;
 
-		}
-		
-		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
-		var tempArray = [];
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined" || jQuery(thisObj.settings.elements[key]['selector']).length==0)
 				delete thisObj.settings.elements[key];
 			else{
-				/*IF USE-ID-ATTRIBUTE IS ON THE SELECTOR IS NOW CHANGED*/
 				if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
 					if(jQuery(thisObj.settings.elements[key]['selector']).length==1){
 						var id = jQuery(thisObj.settings.elements[key]['selector']).attr('id');
@@ -1309,68 +1281,89 @@ Last modification on this file: 11 November 2013
 						else
 							thisObj.settings.elements[key]['selector'] = '#'+id;
 					}
-				}
-				if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
-					delete thisObj.settings.elements[key]['use-id-attribute'];
-			
-				if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
-					/*BUILD FUNCTIONS ARRAY*/
-					if(typeof(thisObj.settings.elements[key]['property'])=='function'){
-						if(typeof(thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])])=="undefined")
-							thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
-						thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
-						thisObj.settings.elements[key]['useCSS3'] = false;
-					}
-					
-					/*MAKES ALL PROPERTY LOWER CASE*/
-					thisObj.settings.elements[key]['property'] = jQuery.trim(thisObj.settings.elements[key]['property']).toLowerCase();
-					if(thisObj.settings.elements[key]['property']=='scrolltop')	thisObj.settings.elements[key]['property'] = 'scrollTop';
-					if(thisObj.settings.elements[key]['property']=='scrollleft') thisObj.settings.elements[key]['property'] = 'scrollLeft';
-					
-					/*CSS3 DOES NOT WORK ON IE7&IE8*/
-					if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
+					else{
+						jQuery(thisObj.settings.elements[key]['selector']).each(function(k, child){
+							if(typeof(jQuery(child).attr('id')) == "undefined"){
+								var id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+								jQuery(child).attr('id', id);
+								idIndex++;
+							}
+							else
+								var id = jQuery(child).attr('id');
+							var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
+							newElement['selector'] = "#"+id;
+							new_elements.push(newElement);
+						});
 						delete thisObj.settings.elements[key];
-						continue;
 					}
-					
-					/*CSS3 WILL FALLBACK TO JQUERY*/
-					if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && browserObj.msie && parseInt(browserObj.version)<10){
-						delete thisObj.settings.elements[key]['useCSS3'];
-						delete thisObj.settings.elements[key]['CSS3Easing'];
-					}
-					
-					/*PUTS PREFIX FOR CSS3*/
-					thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
-					
-					/*DELETES INVALID EASING*/
-					if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
-						delete thisObj.settings.elements[key]['easing'];
-					
-					/*DELETES INVALID EASING CSS3*/
-					if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
-						delete thisObj.settings.elements[key]['CSS3Easing'];
-					
-					/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
-					if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
-						thisObj.settings.elements[key]['useCSS3'] = false;
-					}
-					
-					/*PUT ANIMATE CLASS FOR ANIMATIONS*/
-					if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
-						jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
-						tempArray.push(thisObj.settings.elements[key]['selector']);
-					}
-					
-					/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
-					if(thisObj.settings.elements[key]["method"]=="animate-set")
-						if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
-							thisObj.settings.elements[key]['move-on'] = 1;
-					
-					/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
-					if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS)
-						delete thisObj.settings.elements[key];
-							
 				}
+			}
+		};
+		for(key in new_elements){
+			thisObj.settings.elements["ISALIVE_OBJECT_"+keyIndex] = new_elements[key];
+			keyIndex++;
+		}
+		
+		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
+		var tempArray = [];
+		for(key in thisObj.settings.elements){
+			if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
+				/*BUILD FUNCTIONS ARRAY*/
+				if(typeof(thisObj.settings.elements[key]['property'])=='function'){
+					if(typeof(thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])])=="undefined")
+						thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
+					thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
+					thisObj.settings.elements[key]['useCSS3'] = false;
+				}
+				
+				/*MAKES ALL PROPERTY LOWER CASE*/
+				thisObj.settings.elements[key]['property'] = jQuery.trim(thisObj.settings.elements[key]['property']).toLowerCase();
+				if(thisObj.settings.elements[key]['property']=='scrolltop')	thisObj.settings.elements[key]['property'] = 'scrollTop';
+				if(thisObj.settings.elements[key]['property']=='scrollleft') thisObj.settings.elements[key]['property'] = 'scrollLeft';
+				
+				/*CSS3 DOES NOT WORK ON IE7&IE8*/
+				if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
+					delete thisObj.settings.elements[key];
+					continue;
+				}
+				
+				/*CSS3 WILL FALLBACK TO JQUERY*/
+				if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && browserObj.msie && parseInt(browserObj.version)<10){
+					delete thisObj.settings.elements[key]['useCSS3'];
+					delete thisObj.settings.elements[key]['CSS3Easing'];
+				}
+				
+				/*PUTS PREFIX FOR CSS3*/
+				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
+				
+				/*DELETES INVALID EASING*/
+				if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
+					delete thisObj.settings.elements[key]['easing'];
+				
+				/*DELETES INVALID EASING CSS3*/
+				if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
+					delete thisObj.settings.elements[key]['CSS3Easing'];
+				
+				/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
+				if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollleft')){
+					thisObj.settings.elements[key]['useCSS3'] = false;
+				}
+				
+				/*PUT ANIMATE CLASS FOR ANIMATIONS*/
+				if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
+					jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
+					tempArray.push(thisObj.settings.elements[key]['selector']);
+				}
+				
+				/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
+				if(thisObj.settings.elements[key]["method"]=="animate-set")
+					if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
+						thisObj.settings.elements[key]['move-on'] = 1;
+				
+				/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
+				if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS)
+					delete thisObj.settings.elements[key];
+						
 			}
 		}
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
@@ -1702,6 +1695,8 @@ Last modification on this file: 11 November 2013
 				delete thisObj.settings.elements[key];
 				continue;
 			}
+			if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
+				delete thisObj.settings.elements[key]['use-id-attribute'];			
 			
 			/*DELETES UNUSED ELEMENTS AND FINDS SCROLLBAR*/
 			if(thisObj.settings.elements[key]['scrollbar']!=true){
@@ -1714,7 +1709,7 @@ Last modification on this file: 11 November 2013
 				});
 			}
 		}
-			
+		
 		/*CALLS FUNCTION TO BIND MOUSE AND SCROLL EVENTS*/
 		thisObj.bindScrollTouchEvents();
 		
@@ -1728,7 +1723,6 @@ Last modification on this file: 11 November 2013
 		/*CALL ONLOADINGCOMPLETE FUNCTION*/
 		if(this.settings.onLoadingComplete != null)
 			this.settings.onLoadingComplete(thisObj.mySelector);
-		
 	}
 	
 	/*ANIMATING MAIN FUNCTION!!!*/
@@ -2647,7 +2641,7 @@ Last modification on this file: 11 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.2.0";
+			return "1.2.1";
 		}
 	};
 	

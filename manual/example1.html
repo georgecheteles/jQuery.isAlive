@@ -30,15 +30,16 @@
 					"value-end":"eval(elementHeight-100)"
 				},
 				2:{
-					"selector":"#drawSurface1",
-					"childrens":".myDiv",
+					"selector":"#drawSurface1 .myDiv",
 					"method":"animate",
 					"property":"opacity",
 					"step-start":0,
 					"step-end":10,
 					"value-start":1,
 					"value-end":0.2,
-					"easing":"linear"
+					"easing":"linear",
+					"use-id-attribute":false
+					
 				},
 				3:{
 					"selector":"#drawSurface1 .myDiv2",
