@@ -101,7 +101,48 @@
 					"easing":"linear",
 					"scrollbar":true
 				},
-				
+				11:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"right",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":"eval(elementWidth-100)",
+					"easing":"linear"
+				},
+				12:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"top",
+					"step-start":0,
+					"step-end":10,
+					"value-start":0,
+					"value-end":"eval(elementHeight-100)",
+					"easing":"linear"
+				},
+				13:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"transform",
+					"step-start":0,
+					"step-end":10,
+					"value-start":"0deg",
+					"value-end":"180deg",
+					"format":"rotate(value)",
+					"useCSS3":true
+				},
+				14:{
+					"selector":"#drawSurface1 .myDiv7",
+					"method":"animate",
+					"property":"transform",
+					"step-start":0,
+					"step-end":10,
+					"value-start":"0deg",
+					"value-end":"180deg",
+					"format":"rotateY(value)",
+					"useCSS3":true
+				}
 			};
 			var animations2 = {
 				"#drawSurface2 .myDiv1":{
@@ -211,6 +252,18 @@
 						},
 						"scrollbar":true
 					}
+				},
+				"#drawSurface2 .myDiv6":{
+					0:{
+						"method":"animate",
+						"property":function(sel,val){
+							$(sel).html(Math.round(val) + '%');
+						},
+						"step-start":0,
+						"step-end":10,
+						"value-start":0,
+						"value-end":100
+					}
 				}
 			};
 
@@ -286,6 +339,9 @@
 					<div class="myDiv3 myDiv">set</div>
 					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>set@start</div>
 					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
+					<div class="myDiv6 myDiv">
+						<div class="myDiv7 myDiv"></div>
+					</div>
 					<a href="#" class="action btn1">Go To Step 10</a>
 					<a href="#" class="action btn2">Skip To Step 5</a>
 				</div>
@@ -309,6 +365,7 @@
 					<div class="myDiv3 myDiv">set</div>
 					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
 					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
+					<div class="myDiv6 myDiv"></div>
 					<a href="#" class="action btn1">Play</a>
 					<a href="#" class="action btn2">Rewind</a>
 				</div>
