@@ -179,7 +179,7 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":1,
-						"value-end":0
+						"value-end":0.1
 					}
 				},
 				"#drawSurface2  .myDiv2":{
@@ -269,6 +269,7 @@
 
 			$(document).ready(function(){
 				jQuery('#drawSurface1').isAlive('create',{
+					duration:1000,
 					elements:animations1,
 					elementsType:"linear",
 					easing:"easeOutBounce",
@@ -283,6 +284,7 @@
 				});
 
 				jQuery('#drawSurface2').isAlive('create',{
+					duration:1000,
 					elements:animations2,
 					elementsType:"tree",
 					CSS3Easing:"ease-in",
@@ -293,29 +295,43 @@
 					touchType:'wipe',
 					enableScrollbarTouch:true,
 					debug:false,
-					jumpPoints:[0,4,8,10],
-					wipePoints:[0,4,8,10],
-					playPoints:[0,4,8,10],
-					scrollbarPoints:[0,4,8,10],
-					
+					jumpPoints:[0,2,5,8,10],
+					wipePoints:[0,2,5,8,10],
+					playPoints:[0,2,5,8,10],
+					scrollbarPoints:[0,2,5,8,10],
+					durationTweaks:{
+						'scrollbar':{
+							'duration':100,
+							'durationType':'step'
+						},
+						'wipe':{
+							'duration':200,
+							'durationType':'step'
+						}
+					}
 				});
 
 				$('#drawSurface1 a.btn1').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:0,duration:2000});
+					return false;
+				});
+				
+				$('#drawSurface1 a.btn2').click(function(){
 					jQuery('#drawSurface1').isAlive('goTo',{to:10,duration:2000});
 					return false;
 				});
 
-				$('#drawSurface1 a.btn2').click(function(){
+				$('#drawSurface1 a.btn3').click(function(){
 					jQuery('#drawSurface1').isAlive('skip',{to:5});
 					return false;
 				});
 
-				$('#drawSurface2 a.btn1').click(function(){
+				$('#drawSurface2 a.btn2').click(function(){
 					jQuery('#drawSurface2').isAlive('play',{duration:1000});
 					return false;
 				});
 
-				$('#drawSurface2 a.btn2').click(function(){
+				$('#drawSurface2 a.btn3').click(function(){
 					jQuery('#drawSurface2').isAlive('rewind',{duration:1000});
 					return false;
 				});
@@ -342,8 +358,9 @@
 					<div class="myDiv6 myDiv">
 						<div class="myDiv7 myDiv"></div>
 					</div>
-					<a href="#" class="action btn1">Go To Step 10</a>
-					<a href="#" class="action btn2">Skip To Step 5</a>
+					<a href="#" class="action btn1">Go To Step 0</a>
+					<a href="#" class="action btn2">Go To Step 10</a>
+					<a href="#" class="action btn3">Skip To Step 5</a>
 				</div>
 				<p>
 					The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
@@ -366,8 +383,8 @@
 					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
 					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
 					<div class="myDiv6 myDiv"></div>
-					<a href="#" class="action btn1">Play</a>
-					<a href="#" class="action btn2">Rewind</a>
+					<a href="#" class="action btn2">Play</a>
+					<a href="#" class="action btn3">Rewind</a>
 				</div>
 				<p>
 					The "scrollType" option is set to "jump", this mean that the animations will jump on the steps indicated in "jumpPoints".<br/>

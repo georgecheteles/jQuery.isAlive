@@ -75,6 +75,7 @@ input[type=submit]{
 #drawSurface1 .myDiv6{position:absolute;top:0px;right:0px;width:100px;height:100px;}
 #drawSurface1 .myDiv7{position:absolute;top:0px;left:0px;width:100px;height:100px;background-color:black;color:white;background-image:url(assets/jquery-logo.png);background-position: center center;background-size: 100% auto;}
 #drawSurface2 .myDiv6{position:absolute;top:0px;right:0px;width:100px;height:100px;background-color:black;color:white;font-size: 35px;text-align: center;line-height: 100px;font-weight: bold;}
+
 body.example-1 .myDiv2{
 	top:120px;
 }
@@ -101,10 +102,16 @@ a.action{
 
 a.action.btn1{
 	right:5px;
-	bottom:30px;
+	bottom:55px;
 }
 
 a.action.btn2{
+	right:5px;
+	bottom:30px;
+}
+
+
+a.action.btn3{
 	right:5px;
 	bottom:5px;
 }

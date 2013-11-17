@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.2.2)
+jQuery.isAlive(1.3.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 12 November 2013
+Last modification on this file: 17 November 2013
 */
 
 (function(jQuery) {
@@ -164,7 +164,7 @@ Last modification on this file: 12 November 2013
 	
 	/* CHECKS PROPERTY IS CSS3 */
 	function isCSS3(property){
-		var CSS3 = ['border-radius','transform','filter','trasition','background-size','box-shadow'];
+		var CSS3 = ['transform','trasition','border-radius','background-size','box-shadow'];
 		return (indexOf(CSS3,property)!=-1);
 	}
 	
@@ -179,13 +179,12 @@ Last modification on this file: 12 November 2013
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
 	function fixCSS3(property){
-		var propertyT = property.toLowerCase();
-		if(propertyT=='transform' || propertyT=='filter' || propertyT.indexOf('transition')!=-1){
+		if(property=='transform' || property=='transition' || property=='filter'){
 			if(browserObj.webkit)
 				return "-webkit-"+property;
 			if(browserObj.mozilla)
 				return "-moz-"+property;
-			if(browserObj.msie)
+			if(browserObj.msie && parseInt(browserObj.version)>=9)
 				return "-ms-"+property;
 			if(browserObj.opera)
 				return "-o-"+property;
@@ -303,7 +302,7 @@ Last modification on this file: 12 November 2013
 			easing:'linear', /*linear|swing*/
 			start:0,
 			loop:false,
-			stopScroll:true,
+			preventScroll:true,
 			stepPoints:[],
 			stepPointsSelector:null,
 			stepPointsActiveClass:null,
@@ -315,7 +314,7 @@ Last modification on this file: 12 November 2013
 			wipeXFrom:20,
 			wipeYFrom:20,
 			wipePoints:[],
-			stopTouch:true,
+			preventTouch:true,
 			animateClass:'isalive-'+this.uniqId,
 			rebuildOnResize:true,
 			playPoints:[],
@@ -796,7 +795,7 @@ Last modification on this file: 12 November 2013
 				}	
 		
 				function onTouchMove(e) {
-					if(!ie10 && thisObj.settings.stopTouch) {
+					if(!ie10 && thisObj.settings.preventTouch) {
 						e.preventDefault();
 					}
 		    		 
@@ -879,7 +878,7 @@ Last modification on this file: 12 November 2013
 					thisObj.doScroll(scrollDown);
 				else
 					thisObj.doJump(scrollDown);
-				if(thisObj.settings.stopScroll)
+				if(thisObj.settings.preventScroll)
 					return false;
 			});
 			
@@ -893,7 +892,7 @@ Last modification on this file: 12 November 2013
 					thisObj.doScroll(scrollDown);
 				else
 					thisObj.doJump(scrollDown);
-				if(thisObj.settings.stopScroll)
+				if(thisObj.settings.preventScroll)
 					return false;
 			});
 		}
@@ -1195,7 +1194,7 @@ Last modification on this file: 12 November 2013
 		if(thisObj.settings.enableTouch && (thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
 			thisObj.settings.enableTouch = false;
 
-		if(thisObj.settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && thisObj.settings.stopTouch){
+		if(thisObj.settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && thisObj.settings.preventTouch){
 			thisObj.msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');			
 			jQuery(thisObj.mySelector).css('-ms-touch-action',"none");			
 		}
@@ -2014,9 +2013,10 @@ Last modification on this file: 12 November 2013
 		    			if(step!=stepEnd && typeof(animations[step])!="undefined"){
 					    	for(selector in animations[step]){
 						    	for(property in animations[step][selector]){
+								
 						    		duration = 0;
 						    		if ((directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0) || (!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0))
-						    			duration = animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step)));
+						    			duration = Math.floor(animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step))));
 										
 							    	if(animations[step][selector][property]['CSS3']!=true){
 										if(indexOf(notAccepted,property)==-1 && typeof(thisObj.functionsArray[property])=="undefined"){
@@ -2073,6 +2073,7 @@ Last modification on this file: 12 November 2013
 	isAlive.prototype.doJump = function(pos){
 		
 		var thisObj = this;
+		var directionForward;
 		
 		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0){
 			clearTimeout(thisObj.waitScrollTimer);
@@ -2081,21 +2082,24 @@ Last modification on this file: 12 November 2013
 			},thisObj.settings.scrollDelay);
 		}
 		
+		thisObj.animating?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
+		
 		if(!thisObj.allowScroll || thisObj.forceAnimation)
 			return false;
 		
-		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0 && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((thisObj.lastStep<thisObj.step && pos)||(thisObj.lastStep>thisObj.step && !pos)))
+		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0 && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
 			
-		if(thisObj.settings.scrollDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((thisObj.lastStep<thisObj.step && pos)||(thisObj.lastStep>thisObj.step && !pos)))
+		if(thisObj.settings.scrollDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
 		
 		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0)	
 			thisObj.waitScrollEnd = true;
 			
-		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))){
+		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && !pos)||(!directionForward && pos)))){
 
 			var stepPos = thisObj.getPos(Math.round(thisObj.lastStep));
+			
 			thisObj.jumpPosition = indexOf(thisObj.settings.jumpPoints,stepPos);
 			
 			if(thisObj.jumpPosition==-1){
@@ -2608,11 +2612,11 @@ Last modification on this file: 12 November 2013
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowTouch = options;
-			if(options==true && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.stopTouch){
+			if(options==true && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.preventTouch){
 				isAliveObjects[selector].msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');
 				jQuery(selector).css('-ms-touch-action',"none");				
 			}
-			else if(options==false && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.stopTouch)
+			else if(options==false && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.preventTouch)
 				jQuery(selector).css('-ms-touch-action',isAliveObjects[selector].msTouchAction);
 			return thisObj;
 		},
@@ -2642,7 +2646,7 @@ Last modification on this file: 12 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.2.2";
+			return "1.3.0";
 		}
 	};
 	
