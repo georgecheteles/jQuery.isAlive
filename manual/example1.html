@@ -263,6 +263,14 @@
 						"step-end":10,
 						"value-start":0,
 						"value-end":100
+					},
+					1:{
+						"method":"animate",
+						"property":"background-color",
+						"step-start":0,
+						"step-end":10,
+						"value-start":"#FFD700",
+						"value-end":"#C71585",
 					}
 				}
 			};
@@ -363,15 +371,16 @@
 					<a href="#" class="action btn3">Skip To Step 5</a>
 				</div>
 				<p>
-					The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
-					The "touchType" option is set to default "drag", this mean that the animations will play on each touch move.<br/>
-					The red rectangle animates to left,top.<br/>
-					The yellow rectangle animates-set to left and animates opacity to 20%.<br/>
-					The blue rectangle is set at step 5 and then at step 10.<br/>
-					The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-					The green rectangle shows how set@start method works.<br/>
-					All elements have an opacity animation.<br/>
-					The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
+					 - The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
+					 - The "touchType" option is set to default "drag", this mean that the animations will play on each touch move.<br/>
+					 - The red rectangle animates to left,top.<br/>
+					 - The yellow rectangle animates-set to left and animates opacity to 20%.<br/>
+					 - The blue rectangle is set at step 5 and then at step 10.<br/>
+					 - The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+					 - The green rectangle shows how set@start method works.<br/>
+					 - The back rectangle shows how transform can be animated <br/>
+					 - All elements have an opacity animation.<br/>
+					 - The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
 				</p>
 			</div>
 			<div class="example-wrapper">
@@ -382,20 +391,21 @@
 					<div class="myDiv3 myDiv">set</div>
 					<div class="myDiv4 myDiv">add-class<br/>remove-class<br/>static<br/>rotate(IE7/IE8)</div>
 					<div class="myDiv5 myDiv">scrollbar<br/>drag!</div>
-					<div class="myDiv6 myDiv"></div>
+					<div class="myDiv6 myDiv">0%</div>
 					<a href="#" class="action btn2">Play</a>
 					<a href="#" class="action btn3">Rewind</a>
 				</div>
 				<p>
-					The "scrollType" option is set to "jump", this mean that the animations will jump on the steps indicated in "jumpPoints".<br/>
-					The "touchType" option is set to "wipe", this mean that the animations will jump on the steps indicated in "wipePoints".<br/>
-					The red rectangle animates to left,top,opacity and rotation.<br/>
-					The yellow rectangle animates-set to left 2 by 2 steps.<br/>
-					The blue rectangle is set at step 5 and then at step 10.<br/>
-					The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
-					The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
-					The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
-					CSS3 is used for this animations.
+					 - The "scrollType" option is set to "jump", this mean that the animations will jump on the steps indicated in "jumpPoints".<br/>
+					 - The "touchType" option is set to "wipe", this mean that the animations will jump on the steps indicated in "wipePoints".<br/>
+					 - The red rectangle animates to left,top,opacity and rotation.<br/>
+					 - The yellow rectangle animates-set to left 2 by 2 steps.<br/>
+					 - The blue rectangle is set at step 5 and then at step 10.<br/>
+					 - The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
+					 - The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
+					 - The gold color rectangle changes his color.<br/>
+					 - The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
+					 - CSS3 is used for this animations.
 				</p>
 			</div>
 		</div>

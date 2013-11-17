@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.3.0)
+jQuery.isAlive(1.3.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 17 November 2013
+Last modification on this file: 18 November 2013
 */
 
 (function(jQuery) {
@@ -27,6 +27,15 @@ Last modification on this file: 17 November 2013
 	var windowWidth;
 	var windowHeight;
 	
+	/*CONVERTING HEX TO RGB*/
+	function hexToRgb(hex) {
+		var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+		hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+			return r + r + g + g + b + b;
+		});
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {r: parseInt(result[1], 16),g: parseInt(result[2], 16),	b: parseInt(result[3], 16)} : null;
+	}	
 	/*ACTION ON RESIZE*/
 	function onResizeAction(e){
 		var key;
@@ -339,6 +348,10 @@ Last modification on this file: 17 November 2013
 		
 		/*MAKES THE PLUGIN INITIOALIZATION*/
 		this.initAnimations();
+
+		/*CALL ONLOADINGCOMPLETE FUNCTION*/
+		if(this.settings.onLoadingComplete!=null)
+			this.settings.onLoadingComplete(selector);
 		
 	}
 
@@ -396,7 +409,7 @@ Last modification on this file: 17 November 2013
 			step: function(step,fx){
 				var arrayTemp = [];
 				var val,f,CSSVal;
-				var typeInt = ["color","background-color"]; 
+				var typeInt = ["color","background-color","border-color"]; 
 				step = step-fx.start;
 				for(var key in start){
 					f = ""
@@ -427,57 +440,58 @@ Last modification on this file: 17 November 2013
 		
 		var thisObj = this;
 
-		var returnValue,paramsConv,splitParams,key,format,splitChar,evl,lastBracket,bracketCount;
+		var returnValue,paramsConv,key,format,splitChar,evl,lastBracket,bracketCount,key;
 		
 		if(typeof(params) == "function")
 			return params(thisObj.mySelector,thisObj.params);
 			
-		params = fixSpaces(params);
-		
-		if(!isDinamic(params))
-			return params;
-
-		paramsConv = params.toString();
-		paramsConv = paramsConv.replace(/elementTop/g,thisObj.params.elementTop.toString());
-		paramsConv = paramsConv.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
-		paramsConv = paramsConv.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
-		paramsConv = paramsConv.replace(/elementWidth/g,thisObj.params.elementWidth.toString());
-		paramsConv = paramsConv.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
-		paramsConv = paramsConv.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
-		paramsConv = paramsConv.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
-		paramsConv = paramsConv.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
+		paramsConv = fixSpaces(params).toString();
 		
 		splitChar = " ";
 		if(paramsConv.indexOf(",")!=-1)
 			splitChar = ",";
-			
-		splitParams = paramsConv.split(splitChar); 
-		for(var key in splitParams){
-			splitParams[key] = splitParams[key].replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");
-			if(splitParams[key].indexOf('eval(')!=-1){
-				/*FIND CLOSING BRACKET POSITION*/
-				bracketCount = 0;
-				for(var lastBracket=0;lastBracket<=splitParams[key].indexOf('eval(');lastBracket++)
-					if(splitParams[key].charAt(lastBracket)=="(")
-				bracketCount++;
-				for(lastBracket=splitParams[key].length-1;lastBracket>=0;lastBracket--){
-					if(splitParams[key].charAt(lastBracket)==")"){
-						if(bracketCount==0)
-							break;
-						else
-							bracketCount--;
+		
+		if(!isDinamic(params)){
+			paramsConv = paramsConv.split(splitChar); 
+			for(key in paramsConv)
+				paramsConv[key] = paramsConv[key].replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");		
+		}
+		else{
+			paramsConv = paramsConv.replace(/elementTop/g,thisObj.params.elementTop.toString());
+			paramsConv = paramsConv.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
+			paramsConv = paramsConv.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
+			paramsConv = paramsConv.replace(/elementWidth/g,thisObj.params.elementWidth.toString());
+			paramsConv = paramsConv.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
+			paramsConv = paramsConv.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
+			paramsConv = paramsConv.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
+			paramsConv = paramsConv.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
+			paramsConv = paramsConv.split(splitChar); 
+			for(key in paramsConv){
+				paramsConv[key] = paramsConv[key].replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");
+				if(paramsConv[key].indexOf('eval(')!=-1){
+					/*FIND CLOSING BRACKET POSITION*/
+					bracketCount = 0;
+					for(lastBracket=0;lastBracket<=paramsConv[key].indexOf('eval(');lastBracket++)
+						if(paramsConv[key].charAt(lastBracket)=="(")
+					bracketCount++;
+					for(lastBracket=paramsConv[key].length-1;lastBracket>=0;lastBracket--){
+						if(paramsConv[key].charAt(lastBracket)==")"){
+							if(bracketCount==0)
+								break;
+							else
+								bracketCount--;
+						}
 					}
+					evl = paramsConv[key].substr(paramsConv[key].indexOf('eval(')+5,(lastBracket-5)-paramsConv[key].indexOf('eval('));
+					try{
+						eval("evl = "+evl+';');
+					}catch(err){}
+					paramsConv[key] = paramsConv[key].substr(0,paramsConv[key].indexOf('eval(')) + evl + paramsConv[key].substr(lastBracket+1);
 				}
-				evl = splitParams[key].substr(splitParams[key].indexOf('eval(')+5,(lastBracket-5)-splitParams[key].indexOf('eval('));
-				try{
-					eval("evl = "+evl+';');
-				}catch(err){}
-				splitParams[key] = splitParams[key].substr(0,splitParams[key].indexOf('eval(')) + evl + splitParams[key].substr(lastBracket+1);
 			}
 		}
 		
-		paramsConv = splitParams.join(splitChar);
-		
+		paramsConv = paramsConv.join(splitChar);
 		if(isNumber(paramsConv))
 			return parseFloat(paramsConv);
 		else
@@ -516,6 +530,7 @@ Last modification on this file: 17 November 2013
 			tempObj = jQuery.extend(tempObj, thisObj.CSS3DefaultTransitionArray[selector]);
 		if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined")
 			tempObj = jQuery.extend(tempObj, thisObj.CSS3TransitionArray[selector]);
+			
 		var rt = "";
 		for(var key in tempObj){
 			if(rt=="")
@@ -1483,6 +1498,23 @@ Last modification on this file: 17 November 2013
 		
 		/* GET VALUES FOR CUSTOM PARAMS */
 		for(key in thisObj.settings.elements){
+		
+			/*CONVERT IF HEX COLOR FOUND*/
+			if((thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set") && indexOf(["color","background-color","border-color"],thisObj.settings.elements[key]["property"])!=-1){
+				convertValue = hexToRgb(thisObj.settings.elements[key]["value-start"]);
+				if(convertValue!=null){
+					convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
+					thisObj.settings.elements[key]["value-start"] = convertValue;
+				}
+				convertValue = hexToRgb(thisObj.settings.elements[key]["value-end"]);
+				if(convertValue!=null){
+					convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
+					thisObj.settings.elements[key]["value-end"] = convertValue;
+				}
+				thisObj.settings.elements[key]["format"] = "rgb(value)";
+				thisObj.settings.elements[key]["type"] = "int";
+			}
+		
 			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
 				if(isDinamic(thisObj.settings.elements[key]['value-start']) || isDinamic(thisObj.settings.elements[key]['value-end'])){
 					if(thisObj.settings.elements[key]['scrollbar']==true)
@@ -1500,8 +1532,8 @@ Last modification on this file: 17 November 2013
 					thisObj.cssDinamicElements.push(tempObj);
 				}
 				thisObj.settings.elements[key]['value-under'] = thisObj.convertParams(thisObj.settings.elements[key]['value-under']);
-				thisObj.settings.elements[key]['value-above'] = thisObj.convertParams(thisObj.settings.elements[key]['value-above']);
 				thisObj.settings.elements[key]['value-under'] = addFormat(thisObj.settings.elements[key]['value-under'],thisObj.settings.elements[key]['format'])
+				thisObj.settings.elements[key]['value-above'] = thisObj.convertParams(thisObj.settings.elements[key]['value-above']);
 				thisObj.settings.elements[key]['value-above'] = addFormat(thisObj.settings.elements[key]['value-above'],thisObj.settings.elements[key]['format'])
 			}
 			else if(thisObj.settings.elements[key]["method"]=="static"){
@@ -1719,10 +1751,6 @@ Last modification on this file: 17 November 2013
 
 		/*INCREMENT MAX*/
 		thisObj.settings.max++;
-		
-		/*CALL ONLOADINGCOMPLETE FUNCTION*/
-		if(this.settings.onLoadingComplete != null)
-			this.settings.onLoadingComplete(thisObj.mySelector);
 	}
 	
 	/*ANIMATING MAIN FUNCTION!!!*/
@@ -1928,7 +1956,7 @@ Last modification on this file: 17 November 2013
 		var CSS3Found = false;
 		var CSS3ValuesArray = {};
 		var lastStep = thisObj.lastStep;
-		var notAccepted = ["background-position","color","background-color",fixCSS3('transform')];
+		var notAccepted = ["background-position","color","background-color","border-color",fixCSS3('transform')];
 		
 		/* STARTS ANIMATION */
 		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
@@ -2110,7 +2138,7 @@ Last modification on this file: 17 November 2013
 					else
 						thisObj.jumpPosition=0;
 				}else{
-					for(var i=0;i<=thisObj.settings.jumpPoints.length-2;i++)
+					for(var i=0;i<=thisObj.settings.jumpPoints.length-2;i++){
 						if(stepPos>thisObj.settings.jumpPoints[i] && stepPos<thisObj.settings.jumpPoints[i+1]){
 							if(pos)
 								thisObj.jumpPosition=i;
@@ -2118,6 +2146,7 @@ Last modification on this file: 17 November 2013
 								thisObj.jumpPosition=i+1;
 							break;
 						}
+					}
 					if(thisObj.jumpPosition==null){
 						if(pos)
 							thisObj.jumpPosition=thisObj.settings.jumpPoints.length-1;
@@ -2162,6 +2191,7 @@ Last modification on this file: 17 November 2013
 			thisObj.onComplete=null;
 		} else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
 			thisObj.step=Math.round(thisObj.lastStep);
+		
 		if(pos){
 			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep)<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnScroll;
@@ -2445,13 +2475,14 @@ Last modification on this file: 17 November 2013
 				pos = pos - 1;
 		}
 		
-		for(selector in valuesClasses)
+		for(selector in valuesClasses){
 			for(className in valuesClasses[selector]){
 				if(valuesClasses[selector][className]==true)
 					jQuery(selector).addClass(className);	
 				else
 					jQuery(selector).removeClass(className);	
 			}
+		}
 			
 		for(selector in valuesCSS)
 			for(property in valuesCSS[selector])
@@ -2472,6 +2503,7 @@ Last modification on this file: 17 November 2013
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
+		var selector;
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating = false;
 		thisObj.forceAnimation = false;
@@ -2480,9 +2512,9 @@ Last modification on this file: 17 November 2013
 		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 		thisObj.onComplete = null;
 		
-		for(var key in thisObj.CSS3TransitionArray){
-			delete thisObj.CSS3TransitionArray[key];
-			jQuery(key).css(fixCSS3('transition'),thisObj.getTransitionArray(key));
+		for(selector in thisObj.CSS3TransitionArray){
+			delete thisObj.CSS3TransitionArray[selector];
+			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 		}
 		
 		if(thisObj.rebuildOnStop){
@@ -2646,7 +2678,7 @@ Last modification on this file: 17 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.3.0";
+			return "1.3.1";
 		}
 	};
 	
