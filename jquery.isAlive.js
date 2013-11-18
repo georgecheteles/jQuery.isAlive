@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.3.1)
+jQuery.isAlive(1.3.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 18 November 2013
+Last modification on this file: 19 November 2013
 */
 
 (function(jQuery) {
@@ -377,15 +377,17 @@ Last modification on this file: 18 November 2013
 	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
 	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
 		
-		thisObj = this;
+		var thisObj = this;
+		var temp;
+		var format = null;
+		var isInt = (property.indexOf("color")!=-1);
 		
 		if(startPos==parseInt(startPos) || typeof(thisObj.lastCSS[selector+'|'+property])=="undefined")
 			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
 
 		var start = thisObj.lastCSS[selector+'|'+property];
 		var end = value.toString();
-
-		var format = null;
+		
 		if(start.indexOf('(')!=-1){
 			temp = start.split('(');
 			format = temp[0];
@@ -409,7 +411,6 @@ Last modification on this file: 18 November 2013
 			step: function(step,fx){
 				var arrayTemp = [];
 				var val,f,CSSVal;
-				var typeInt = ["color","background-color","border-color"]; 
 				step = step-fx.start;
 				for(var key in start){
 					f = ""
@@ -422,7 +423,7 @@ Last modification on this file: 18 November 2013
 					startT = parseInt(start[key].replace(f,""));
 					endT = parseInt(end[key].replace(f,""));
 					val = startT + ((endT-startT)*(step/100));
-					if(indexOf(typeInt,property)!=-1)
+					if(isInt)
 						val = Math.round(val);
 					arrayTemp.push(val.toString()+f);
 				}
@@ -1208,7 +1209,8 @@ Last modification on this file: 18 November 2013
 		/*CHECK FOR TOUCH*/
 		if(thisObj.settings.enableTouch && (thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
 			thisObj.settings.enableTouch = false;
-
+		
+		/*GET CSS FOR MSIE 10 TOUCH*/
 		if(thisObj.settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && thisObj.settings.preventTouch){
 			thisObj.msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');			
 			jQuery(thisObj.mySelector).css('-ms-touch-action',"none");			
@@ -1326,12 +1328,12 @@ Last modification on this file: 18 November 2013
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
+			
 				/*BUILD FUNCTIONS ARRAY*/
 				if(typeof(thisObj.settings.elements[key]['property'])=='function'){
 					if(typeof(thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])])=="undefined")
 						thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
 					thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
-					thisObj.settings.elements[key]['useCSS3'] = false;
 				}
 				
 				/*MAKES ALL PROPERTY LOWER CASE*/
@@ -1345,11 +1347,16 @@ Last modification on this file: 18 November 2013
 					continue;
 				}
 				
-				/*CSS3 WILL FALLBACK TO JQUERY*/
-				if(thisObj.settings.elements[key]['method']=="animate" && thisObj.settings.elements[key]['useCSS3'] && browserObj.msie && parseInt(browserObj.version)<10){
-					delete thisObj.settings.elements[key]['useCSS3'];
-					delete thisObj.settings.elements[key]['CSS3Easing'];
+				/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
+				if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS){
+					delete thisObj.settings.elements[key];
+					continue;
 				}
+
+				/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
+				if(thisObj.settings.elements[key]["method"]=="animate-set")
+					if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
+						thisObj.settings.elements[key]['move-on'] = 1;
 				
 				/*DELETES INVALID EASING*/
 				if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
@@ -1358,26 +1365,45 @@ Last modification on this file: 18 November 2013
 				/*DELETES INVALID EASING CSS3*/
 				if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
 					delete thisObj.settings.elements[key]['CSS3Easing'];
-				
-				/*SCROLL ANIMATIONS CAN NOT BE CSS3*/
-				if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['useCSS3'] || thisObj.settings.useCSS3) && (thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft')){
-					thisObj.settings.elements[key]['useCSS3'] = false;
+					
+					
+				/*SET CSS3 VARS*/
+				if(thisObj.settings.elements[key]["method"]=="animate"){
+					if(thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (browserObj.msie && parseInt(browserObj.version)<10)){
+						thisObj.settings.elements[key]['useCSS3'] = false;
+						if(typeof(thisObj.settings.elements[key]["easing"])=="undefined")
+							thisObj.settings.elements[key]["easing"] = thisObj.settings.easing;
+						if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
+							delete thisObj.settings.elements[key]['CSS3Easing'];
+					}
+					else {
+						if((thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']){
+							thisObj.settings.elements[key]['useCSS3'] = true;
+							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.CSS3Easing;
+							else{
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["CSS3Easing"];
+								delete thisObj.settings.elements[key]['CSS3Easing'];
+							}
+						}
+						else{
+							thisObj.settings.elements[key]['useCSS3'] = false;
+							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined")
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.easing;
+							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
+								delete thisObj.settings.elements[key]['CSS3Easing'];
+						}
+					}
+					thisObj.settings.elements[key]['useJQuery'] = true;
+					if(thisObj.settings.elements[key]['useCSS3'] || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (!thisObj.settings.elements[key]['useCSS3'] && indexOf(["transform","color","background-color","border-color","border-left-color","border-top-color","border-right-color","border-bottom-color"],thisObj.settings.elements[key]["property"])!=-1))
+						thisObj.settings.elements[key]['useJQuery'] = false;
 				}
-				
+
 				/*PUT ANIMATE CLASS FOR ANIMATIONS*/
 				if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 					jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
 					tempArray.push(thisObj.settings.elements[key]['selector']);
 				}
-				
-				/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
-				if(thisObj.settings.elements[key]["method"]=="animate-set")
-					if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
-						thisObj.settings.elements[key]['move-on'] = 1;
-				
-				/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
-				if(thisObj.settings.elements[key]["method"]=="set@start" && thisObj.settings.initCSS)
-					delete thisObj.settings.elements[key];
 						
 				/*PUTS PREFIX FOR CSS3*/
 				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
@@ -1498,21 +1524,22 @@ Last modification on this file: 18 November 2013
 		
 		/* GET VALUES FOR CUSTOM PARAMS */
 		for(key in thisObj.settings.elements){
-		
 			/*CONVERT IF HEX COLOR FOUND*/
-			if((thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set") && indexOf(["color","background-color","border-color"],thisObj.settings.elements[key]["property"])!=-1){
-				convertValue = hexToRgb(thisObj.settings.elements[key]["value-start"]);
-				if(convertValue!=null){
-					convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
-					thisObj.settings.elements[key]["value-start"] = convertValue;
+			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
+				if(indexOf(["color","background-color","border-color","border-left-color","border-top-color","border-right-color","border-bottom-color"],thisObj.settings.elements[key]["property"])!=-1){
+					convertValue = hexToRgb(thisObj.settings.elements[key]["value-start"]);
+					if(convertValue!=null){
+						convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
+						thisObj.settings.elements[key]["value-start"] = convertValue;
+					}
+					convertValue = hexToRgb(thisObj.settings.elements[key]["value-end"]);
+					if(convertValue!=null){
+						convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
+						thisObj.settings.elements[key]["value-end"] = convertValue;
+					}
+					thisObj.settings.elements[key]["format"] = "rgb(value)";
+					thisObj.settings.elements[key]["type"] = "int";
 				}
-				convertValue = hexToRgb(thisObj.settings.elements[key]["value-end"]);
-				if(convertValue!=null){
-					convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
-					thisObj.settings.elements[key]["value-end"] = convertValue;
-				}
-				thisObj.settings.elements[key]["format"] = "rgb(value)";
-				thisObj.settings.elements[key]["type"] = "int";
 			}
 		
 			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
@@ -1768,7 +1795,6 @@ Last modification on this file: 18 November 2013
 		var start;
 		var end;
 		var timing;
-		var easing;
 		var loop;
 		var directionForward;
 		var loopFound;
@@ -1792,7 +1818,6 @@ Last modification on this file: 18 November 2013
 					continue;
 				
 				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.step)==false){
-					
 					loop = thisObj.l(thisObj.lastStep);
 					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
 						start=thisObj.lastStep;
@@ -1808,28 +1833,19 @@ Last modification on this file: 18 November 2013
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
-
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
-
-					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
-						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
-					}else{
-						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
-					}
-					
+					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'duration':timing,
+						'end':end,
+						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+						'useCSS3':thisObj.settings.elements[key]['useCSS3'],
+						'useJQuery':thisObj.settings.elements[key]['useJQuery'],
+						'easing':thisObj.settings.elements[key]['easing']
+					};
+					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}	
 				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.step)==false){
-					
 					loop = thisObj.l(thisObj.step);
 					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
 						start=thisObj.lastStep;
@@ -1845,26 +1861,18 @@ Last modification on this file: 18 November 2013
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
-
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
-
-					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
-						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
-					}else{
-						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
-					}
+					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'duration':timing,
+						'end':end,
+						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+						'useCSS3':thisObj.settings.elements[key]['useCSS3'],
+						'useJQuery':thisObj.settings.elements[key]['useJQuery'],
+						'easing':thisObj.settings.elements[key]['easing']
+					};
+					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}
-				//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 			}
 		}else{
 			/*SCROLL UP*/
@@ -1891,24 +1899,17 @@ Last modification on this file: 18 November 2013
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
-
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
-						
-					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
-						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
-					}else{
-						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
-					}
+					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'duration':timing,
+						'end':end,
+						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+						'useCSS3':thisObj.settings.elements[key]['useCSS3'],
+						'useJQuery':thisObj.settings.elements[key]['useJQuery'],
+						'easing':thisObj.settings.elements[key]['easing']
+					};
+					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}	
 				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.lastStep)==false){
 					
@@ -1927,26 +1928,18 @@ Last modification on this file: 18 November 2013
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
-
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {'duration':timing,'end':end,'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]};
-
-					if((thisObj.settings.useCSS3 && thisObj.settings.elements[key]['useCSS3']!=false) || thisObj.settings.elements[key]['useCSS3']==true){
-						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['CSS3'] = true;
-						if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['CSS3Easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.CSS3Easing;
-					}else{
-						if(typeof(thisObj.settings.elements[key]['easing'])!="undefined")
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.elements[key]['easing'];
-						else
-							animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]['easing'] = thisObj.settings.easing;
-					}
+					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'duration':timing,
+						'end':end,
+						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+						'useCSS3':thisObj.settings.elements[key]['useCSS3'],
+						'useJQuery':thisObj.settings.elements[key]['useJQuery'],
+						'easing':thisObj.settings.elements[key]['easing']
+					};
+					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}
-				//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 			}
 		}
 		
@@ -1956,7 +1949,6 @@ Last modification on this file: 18 November 2013
 		var CSS3Found = false;
 		var CSS3ValuesArray = {};
 		var lastStep = thisObj.lastStep;
-		var notAccepted = ["background-position","color","background-color","border-color",fixCSS3('transform')];
 		
 		/* STARTS ANIMATION */
 		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
@@ -2046,8 +2038,8 @@ Last modification on this file: 18 November 2013
 						    		if ((directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0) || (!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0))
 						    			duration = Math.floor(animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step))));
 										
-							    	if(animations[step][selector][property]['CSS3']!=true){
-										if(indexOf(notAccepted,property)==-1 && typeof(thisObj.functionsArray[property])=="undefined"){
+							    	if(!animations[step][selector][property]['useCSS3']){
+										if(animations[step][selector][property]['useJQuery']){
 											var animObj = {};
 											animObj[property] = animations[step][selector][property]['to'];
 											jQuery(selector).animate(animObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
@@ -2678,7 +2670,7 @@ Last modification on this file: 18 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.3.1";
+			return "1.3.2";
 		}
 	};
 	

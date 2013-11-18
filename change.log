@@ -1,5 +1,10 @@
 jQuery isAlive Changelog
 
+ver. 1.3.2 (19 November 2013)
+ - speed improvements
+ - border-bottom-color,border-right-color,border-top-color,border-left-color animations suport added
+ - bugs fixed
+
 ver. 1.3.1 (18 November 2013)
  - bugs fixed
  - now you are allowed to animate colors with hex code
