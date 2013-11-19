@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.3.3)
+jQuery.isAlive(1.3.4)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 19 November 2013
+Last modification on this file: 20 November 2013
 */
 
 (function(jQuery) {
@@ -276,13 +276,7 @@ Last modification on this file: 19 November 2013
 		this.scrollbarActive = null;
 		this.waitScrollEnd = false;
 		this.waitScrollTimer;
-		
-		/* MY CLASS/SET ARRAYS */
-		this.setArray = {};
-		this.onOffClassArray = {};
-		
 		this.cssDinamicElements = [];
-		
 		this.params = {};
 		this.onComplete = null;
 		this.uniqId = Math.round(Math.random()*1000)+1;
@@ -293,6 +287,11 @@ Last modification on this file: 19 November 2013
 		this.rebuildOnStop = false;
 		this.msTouchAction;
 		this.lastCSS = {};
+		this.dragHorizontal = null;
+
+		/* MY CLASS/SET ARRAYS */
+		this.setArray = {};
+		this.onOffClassArray = {};
 		
 		this.settings = jQuery.extend({}, {
 			elements:{},
@@ -805,6 +804,7 @@ Last modification on this file: 19 November 2013
 						document.removeEventListener('MSPointerUp', cancelTouch);
 					}
 					isMoving = false;
+					thisObj.dragHorizontal = null;
 				}	
 		
 				function onTouchMove(e) {
@@ -823,45 +823,49 @@ Last modification on this file: 19 November 2013
 						var dx = startX - x;
 						var dy = startY - y;
 						if(thisObj.settings.touchType=='wipe'){
-							if(Math.abs(dx) >= thisObj.settings.wipeXFrom) {
-								if(dx > 0 && thisObj.settings.touchActions.left!=0) {
+							if(Math.abs(dx)>=thisObj.settings.wipeXFrom) {
+								if(thisObj.settings.touchActions.left!=0 && dx>0){
 									cancelTouch();
 									thisObj.doWipeTouch(thisObj.settings.touchActions.left);
 									return;
 								}
-								else if(dx < 0 && thisObj.settings.touchActions.right!=0){
+								else if(thisObj.settings.touchActions.right!=0 && dx<0){
 									cancelTouch();
 									thisObj.doWipeTouch(thisObj.settings.touchActions.right);
 									return;
 								}
 							}
-							if(Math.abs(dy) >= thisObj.settings.wipeYFrom) {
-								if(dy > 0 && thisObj.settings.touchActions.up!=0) {
+							if(Math.abs(dy)>=thisObj.settings.wipeYFrom) {
+								if(thisObj.settings.touchActions.up!=0 && dy>0){
 									cancelTouch();
 									thisObj.doWipeTouch(thisObj.settings.touchActions.up);
 									return;
 								}
-								else if(dy < 0 && thisObj.settings.touchActions.down!=0) {
+								else if(thisObj.settings.touchActions.down!=0 && dy<0 ){
 									cancelTouch();
 									thisObj.doWipeTouch(thisObj.settings.touchActions.down);
 									return;
 								}
 							}
 						} else {
-							if(Math.abs(dx) >= thisObj.settings.dragXFrom) {
-								if(dx > 0 && thisObj.settings.touchActions.left!=0){
+							if(Math.abs(dx)>=thisObj.settings.dragXFrom){
+								if(thisObj.settings.touchActions.left!=0 && dx>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
+									thisObj.dragHorizontal = true;
 									thisObj.doDragTouch(thisObj.settings.touchActions.left);
 									startX = x;
-								} else if(dx < 0 && thisObj.settings.touchActions.right!=0){
+								} else if(thisObj.settings.touchActions.right!=0 && dx<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
+									thisObj.dragHorizontal = true;
 									thisObj.doDragTouch(thisObj.settings.touchActions.right);
 									startX = x;
 								}
 				    		 }
-			    			 if(Math.abs(dy) >= thisObj.settings.dragYFrom) {
-				    			if(dy > 0 && thisObj.settings.touchActions.up!=0){
+			    			 if(Math.abs(dy)>=thisObj.settings.dragYFrom){
+				    			if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
+									thisObj.dragHorizontal = false;
 				    				thisObj.doDragTouch(thisObj.settings.touchActions.up);
 									startY = y;
-				    			}else if(dy < 0 && thisObj.settings.touchActions.down!=0){
+				    			}else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
+									thisObj.dragHorizontal = false;
 				    				thisObj.doDragTouch(thisObj.settings.touchActions.down);
 									startY = y;
 								}
@@ -2663,7 +2667,7 @@ Last modification on this file: 19 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.3.3";
+			return "1.3.4";
 		}
 	};
 	

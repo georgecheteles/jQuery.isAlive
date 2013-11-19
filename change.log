@@ -1,5 +1,8 @@
 jQuery isAlive Changelog
 
+ver. 1.3.4 (20 November 2013)
+ - drag on touch devices fixed
+
 ver. 1.3.3 (19 November 2013)
  - speed improvements
  - bugs fixed
