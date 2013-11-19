@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.3.3 (19 November 2013)
+ - speed improvements
+ - bugs fixed
+
 ver. 1.3.2 (19 November 2013)
  - speed improvements
  - border-bottom-color,border-right-color,border-top-color,border-left-color animations suport added

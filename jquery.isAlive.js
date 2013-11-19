@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.3.2)
+jQuery.isAlive(1.3.3)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -291,7 +291,6 @@ Last modification on this file: 19 November 2013
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
-		this.newDragStarted = false;
 		this.msTouchAction;
 		this.lastCSS = {};
 		
@@ -795,7 +794,6 @@ Last modification on this file: 19 November 2013
 						document.addEventListener('MSPointerMove', onTouchMove, false);
 						document.addEventListener('MSPointerUp', cancelTouch, false);
 					}
-					thisObj.newDragStarted = true;
 				}
 	
 				function cancelTouch(e) {
@@ -807,7 +805,6 @@ Last modification on this file: 19 November 2013
 						document.removeEventListener('MSPointerUp', cancelTouch);
 					}
 					isMoving = false;
-					thisObj.newDragStarted = false;
 				}	
 		
 				function onTouchMove(e) {
@@ -884,33 +881,34 @@ Last modification on this file: 19 November 2013
 		
 		/* BIND SCROLL EVENTS */
 		if(thisObj.settings.enableScroll){
-			/*FOR NON FIREFOX*/
-			jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
-				if(e.originalEvent.detail > 0)
-					var scrollDown=true;				 
-				else
-					var scrollDown=false;
-				if(thisObj.settings.scrollType=="scroll")
-					thisObj.doScroll(scrollDown);
-				else
-					thisObj.doJump(scrollDown);
-				if(thisObj.settings.preventScroll)
-					return false;
-			});
-			
-			/*FOR FIREFOX*/
-			jQuery(thisObj.mySelector).bind('mousewheel', function(e){
-				if(e.originalEvent.wheelDelta < 0)
-					scrollDown=true;
-				else
-					scrollDown=false;
-				if(thisObj.settings.scrollType=="scroll")
-					thisObj.doScroll(scrollDown);
-				else
-					thisObj.doJump(scrollDown);
-				if(thisObj.settings.preventScroll)
-					return false;
-			});
+			if(thisObj.settings.scrollType=="scroll"){
+				/*FOR NON FIREFOX*/
+				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
+					(e.originalEvent.detail > 0)?thisObj.doScroll(true):thisObj.doScroll(false);
+					if(thisObj.settings.preventScroll)
+						return false;
+				});
+				/*FOR FIREFOX*/
+				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
+					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(true):thisObj.doScroll(false);
+					if(thisObj.settings.preventScroll)
+						return false;
+				});
+			}
+			else{
+				/*FOR FIREFOX*/
+				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
+					(e.originalEvent.detail > 0)?thisObj.doJump(true):thisObj.doJump(false);
+					if(thisObj.settings.preventScroll)
+						return false;
+				});
+				/*FOR NON FIREFOX*/
+				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
+					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(true):thisObj.doJump(false);
+					if(thisObj.settings.preventScroll)
+						return false;
+				});
+			}
 		}
 	}
 	
@@ -958,7 +956,6 @@ Last modification on this file: 19 November 2013
 				}
 				else if(myElements[key]['method']=="animate-set"){
 					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end'] && (pos-myElements[key]['step-start'])%myElements[key]['move-on']==0){
-
 						selector = myElements[key]['selector']; 
 						property = myElements[key]['property']; 
 						valStart = myElements[key]['value-start']; 
@@ -1256,10 +1253,6 @@ Last modification on this file: 19 November 2013
 		/*SET TOUCH ACTIONS*/
 		thisObj.settings.touchActions = jQuery.extend({up:1,down:-1,right:0,left:0},thisObj.settings.touchActions);
 			
-		/*IE9 AND LOWER FIX FOR CSS3*/
-		if(browserObj.msie && parseInt(browserObj.version)<10 && thisObj.settings.useCSS3)
-			thisObj.settings.useCSS3 = false;
-		
 		/*SORT AND INIT STEP POINTS*/	
 		thisObj.haveStepPoints = (thisObj.settings.stepPointsSelector!=null && thisObj.settings.stepPointsActiveClass!=null && thisObj.settings.stepPoints.length>0);
 		thisObj.settings.stepPoints.sort(function(a,b){return a-b});
@@ -1456,6 +1449,7 @@ Last modification on this file: 19 November 2013
 		
 		/* DELETES UNWANTED ELEMENTS FROM TRANSITION ARRAY AND MAKES DEFAULT TRANSITION ARRAY*/		
 		for(key in thisObj.CSS3DefaultTransitionArray){
+		
 			if(thisObj.CSS3DefaultTransitionArray[key]==null){
 				delete thisObj.CSS3DefaultTransitionArray[key];
 				continue;
@@ -1524,6 +1518,7 @@ Last modification on this file: 19 November 2013
 		
 		/* GET VALUES FOR CUSTOM PARAMS */
 		for(key in thisObj.settings.elements){
+		
 			/*CONVERT IF HEX COLOR FOUND*/
 			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
 				if(indexOf(["color","background-color","border-color","border-left-color","border-top-color","border-right-color","border-bottom-color"],thisObj.settings.elements[key]["property"])!=-1){
@@ -2285,10 +2280,8 @@ Last modification on this file: 19 November 2013
 			thisObj.animateDuration=thisObj.settings.duration;
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
-		} if(thisObj.animating && thisObj.animationType=='dragTouch' && thisObj.newDragStarted && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1))){
+		} if(thisObj.animating && thisObj.animationType=='dragTouch' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
 			thisObj.step=Math.round(thisObj.lastStep);
-			thisObj.newDragStarted = false;
-		}
 		
 		if(value==1){
 			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep)<=thisObj.settings.maxDrag)
@@ -2670,7 +2663,7 @@ Last modification on this file: 19 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.3.2";
+			return "1.3.3";
 		}
 	};
 	
