@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.0)
+jQuery.isAlive(1.4.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -208,7 +208,7 @@ Last modification on this file: 22 November 2013
 	function getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd){
 		valStart = valStart.toString(); 
 		valEnd = valEnd.toString();
-		var doRecursive = function(valStart,valEnd,rgbFound){
+		var doRecursive = function(valStart,valEnd,colorFound){
 			if(valStart==valEnd)
 				return valStart;
 			if(valStart.indexOf(' ')!=-1){
@@ -216,21 +216,21 @@ Last modification on this file: 22 November 2013
 				valStart = valStart.split(' '); 
 				valEnd = valEnd.split(' ');
 				for(var key in valStart)
-					value.push(doRecursive(valStart[key],valEnd[key],rgbFound));
+					value.push(doRecursive(valStart[key],valEnd[key]));
 				return value.join(' '); 
 			}
 			if(valStart.indexOf('(')!=-1){
 				var format = valStart.substr(0,valStart.indexOf('('));
 				valStart = valStart.substr(valStart.indexOf('(')+1,valStart.indexOf(')')-valStart.indexOf('(')-1);
 				valEnd = valEnd.substr(valEnd.indexOf('(')+1,valEnd.indexOf(')')-valEnd.indexOf('(')-1);
-				return format + '(' + doRecursive(valStart,valEnd,(format=='rgb')) + ')';
+				return format + '(' + doRecursive(valStart,valEnd,(format=='rgb' || format=='rgba')) + ')';
 			}
 			if(valStart.indexOf(',')!=-1){
 				var value = [];
 				valStart = valStart.split(','); 
 				valEnd = valEnd.split(',');
 				for(var key in valStart)
-					value.push(doRecursive(valStart[key],valEnd[key],rgbFound))
+					value.push(doRecursive(valStart[key],valEnd[key],(colorFound && key<3)));
 				return value.join(','); 
 			}
 			var format = '';
@@ -247,13 +247,13 @@ Last modification on this file: 22 November 2013
 			valStart = parseFloat(valStart);
 			valEnd = parseFloat(valEnd);
 			var value = parseFloat(valStart+((valEnd-valStart)*((pos-stepStart)/(stepEnd-stepStart))));
-			if(rgbFound)
+			if(colorFound)
 				return Math.round(Math.min(255,Math.max(0,value)));
 			if(format!='')
 				return value + format;
 			return value;
 		}
-		return doRecursive(valStart,valEnd,false);
+		return doRecursive(valStart,valEnd);
 	}
 	
 /*ISALIVE MAIN OBJECT:BEGIN*/	
@@ -1382,7 +1382,7 @@ Last modification on this file: 22 November 2013
 			}
 			
 			/*MAKES WEBKIT GPU ENABLED*/
-			if(validGPU && (thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
+			if(validGPU && thisObj.settings.elements[key]['method']=='animate' && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
 				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden') ;
 				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000') ;
 				tempArrayGPU.push(thisObj.settings.elements[key]['selector']);
@@ -2583,7 +2583,7 @@ Last modification on this file: 22 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.0";
+			return "1.4.1";
 		}
 	};
 	

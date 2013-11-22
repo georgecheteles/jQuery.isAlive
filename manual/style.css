@@ -91,3 +91,11 @@ p.imp{
 	border-radius:5px;
 	box-shadow: 5px 5px 5px #ccc;
 }
+
+.links{
+	display: block;
+	padding: 10px;
+	margin: 5px;
+	font-size: 20px;
+	font-style: italic;
+}

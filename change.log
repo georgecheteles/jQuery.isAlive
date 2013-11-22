@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.4.1 (22 November 2013)
+ - suport for rgba colors added
+ - 'animate-set' does no longer gets special CSS for GPU acceleration
+
 ver. 1.4.0 (22 November 2013)
  - 'int' is no longer suported for 'animate-set'
  - now you can animate any css property (with CSS3 or jQyery) like background, border, transform, etc without using 'format'.
