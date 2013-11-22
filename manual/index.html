@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.3.X Manual</h1>
+				<h1>jQuery.isAlive 1.4.X Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -391,7 +391,7 @@
 	"step-end": > step where animation will end
 	"value-start": > CSS value at start<span class="red">*</span>
 	"value-end": > CSS value at end
-	"format": > this is used for special cases like working with CSS3 transform
+	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: rotate(X),rotate(Xdeg),Xpx,X%
 	"useCSS3": > true | false > force to use CSS3 or not
 	"easing": > easing for jQuery animations
 	"CSS3Easing": > easing for CSS3 animations
@@ -415,7 +415,7 @@
 	"step-from": > step where you want this action to be done
 	"value-under": > CSS value at under this step<span class="red">*</span>
 	"value-above": > CSS value at above this step
-	"format": > this is used for special cases like working with CSS3 transform
+	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: rotate(X),rotate(Xdeg),Xpx,X%
 	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
@@ -436,11 +436,10 @@
 	"step-end": > step where animation will end
 	"value-start": > CSS value at start<span class="red">*</span>
 	"value-end": > CSS value at end
-	"format": > this is used for special cases like animating CSS3
+	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: rotate(X),rotate(Xdeg),Xpx,X%
 	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
-	"type" : > can be float or int, by default is float
 	"move-on" : > the number of steps where the animation will occur, by defaul is 1. This means that on every step an animation will occur.
 }
 						</p>
@@ -456,7 +455,7 @@
 	"method": "static" > use "animate" if you want to change a CSS setting for an element
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
-	"format": > this is used for special cases like working with CSS3 transform
+	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: rotate(X),rotate(Xdeg),Xpx,X%
 	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>
@@ -474,7 +473,7 @@
 	"method": "set@start" > use "animate" if you want to change a CSS setting for an element
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
-	"format": > this is used for special cases like working with CSS3 transform
+	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: rotate(X),rotate(Xdeg),Xpx,X%
 	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that suport this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not suport this animation<span class="red">**</span>

@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.3.4)
+jQuery.isAlive(1.4.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 20 November 2013
+Last modification on this file: 22 November 2013
 */
 
 (function(jQuery) {
@@ -26,6 +26,37 @@ Last modification on this file: 20 November 2013
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
+	
+	/*CHECK IF FUNCTION IS COMPATIBLE WITH JQUERY*/
+	function canJQueryAnimate(property){
+		if(property=='scrollTop' || property=='scrollLeft')
+			return true;
+		var allowed = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity').split(',');
+		if(property.indexOf('-')!=-1){
+			property = property.toLowerCase().split('-');
+			for(var key in property)
+				if(key>0)
+					property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
+			property = property.join('');
+		}
+		return (indexOf(allowed,property)!=-1); 
+	}
+	
+	/*GET TEXT BETWEEN BRACKETS*/
+	function getBetweenBrackets(text,doEval){
+		var lastBracket;
+		for(lastBracket=text.length;lastBracket>=0;lastBracket--)
+			if(text.charAt(lastBracket)==')')
+				break;
+		if(typeof(doEval)=='undefined')
+			return text.substr(text.indexOf('(')+1,lastBracket-text.indexOf('(')-1);
+
+		var evalExp = text.substr(text.indexOf('(')+1,lastBracket-text.indexOf('(')-1);
+		try{
+			eval("evalExp = "+evalExp+';');
+		}catch(err){}
+		return evalExp + text.substr(lastBracket+1,text.length-lastBracket-1);
+	}
 	
 	/*CONVERTING HEX TO RGB*/
 	function hexToRgb(hex) {
@@ -52,13 +83,6 @@ Last modification on this file: 20 November 2013
 		},250);
 	}
 	
-	/*FUNCTION ADD FORMAT*/
-	function addFormat(value,format){
-		if(typeof(format)!="undefined")
-			return format.replace(/value/g,value);
-		return value;
-	}
-
 	/*VALIDATES BROWSERS*/
 	function validateBrowsers(exp){
 		var isValid = function(browser){
@@ -90,18 +114,6 @@ Last modification on this file: 20 November 2013
 		return valid;
 	}
 
-	/*REMOVES ALL DOUBLE SPACES*/
-	function fixSpaces(text){
-		if(typeof(text)!="string" || text.indexOf(" ")==-1)
-			return text;
-		text = text.split(" ");
-		var ret = [];
-		for(var key in text)
-			if(text[key]!="")
-				ret.push(text[key]);
-		return ret.join(" ");
-	}	
-	
 	/*CONVERT TO STRING*/
 	function toString(value){
 		if(typeof(value)=='function')
@@ -117,15 +129,6 @@ Last modification on this file: 20 November 2013
 			hash = c + (hash << 6) + (hash << 16) - hash;
 		}
 		return hash;
-	}
-	
-	/*RETURNS THE OBJECT LENGTH*/
-	function lengthObj(obj){
-		var key;
-		var ret = 0;
-		for(key in obj)
-			ret++;
-		return ret;
 	}
 	
 	/*CHECKS IF NUMBER*/
@@ -181,7 +184,7 @@ Last modification on this file: 20 November 2013
 	function isDinamic(params){
 		if(typeof(params) == "function")
 			return true;
-		if(params.toString().indexOf('eval(')!==-1)
+		if(params.toString().indexOf('eval')!==-1)
 			return true;
 		return false;
 	}
@@ -202,58 +205,55 @@ Last modification on this file: 20 November 2013
 	}
 	
 	/*CALCULATE THE CSS PROPERTY AT A POSITION*/
-	function getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,format,type){
-		var value,valTemp,formatDetected,splitChar;
-		
-		splitChar = " ";
-		if(valStart.toString().indexOf(",")!=-1)
-			splitChar = ",";
-			
-		/* IF THE FORMAT DOES NOT MATCH */		
-		if(valStart.toString().split(splitChar).length!=valEnd.toString().split(splitChar).length)
-				return false;
-				
-		valStart = valStart.toString().split(splitChar);
-		valEnd = valEnd.toString().split(splitChar);
-		
-		value = [];
-		for(var key in valStart){
-			
-			if(valStart[key].indexOf("px")!=-1 || valEnd[key].indexOf("px")!=-1)
-				formatDetected = "px";
-			else if(valStart[key].indexOf("%")!=-1 && valEnd[key].indexOf("%")!=-1)
-				formatDetected = "%"; 
-			else if(valStart[key].indexOf("deg")!=-1 && valEnd[key].indexOf("deg")!=-1)
-				formatDetected = "deg";
-			else
-				formatDetected = "";
-				
-			valStart[key] = valStart[key].replace(formatDetected,"");
-			valEnd[key] = valEnd[key].replace(formatDetected,"");
-			
-			if(isNaN(parseFloat(valStart[key])) || isNaN(parseFloat(valEnd[key]))){
-				value.push(valStart[key]);
-				continue;
+	function getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd){
+		valStart = valStart.toString(); 
+		valEnd = valEnd.toString();
+		var doRecursive = function(valStart,valEnd,rgbFound){
+			if(valStart==valEnd)
+				return valStart;
+			if(valStart.indexOf(' ')!=-1){
+				var value = [];
+				valStart = valStart.split(' '); 
+				valEnd = valEnd.split(' ');
+				for(var key in valStart)
+					value.push(doRecursive(valStart[key],valEnd[key],rgbFound));
+				return value.join(' '); 
 			}
-			
-			valStart[key] = parseFloat(valStart[key]);
-			valEnd[key] = parseFloat(valEnd[key]);
-			
-			valTemp = parseFloat(valStart[key]+((valEnd[key]-valStart[key])*((pos-stepStart)/(stepEnd-stepStart))));
-			
-			if(type=="int")
-				valTemp = Math.round(valTemp);
-
-			value.push(valTemp.toString()+formatDetected);
+			if(valStart.indexOf('(')!=-1){
+				var format = valStart.substr(0,valStart.indexOf('('));
+				valStart = valStart.substr(valStart.indexOf('(')+1,valStart.indexOf(')')-valStart.indexOf('(')-1);
+				valEnd = valEnd.substr(valEnd.indexOf('(')+1,valEnd.indexOf(')')-valEnd.indexOf('(')-1);
+				return format + '(' + doRecursive(valStart,valEnd,(format=='rgb')) + ')';
+			}
+			if(valStart.indexOf(',')!=-1){
+				var value = [];
+				valStart = valStart.split(','); 
+				valEnd = valEnd.split(',');
+				for(var key in valStart)
+					value.push(doRecursive(valStart[key],valEnd[key],rgbFound))
+				return value.join(','); 
+			}
+			var format = '';
+			if(valStart.indexOf("px")!=-1)
+				format = "px";
+			else if(valStart.indexOf("%")!=-1)
+				format = "%"; 
+			else if(valStart.indexOf("deg")!=-1)
+				format = "deg";
+			if(format!=''){
+				valStart = valStart.replace(format,"");
+				valEnd = valEnd.replace(format,"");
+			}
+			valStart = parseFloat(valStart);
+			valEnd = parseFloat(valEnd);
+			var value = parseFloat(valStart+((valEnd-valStart)*((pos-stepStart)/(stepEnd-stepStart))));
+			if(rgbFound)
+				return Math.round(Math.min(255,Math.max(0,value)));
+			if(format!='')
+				return value + format;
+			return value;
 		}
-		
-		value = value.join(splitChar);
-		value = addFormat(value,format);
-		
-		if(isNumber(value))
-			return parseFloat(value);
-		
-		return value;
+		return doRecursive(valStart,valEnd,false);
 	}
 	
 /*ISALIVE MAIN OBJECT:BEGIN*/	
@@ -374,127 +374,71 @@ Last modification on this file: 20 November 2013
 	
 	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
 	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
-		
 		var thisObj = this;
-		var temp;
-		var format = null;
-		var isInt = (property.indexOf("color")!=-1);
-		
 		if(startPos==parseInt(startPos) || typeof(thisObj.lastCSS[selector+'|'+property])=="undefined")
 			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
-
 		var start = thisObj.lastCSS[selector+'|'+property];
 		var end = value.toString();
-		
-		if(start.indexOf('(')!=-1){
-			temp = start.split('(');
-			format = temp[0];
-			start = temp[1].replace(")","");
-			temp = end.split('(');
-			end = temp[1].replace(")","");
-		}
-			
-		var splitChar = " ";
-		if(start.indexOf(',')!=-1)
-			splitChar = ",";
-		start = start.split(splitChar);
-		end = end.split(splitChar);
-		
-		if(start.length!=end.length)
-			return false;
-			
 		var tempObj = {};
 		tempObj[property.replace(/-/g,"")+'Timer']="+=100";
 		jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
 			step: function(step,fx){
-				var arrayTemp = [];
-				var val,f,CSSVal;
-				step = step-fx.start;
-				for(var key in start){
-					f = ""
-					if(start[key].indexOf("px")!=-1)
-						f = "px";
-					else if(start[key].indexOf("%")!=-1)
-						f = "%";
-					else if(start[key].indexOf("deg")!=-1)
-						f = "deg";
-					startT = parseInt(start[key].replace(f,""));
-					endT = parseInt(end[key].replace(f,""));
-					val = startT + ((endT-startT)*(step/100));
-					if(isInt)
-						val = Math.round(val);
-					arrayTemp.push(val.toString()+f);
-				}
-				CSSVal = arrayTemp.join(splitChar);
-				if(format!=null)
-					CSSVal = format+"("+CSSVal+")";
-				thisObj.lastCSS[selector+'|'+property] = CSSVal;
-				thisObj.setCSS(selector,property,CSSVal);
+				var pos = step-fx.start;
+				var value = getAtPosValue(pos,start,end,0,100);
+				thisObj.lastCSS[selector+'|'+property] = value;
+				thisObj.setCSS(selector,property,value);
 			}
 		});
 	}
 	
 	/* REPLACES PARAMS */
-	isAlive.prototype.convertParams = function(params){
-		
+	isAlive.prototype.convertParams = function(params,format){
 		var thisObj = this;
-
-		var returnValue,paramsConv,key,format,splitChar,evl,lastBracket,bracketCount,key;
-		
 		if(typeof(params) == "function")
-			return params(thisObj.mySelector,thisObj.params);
-			
-		paramsConv = fixSpaces(params).toString();
-		
-		splitChar = " ";
-		if(paramsConv.indexOf(",")!=-1)
-			splitChar = ",";
-		
-		if(!isDinamic(params)){
-			paramsConv = paramsConv.split(splitChar); 
-			for(key in paramsConv)
-				paramsConv[key] = paramsConv[key].replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");		
-		}
+			params = params(thisObj.mySelector,thisObj.params).toString();
 		else{
-			paramsConv = paramsConv.replace(/elementTop/g,thisObj.params.elementTop.toString());
-			paramsConv = paramsConv.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
-			paramsConv = paramsConv.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
-			paramsConv = paramsConv.replace(/elementWidth/g,thisObj.params.elementWidth.toString());
-			paramsConv = paramsConv.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
-			paramsConv = paramsConv.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
-			paramsConv = paramsConv.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
-			paramsConv = paramsConv.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
-			paramsConv = paramsConv.split(splitChar); 
-			for(key in paramsConv){
-				paramsConv[key] = paramsConv[key].replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");
-				if(paramsConv[key].indexOf('eval(')!=-1){
-					/*FIND CLOSING BRACKET POSITION*/
-					bracketCount = 0;
-					for(lastBracket=0;lastBracket<=paramsConv[key].indexOf('eval(');lastBracket++)
-						if(paramsConv[key].charAt(lastBracket)=="(")
-					bracketCount++;
-					for(lastBracket=paramsConv[key].length-1;lastBracket>=0;lastBracket--){
-						if(paramsConv[key].charAt(lastBracket)==")"){
-							if(bracketCount==0)
-								break;
-							else
-								bracketCount--;
-						}
-					}
-					evl = paramsConv[key].substr(paramsConv[key].indexOf('eval(')+5,(lastBracket-5)-paramsConv[key].indexOf('eval('));
-					try{
-						eval("evl = "+evl+';');
-					}catch(err){}
-					paramsConv[key] = paramsConv[key].substr(0,paramsConv[key].indexOf('eval(')) + evl + paramsConv[key].substr(lastBracket+1);
+			params = params.toString();
+			params = params.replace(/elementTop/g,thisObj.params.elementTop.toString());
+			params = params.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
+			params = params.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
+			params = params.replace(/elementWidth/g,thisObj.params.elementWidth.toString());
+			params = params.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
+			params = params.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
+			params = params.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
+			params = params.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
+			var doRecursive = function(params){
+				if(params.indexOf(' ')!=-1){
+					params = params.split(' ');
+					for(var key in params)
+						params[key] = doRecursive(params[key]);
+					return params.join(' ');
 				}
+				if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval')
+					return params.substr(0,params.indexOf('(')) + '(' + doRecursive(getBetweenBrackets(params)) + ')';
+				if(params.indexOf(',')!=-1){
+					params = params.split(',');
+					for(var key in params)
+						params[key] = doRecursive(params[key]);
+					return params.join(',');
+				}
+				if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
+					return getBetweenBrackets(params,true);
+				if(params.indexOf('#')!=-1){
+					var convertValue = hexToRgb(params);
+					if(convertValue!=null)
+						params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
+				}
+				else
+					params = params.replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");	
+				return params;
 			}
+			params = doRecursive(params);
 		}
-		
-		paramsConv = paramsConv.join(splitChar);
-		if(isNumber(paramsConv))
-			return parseFloat(paramsConv);
-		else
-			return paramsConv;
+		if(typeof(format)!='undefined')
+			params = format.replace('(X)','('+params+')').replace('Xpx',params+'px').replace('X%',params+'%').replace('Xdeg',params+'deg');
+		if(isNumber(params))
+			return parseFloat(params);
+		return params;
 	}
 	
 	/* CREATES AND GETS CSS3 ARRAY */
@@ -598,13 +542,16 @@ Last modification on this file: 20 November 2013
 			for(key in thisObj.cssDinamicElements){
 				if(thisObj.cssDinamicElements[key]['method']=="static"){
 					/*REPOSITION STATIC ELEMNTS*/
-					value = thisObj.convertParams(thisObj.cssDinamicElements[key]['value']);
-					value = addFormat(value,thisObj.cssDinamicElements[key]['format'])
-					thisObj.setCSS(thisObj.cssDinamicElements[key]['selector'],thisObj.cssDinamicElements[key]['property'],value);
+					selector = thisObj.cssDinamicElements[key]['selector'];
+					property = thisObj.cssDinamicElements[key]['property'];
+					value = thisObj.convertParams(thisObj.cssDinamicElements[key]['value'],thisObj.cssDinamicElements[key]['format']);
+					thisObj.setCSS(selector,property,value);
 				} else if(thisObj.cssDinamicElements[key]['method']=="animate"){
 					/*REPOSITION ANIMATE*/	
-					valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start']);
-					valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end']);
+					selector = thisObj.cssDinamicElements[key]['selector'];
+					property = thisObj.cssDinamicElements[key]['property'];
+					valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start'],thisObj.cssDinamicElements[key]['format']);
+					valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end'],thisObj.cssDinamicElements[key]['format']);
 					if(thisObj.cssDinamicElements[key]['scrollbar']==true){
 						thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-start']=valStart;
 						thisObj.settings.elements[thisObj.cssDinamicElements[key]['key']]['value-end']=valEnd;
@@ -612,52 +559,44 @@ Last modification on this file: 20 November 2013
 					stepStart = thisObj.cssDinamicElements[key]['step-start']
 					stepEnd = thisObj.cssDinamicElements[key]['step-end']
 					for(pos=stepStart;pos<=stepEnd;pos++){
-						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
-						thisObj.animPositions[pos][thisObj.cssDinamicElements[key]['selector']][thisObj.cssDinamicElements[key]['property']]=value;
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
+						thisObj.animPositions[pos][selector][property]=value;
 					}
-					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+					if(typeof(changedElements[selector])=="undefined")
+						changedElements[selector] = [];
+					if(indexOf(changedElements[selector],property)==-1)
+						changedElements[selector].push(property);
 				}else if(thisObj.cssDinamicElements[key]['method']=="set"){
 					/*REPOSITION SET*/
 					selector = thisObj.cssDinamicElements[key]['selector'];
 					property = thisObj.cssDinamicElements[key]['property'];
 					stepFrom = thisObj.cssDinamicElements[key]['step-from'];
-
 					valAbove = thisObj.cssDinamicElements[key]['value-above'];
 					if(isDinamic(valAbove)){
-						valAbove = thisObj.convertParams(valAbove);
-						valAbove = addFormat(valAbove,thisObj.cssDinamicElements[key]['format']);
+						valAbove = thisObj.convertParams(valAbove,thisObj.cssDinamicElements[key]['format']);
 						thisObj.setArray['forward'][stepFrom][selector][property] = valAbove;
 					}
-					
 					valUnder = thisObj.cssDinamicElements[key]['value-under'];
 					if(isDinamic(valUnder)){
-						valUnder = thisObj.convertParams(valUnder);
-						valUnder = addFormat(valUnder,thisObj.cssDinamicElements[key]['format']);
+						valUnder = thisObj.convertParams(valUnder,thisObj.cssDinamicElements[key]['format']);
 						thisObj.setArray['backward'][stepFrom][selector][property] = valUnder;
 					}
-					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+					if(typeof(changedElements[selector])=="undefined")
+						changedElements[selector] = [];
+					if(indexOf(changedElements[selector],property)==-1)
+						changedElements[selector].push(property);
 				}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
 					/*REPOSITION ANIMATE-SET*/
-					valStart = thisObj.cssDinamicElements[key]['value-start'];
-					valEnd = thisObj.cssDinamicElements[key]['value-end'];
-					if(isDinamic(valStart))
-						valStart = thisObj.convertParams(valStart);
-					if(isDinamic(valEnd))
-						valEnd = thisObj.convertParams(valEnd);
 					selector = thisObj.cssDinamicElements[key]['selector'];
 					property = thisObj.cssDinamicElements[key]['property'];
+					valStart = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-start'],thisObj.cssDinamicElements[key]['format']);
+					valEnd = thisObj.convertParams(thisObj.cssDinamicElements[key]['value-end'],thisObj.cssDinamicElements[key]['format']);
 					stepStart = thisObj.cssDinamicElements[key]['step-start'];
 					stepEnd = thisObj.cssDinamicElements[key]['step-end'];
 					moveOn = thisObj.cssDinamicElements[key]['move-on'];
 					for(pos=stepStart;pos<=stepEnd;pos++){
 						if((pos-stepStart)%moveOn==0){
-							value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,thisObj.cssDinamicElements[key]['format'],thisObj.cssDinamicElements[key]['type']);
+							value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
 							if(pos>stepStart){
 								thisObj.setArray['forward'][pos][selector][property] = value;
 								thisObj.setArray['backward'][pos][selector][property] = oldValue;
@@ -665,10 +604,10 @@ Last modification on this file: 20 November 2013
 							oldValue = value;
 						}
 					}
-					if(typeof(changedElements[thisObj.cssDinamicElements[key]['selector']])=="undefined")
-						changedElements[thisObj.cssDinamicElements[key]['selector']] = [];
-					if(indexOf(changedElements[thisObj.cssDinamicElements[key]['selector']],thisObj.cssDinamicElements[key]['property'])==-1)
-						changedElements[thisObj.cssDinamicElements[key]['selector']].push(thisObj.cssDinamicElements[key]['property']);
+					if(typeof(changedElements[selector])=="undefined")
+						changedElements[selector] = [];
+					if(indexOf(changedElements[selector],property)==-1)
+						changedElements[selector].push(property);
 				}
 			}
 			
@@ -690,7 +629,6 @@ Last modification on this file: 20 November 2013
 					}
 				}
 			}
-			
 			for(selector in changedElements){
 				for(key in changedElements[selector]){
 					property = changedElements[selector][key];
@@ -938,24 +876,24 @@ Last modification on this file: 20 November 2013
 		/*CREATES ARRAYS FOR ADDCLASS, REMOVECLASS, SET, ANIMATION PROPERTY*/
 		for(pos=0;pos<=thisObj.settings.max;pos++){
 			for(key in myElements){
-			
 				if((myElements[key]['method']=='animate' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='animate-set' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='set' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='add-class' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='remove-class' && pos>myElements[key]['step-from'])){
 					delete myElements[key];
 					continue;
 				}
-			
 				if(myElements[key]['method']=='animate'){
 					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end']){
+						selector = myElements[key]['selector'];
+						property = myElements[key]['property'];
 						valStart = myElements[key]['value-start']; 
 						valEnd = myElements[key]['value-end'];
 						stepStart = myElements[key]['step-start']; 
 						stepEnd = myElements[key]['step-end'];
-						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
 						if(typeof(thisObj.animPositions[pos])=="undefined")
 							thisObj.animPositions[pos]=[];
-						if(typeof(thisObj.animPositions[pos][myElements[key]['selector']])=="undefined")
-							thisObj.animPositions[pos][myElements[key]['selector']]=[];
-						thisObj.animPositions[pos][myElements[key]['selector']][myElements[key]['property']]=value;
+						if(typeof(thisObj.animPositions[pos][selector])=="undefined")
+							thisObj.animPositions[pos][selector]=[];
+						thisObj.animPositions[pos][selector][property]=value;
 					}
 				}
 				else if(myElements[key]['method']=="animate-set"){
@@ -966,7 +904,7 @@ Last modification on this file: 20 November 2013
 						valEnd = myElements[key]['value-end'];
 						stepStart = myElements[key]['step-start']; 
 						stepEnd = myElements[key]['step-end'];
-						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd,myElements[key]['format'],myElements[key]['type']);
+						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
 						if(pos>stepStart){
 							if(typeof(thisObj.setArray['forward'][pos])=="undefined")
 								thisObj.setArray['forward'][pos] = {};
@@ -1332,11 +1270,10 @@ Last modification on this file: 20 November 2013
 						thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
 					thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
 				}
-				
-				/*MAKES ALL PROPERTY LOWER CASE*/
-				thisObj.settings.elements[key]['property'] = jQuery.trim(thisObj.settings.elements[key]['property']).toLowerCase();
-				if(thisObj.settings.elements[key]['property']=='scrolltop')	thisObj.settings.elements[key]['property'] = 'scrollTop';
-				if(thisObj.settings.elements[key]['property']=='scrollleft') thisObj.settings.elements[key]['property'] = 'scrollLeft';
+				else{
+					/*TRIMS PROPERTY*/
+					thisObj.settings.elements[key]['property'] = jQuery.trim(thisObj.settings.elements[key]['property']);
+				}
 				
 				/*CSS3 DOES NOT WORK ON IE7&IE8*/
 				if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
@@ -1391,8 +1328,9 @@ Last modification on this file: 20 November 2013
 								delete thisObj.settings.elements[key]['CSS3Easing'];
 						}
 					}
-					thisObj.settings.elements[key]['useJQuery'] = true;
-					if(thisObj.settings.elements[key]['useCSS3'] || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (!thisObj.settings.elements[key]['useCSS3'] && indexOf(["transform","color","background-color","border-color","border-left-color","border-top-color","border-right-color","border-bottom-color"],thisObj.settings.elements[key]["property"])!=-1))
+					if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
+						thisObj.settings.elements[key]['useJQuery'] = true
+					else
 						thisObj.settings.elements[key]['useJQuery'] = false;
 				}
 
@@ -1406,6 +1344,7 @@ Last modification on this file: 20 November 2013
 				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
 			}
 		}
+		
 		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
 		
 		/*CHECKS IF ENABLE GPU IS VALID*/
@@ -1522,25 +1461,6 @@ Last modification on this file: 20 November 2013
 		
 		/* GET VALUES FOR CUSTOM PARAMS */
 		for(key in thisObj.settings.elements){
-		
-			/*CONVERT IF HEX COLOR FOUND*/
-			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
-				if(indexOf(["color","background-color","border-color","border-left-color","border-top-color","border-right-color","border-bottom-color"],thisObj.settings.elements[key]["property"])!=-1){
-					convertValue = hexToRgb(thisObj.settings.elements[key]["value-start"]);
-					if(convertValue!=null){
-						convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
-						thisObj.settings.elements[key]["value-start"] = convertValue;
-					}
-					convertValue = hexToRgb(thisObj.settings.elements[key]["value-end"]);
-					if(convertValue!=null){
-						convertValue = convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString();
-						thisObj.settings.elements[key]["value-end"] = convertValue;
-					}
-					thisObj.settings.elements[key]["format"] = "rgb(value)";
-					thisObj.settings.elements[key]["type"] = "int";
-				}
-			}
-		
 			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
 				if(isDinamic(thisObj.settings.elements[key]['value-start']) || isDinamic(thisObj.settings.elements[key]['value-end'])){
 					if(thisObj.settings.elements[key]['scrollbar']==true)
@@ -1549,32 +1469,28 @@ Last modification on this file: 20 November 2013
 						var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
-				thisObj.settings.elements[key]['value-start'] = thisObj.convertParams(thisObj.settings.elements[key]['value-start']);
-				thisObj.settings.elements[key]['value-end'] = thisObj.convertParams(thisObj.settings.elements[key]['value-end']);
+				thisObj.settings.elements[key]['value-start'] = thisObj.convertParams(thisObj.settings.elements[key]['value-start'],thisObj.settings.elements[key]['format']);
+				thisObj.settings.elements[key]['value-end'] = thisObj.convertParams(thisObj.settings.elements[key]['value-end'],thisObj.settings.elements[key]['format']);
 			}
 			else if(thisObj.settings.elements[key]["method"]=="set"){
 				if(isDinamic(thisObj.settings.elements[key]['value-under']) || isDinamic(thisObj.settings.elements[key]['value-above'])){
 					var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
-				thisObj.settings.elements[key]['value-under'] = thisObj.convertParams(thisObj.settings.elements[key]['value-under']);
-				thisObj.settings.elements[key]['value-under'] = addFormat(thisObj.settings.elements[key]['value-under'],thisObj.settings.elements[key]['format'])
-				thisObj.settings.elements[key]['value-above'] = thisObj.convertParams(thisObj.settings.elements[key]['value-above']);
-				thisObj.settings.elements[key]['value-above'] = addFormat(thisObj.settings.elements[key]['value-above'],thisObj.settings.elements[key]['format'])
+				thisObj.settings.elements[key]['value-under'] = thisObj.convertParams(thisObj.settings.elements[key]['value-under'],thisObj.settings.elements[key]['format']);
+				thisObj.settings.elements[key]['value-above'] = thisObj.convertParams(thisObj.settings.elements[key]['value-above'],thisObj.settings.elements[key]['format']);
 			}
 			else if(thisObj.settings.elements[key]["method"]=="static"){
 				if(isDinamic(thisObj.settings.elements[key]['value'])){
 					var tempObj = jQuery.extend(true, {}, thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
-				convertValue = thisObj.convertParams(thisObj.settings.elements[key]['value']);
-				convertValue = addFormat(convertValue,thisObj.settings.elements[key]['format'])
+				convertValue = thisObj.convertParams(thisObj.settings.elements[key]['value'],thisObj.settings.elements[key]['format']);
 				thisObj.setCSS(thisObj.settings.elements[key]['selector'],thisObj.settings.elements[key]['property'],convertValue);
 				delete thisObj.settings.elements[key];
 			}
 			else if(thisObj.settings.elements[key]["method"]=="set@start"){
-				var convertValue = thisObj.convertParams(thisObj.settings.elements[key]["value"]);
-				convertValue = addFormat(convertValue,thisObj.settings.elements[key]["format"]);
+				var convertValue = thisObj.convertParams(thisObj.settings.elements[key]["value"],thisObj.settings.elements[key]['format']);
 				thisObj.setCSS(thisObj.settings.elements[key]["selector"],thisObj.settings.elements[key]["property"],convertValue);
 				delete thisObj.settings.elements[key];
 			}
@@ -2667,7 +2583,7 @@ Last modification on this file: 20 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.3.4";
+			return "1.4.0";
 		}
 	};
 	
