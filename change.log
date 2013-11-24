@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.4.2 (24 November 2013)
+ - small changes
+ - with durationTweeks can now adjust the duration for scroll and drag. If this is not set the default duration will be used.
+
 ver. 1.4.1 (22 November 2013)
  - suport for rgba colors added
  - 'animate-set' does no longer gets special CSS for GPU acceleration

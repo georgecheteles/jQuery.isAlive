@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.1)
+jQuery.isAlive(1.4.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 22 November 2013
+Last modification on this file: 24 November 2013
 */
 
 (function(jQuery) {
@@ -29,9 +29,7 @@ Last modification on this file: 22 November 2013
 	
 	/*CHECK IF FUNCTION IS COMPATIBLE WITH JQUERY*/
 	function canJQueryAnimate(property){
-		if(property=='scrollTop' || property=='scrollLeft')
-			return true;
-		var allowed = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity').split(',');
+		var allowed = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity,scrollLeft,scrollTop').split(',');
 		if(property.indexOf('-')!=-1){
 			property = property.toLowerCase().split('-');
 			for(var key in property)
@@ -297,7 +295,7 @@ Last modification on this file: 22 November 2013
 			elements:{},
 			elementsType:"linear", /*linear|tree*/
 			duration: 1000,
-			durationTweaks:{}, /*obj: {jump|wipe|scrollBar:duration|durationType|minStepDuration}*/
+			durationTweaks:{}, /*obj: {scroll|jump|drag|wipe|scrollBar:duration|durationType|minStepDuration}*/
 			enableScroll:true,
 			scrollType:"scroll", /*scroll|jump*/
 			jumpPoints:[],
@@ -375,8 +373,8 @@ Last modification on this file: 22 November 2013
 	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
 	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
 		var thisObj = this;
-		if(startPos==parseInt(startPos) || typeof(thisObj.lastCSS[selector+'|'+property])=="undefined")
-			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[Math.round(startPos)][selector][property].toString();
+		if(startPos==parseInt(startPos))
+			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[startPos][selector][property].toString();
 		var start = thisObj.lastCSS[selector+'|'+property];
 		var end = value.toString();
 		var tempObj = {};
@@ -389,6 +387,42 @@ Last modification on this file: 22 November 2013
 				thisObj.setCSS(selector,property,value);
 			}
 		});
+	}
+
+	/*SET CSS VALUES*/
+	isAlive.prototype.setCSS = function(selector,property,value){
+		var thisObj = this;
+		var key,key2;
+		if(typeof(property)=="string"){
+			if(typeof(thisObj.functionsArray[property])!="undefined"){
+				var f = thisObj.functionsArray[property];
+				f(selector,value);
+				return;
+			}
+			if(property=="scrollTop"){
+				jQuery(selector).scrollTop(value);
+				return;
+			}
+			if(property=="scrollLeft"){
+				jQuery(selector).scrollLeft(value);
+				return;
+			}
+			else{
+				if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
+					delete thisObj.CSS3TransitionArray[selector][property];
+					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+				}
+				else if(property==fixCSS3("transition")){
+					value = thisObj.getTransitionArray(selector,value);
+				}
+				jQuery(selector).css(property,value);
+				return;
+			}
+		}		
+		else{
+			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+			jQuery(selector).css(property);
+		}
 	}
 	
 	/* REPLACES PARAMS */
@@ -484,42 +518,6 @@ Last modification on this file: 22 November 2013
 		if(rt=="")
 			rt = "all 0s";
 		return rt;
-	}
-	
-	/*SET CSS VALUES*/
-	isAlive.prototype.setCSS = function(selector,property,value){
-		var thisObj = this;
-		var key,key2;
-		if(typeof(property)=="string"){
-			if(typeof(thisObj.functionsArray[property])!="undefined"){
-				var f = thisObj.functionsArray[property];
-				f(selector,value);
-				return;
-			}
-			if(property=="scrollTop"){
-				jQuery(selector).scrollTop(value);
-				return;
-			}
-			if(property=="scrollLeft"){
-				jQuery(selector).scrollLeft(value);
-				return;
-			}
-			else{
-				if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
-					delete thisObj.CSS3TransitionArray[selector][property];
-					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
-				}
-				else if(property==fixCSS3("transition")){
-					value = thisObj.getTransitionArray(selector,value);
-				}
-				jQuery(selector).css(property,value);
-				return;
-			}
-		}		
-		else{
-			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
-			jQuery(selector).css(property);
-		}
 	}
 	
 	/*REMAKES PAGE LAYOUT*/
@@ -1178,13 +1176,19 @@ Last modification on this file: 22 November 2013
 			thisObj.settings.scrollbarType = "scroll";
 		
 		/*SETS THE DURATION TWEAKS*/
+		if(typeof(thisObj.settings.durationTweaks['scroll'])=="undefined")
+			thisObj.settings.durationTweaks['scroll'] = {};
 		if(typeof(thisObj.settings.durationTweaks['jump'])=="undefined")
 			thisObj.settings.durationTweaks['jump'] = {};
+		if(typeof(thisObj.settings.durationTweaks['drag'])=="undefined")
+			thisObj.settings.durationTweaks['drag'] = {};
 		if(typeof(thisObj.settings.durationTweaks['wipe'])=="undefined")
 			thisObj.settings.durationTweaks['wipe'] = {};
 		if(typeof(thisObj.settings.durationTweaks['scrollbar'])=="undefined")
 			thisObj.settings.durationTweaks['scrollbar'] = {};
+		thisObj.settings.durationTweaks['scroll'] = jQuery.extend({duration:thisObj.settings.duration},thisObj.settings.durationTweaks['scroll']);
 		thisObj.settings.durationTweaks['jump'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['jump']);
+		thisObj.settings.durationTweaks['drag'] = jQuery.extend({duration:thisObj.settings.duration},thisObj.settings.durationTweaks['drag']);
 		thisObj.settings.durationTweaks['wipe'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['wipe']);
 		thisObj.settings.durationTweaks['scrollbar'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['scrollbar']);
 
@@ -1300,7 +1304,6 @@ Last modification on this file: 22 November 2013
 				if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
 					delete thisObj.settings.elements[key]['CSS3Easing'];
 					
-					
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
 					if(thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (browserObj.msie && parseInt(browserObj.version)<10)){
@@ -1328,10 +1331,7 @@ Last modification on this file: 22 November 2013
 								delete thisObj.settings.elements[key]['CSS3Easing'];
 						}
 					}
-					if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
-						thisObj.settings.elements[key]['useJQuery'] = true
-					else
-						thisObj.settings.elements[key]['useJQuery'] = false;
+					(canJQueryAnimate(thisObj.settings.elements[key]["property"]))?thisObj.settings.elements[key]['useJQuery'] = true:thisObj.settings.elements[key]['useJQuery'] = false;
 				}
 
 				/*PUT ANIMATE CLASS FOR ANIMATIONS*/
@@ -1383,8 +1383,8 @@ Last modification on this file: 22 November 2013
 			
 			/*MAKES WEBKIT GPU ENABLED*/
 			if(validGPU && thisObj.settings.elements[key]['method']=='animate' && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
-				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden') ;
-				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000') ;
+				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden');
+				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000');
 				tempArrayGPU.push(thisObj.settings.elements[key]['selector']);
 			}
 			
@@ -1714,14 +1714,6 @@ Last modification on this file: 22 November 2013
 		var directionForward;
 		var loopFound;
 		
-		if(thisObj.step==thisObj.lastStep){
-			thisObj.animating=false;
-			thisObj.animationType='none';
-			thisObj.animateDuration = thisObj.settings.duration;
-			thisObj.forceAnimation = false;			
-			return;
-		}
-		
 		loopFound = (thisObj.l(thisObj.lastStep)!=thisObj.l(thisObj.step));
 		
 		if(thisObj.step>thisObj.lastStep){
@@ -1871,7 +1863,6 @@ Last modification on this file: 22 November 2013
 				var selector;
 				thisObj.animating = false;
 				thisObj.animationType='none';
-				thisObj.animateDuration = thisObj.settings.duration;
 				thisObj.forceAnimation = false;
 				
 				for(selector in thisObj.CSS3TransitionArray){
@@ -1884,7 +1875,7 @@ Last modification on this file: 22 November 2013
 					thisObj.rebuildOnStop = false;
 				}
 				
-				if(thisObj.onComplete!==null){
+				if(thisObj.onComplete!==null && typeof(settings.onComplete)=='function'){
 					thisObj.onComplete();
 					thisObj.onComplete = null;
 				}
@@ -2093,10 +2084,10 @@ Last modification on this file: 22 November 2013
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='scroll'){
-			thisObj.animateDuration=thisObj.settings.duration;
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
-		} else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
+		}
+		else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		if(pos){
@@ -2121,11 +2112,13 @@ Last modification on this file: 22 November 2013
 		clearTimeout(thisObj.scrollTimer);
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='scroll')){
 			thisObj.animationType='scroll';
+			thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
 			thisObj.animateSite();
 		}
 		else{
 			thisObj.scrollTimer = setTimeout(function(){
 				thisObj.animationType='scroll';
+				thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
 				thisObj.animateSite();
 			},20);
 		}
@@ -2197,10 +2190,10 @@ Last modification on this file: 22 November 2013
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='dragTouch'){
-			thisObj.animateDuration=thisObj.settings.duration;
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
-		} if(thisObj.animating && thisObj.animationType=='dragTouch' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
+		}
+		else if(thisObj.animating && thisObj.animationType=='dragTouch' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		if(value==1){
@@ -2223,6 +2216,7 @@ Last modification on this file: 22 November 2013
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
 		thisObj.animationType='dragTouch';
+		thisObj.animateDuration = thisObj.settings.durationTweaks.drag.duration;
 		thisObj.animateSite();
 	}
 	
@@ -2231,8 +2225,8 @@ Last modification on this file: 22 November 2013
 		settings = jQuery.extend({
 			to:null,
 			duration: null,
-			durationType: 'default',
-			orientation:'default',
+			durationType: 'default',  /*default|step*/
+			orientation:'default', /*default|loop|next|prev*/
 			animationType:'goTo',
 			onComplete:null,
 			minStepDuration:null,
@@ -2250,9 +2244,6 @@ Last modification on this file: 22 November 2013
 		
 		pos = settings.to+(Math.floor(thisObj.lastStep/thisObj.settings.max)*thisObj.settings.max);
 		
-		if(Math.abs(pos-thisObj.lastStep)>=thisObj.settings.max*2)
-			return;
-
 		if(thisObj.settings.loop){
 			if(settings.orientation=='loop'){
 				if(thisObj.lastStep<=pos)
@@ -2307,10 +2298,7 @@ Last modification on this file: 22 November 2013
 					thisObj.animateDuration = settings.duration;
 			}
 		}
-		
-		thisObj.onComplete=null;
-		if(settings.onComplete!==null && typeof(settings.onComplete)=='function')
-			thisObj.onComplete = settings.onComplete; 
+		(settings.onComplete!==null)?thisObj.onComplete=settings.onComplete:thisObj.onComplete=null;
 		thisObj.animateSite();
 	}
 	
@@ -2411,11 +2399,11 @@ Last modification on this file: 22 November 2013
 		var selector;
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating = false;
-		thisObj.forceAnimation = false;
 		thisObj.animationType='none';
-		thisObj.animateDuration = thisObj.settings.duration;	
-		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
+		thisObj.forceAnimation = false;
 		thisObj.onComplete = null;
+		
+		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 		
 		for(selector in thisObj.CSS3TransitionArray){
 			delete thisObj.CSS3TransitionArray[selector];
@@ -2561,10 +2549,7 @@ Last modification on this file: 22 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
 				return false;
-			if(typeof(options)=='function')
-				isAliveObjects[selector].onComplete = options;
-			else
-				return false;
+			isAliveObjects[selector].onComplete = options;
 			return thisObj;
 		},
 		getStepPosition : function(thisObj){
@@ -2583,7 +2568,7 @@ Last modification on this file: 22 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.1";
+			return "1.4.2";
 		}
 	};
 	
