@@ -1,5 +1,8 @@
 jQuery isAlive Changelog
 
+ver. 1.4.3 (24 November 2013)
+ - color names are now suported
+
 ver. 1.4.2 (24 November 2013)
  - small changes
  - with durationTweeks can now adjust the duration for scroll and drag. If this is not set the default duration will be used.
