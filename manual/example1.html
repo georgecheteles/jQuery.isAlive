@@ -5,7 +5,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 		<link type="text/css" rel="stylesheet" href="examples.css" media="screen" />
-		<script src="../jquery-1.9.1.min.js"></script>
+		<script src="../jquery-1.10.2.min.js"></script>
 		<script src="../jquery.isAlive.js"></script>
 		<script src="../easing.js"></script>
 		<script src="../jquery.isAlive.helper.js"></script>
@@ -126,8 +126,7 @@
 					"step-start":0,
 					"step-end":10,
 					"value-start":"rotate(0deg) scale(1)",
-					"value-end":"rotate(180deg) scale(2)",
-					"useCSS3":true
+					"value-end":"rotate(180deg) scale(2)"
 				},
 				14:{
 					"selector":"#drawSurface1 .myDiv7",
@@ -137,8 +136,7 @@
 					"step-end":10,
 					"value-start":0,
 					"value-end":180,
-					"format":"rotateY(Xdeg)",
-					"useCSS3":true
+					"format":"rotateY(Xdeg)"
 				}
 			};
 			var animations2 = {
@@ -175,7 +173,7 @@
 						"property":"box-shadow",
 						"step-start":0,
 						"step-end":5,
-						"value-start":"0px 0px 0px gray",
+						"value-start":"0px 0px 0px blue",
 						"value-end":"10px 10px 40px gray"
 					},
 					4:{
@@ -184,7 +182,7 @@
 						"step-start":5,
 						"step-end":10,
 						"value-start":"10px 10px 40px gray",
-						"value-end":"0px 0px 0px gray"
+						"value-end":"0px 0px 0px pink"
 					}
 				},
 				"#drawSurface2  .myDiv2":{
@@ -294,7 +292,7 @@
 					duration:1000,
 					elements:animations1,
 					elementsType:"linear",
-					easing:"easeOutBounce",
+					easing:"easeOutQuad",
 					scrollType:"scroll",
 					useCSS3:false,
 					enableTouch:true,

@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.3)
+jQuery.isAlive(1.4.4)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 24 November 2013
+Last modification on this file: 25 November 2013
 */
 
 (function(jQuery) {
@@ -403,8 +403,7 @@ Last modification on this file: 24 November 2013
 		var key,key2;
 		if(typeof(property)=="string"){
 			if(typeof(thisObj.functionsArray[property])!="undefined"){
-				var f = thisObj.functionsArray[property];
-				f(selector,value);
+				thisObj.functionsArray[property](selector,value);
 				return;
 			}
 			if(property=="scrollTop"){
@@ -439,6 +438,7 @@ Last modification on this file: 24 November 2013
 		if(typeof(params) == "function")
 			params = params(thisObj.mySelector,thisObj.params).toString();
 		else{
+			var nameToPosition = {"top":"0%","center":"50%","bottom":"100%","left":"0%","right":"100%"};
 			params = params.toString();
 			params = params.replace(/elementTop/g,thisObj.params.elementTop.toString());
 			params = params.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
@@ -465,7 +465,9 @@ Last modification on this file: 24 November 2013
 				}
 				if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
 					return getBetweenBrackets(params,true);
-				if(params.indexOf('#')!=-1){
+				if(typeof(nameToPosition[params])!="undefined")
+					params = nameToPosition[params];
+				else if(params.charAt(0)=="#"){
 					var convertValue = hexToRgb(params);
 					if(convertValue!=null)
 						params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
@@ -474,7 +476,6 @@ Last modification on this file: 24 November 2013
 					var convertValue = nameToRgb(params);
 					if(convertValue!=null)
 						params = convertValue;
-					params = params.replace("top","0%").replace("center","50%").replace("bottom","100%").replace("left","0%").replace("right","100%");	
 				}
 				return params;
 			}
@@ -1231,7 +1232,6 @@ Last modification on this file: 24 November 2013
 		var new_elements = [];
 		var idIndex = 0;
 		var keyIndex = 0;
-
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined" || jQuery(thisObj.settings.elements[key]['selector']).length==0)
 				delete thisObj.settings.elements[key];
@@ -2020,10 +2020,10 @@ Last modification on this file: 24 November 2013
 			},thisObj.settings.scrollDelay);
 		}
 		
-		thisObj.animating?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
-		
 		if(!thisObj.allowScroll || thisObj.forceAnimation)
 			return false;
+			
+		thisObj.animating?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
 		
 		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0 && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
@@ -2409,19 +2409,20 @@ Last modification on this file: 24 November 2013
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
 		var selector;
+
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating = false;
 		thisObj.animationType='none';
 		thisObj.forceAnimation = false;
 		thisObj.onComplete = null;
-		
+
 		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
-		
+
 		for(selector in thisObj.CSS3TransitionArray){
 			delete thisObj.CSS3TransitionArray[selector];
 			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 		}
-		
+
 		if(thisObj.rebuildOnStop){
 			thisObj.rebuildLayout();
 			thisObj.rebuildOnStop = false;
@@ -2580,7 +2581,7 @@ Last modification on this file: 24 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.3";
+			return "1.4.4";
 		}
 	};
 	
