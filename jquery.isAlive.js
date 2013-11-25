@@ -196,7 +196,7 @@ Last modification on this file: 25 November 2013
 	}
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
-	function fixCSS3(property){
+	function vP(property){
 		if(property=='transform' || property=='transition' || property=='filter'){
 			if(browserObj.webkit)
 				return "-webkit-"+property;
@@ -419,9 +419,9 @@ Last modification on this file: 25 November 2013
 			else{
 				if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
 					delete thisObj.CSS3TransitionArray[selector][property];
-					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+					jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 				}
-				else if(property==fixCSS3("transition")){
+				else if(property==vP("transition")){
 					value = thisObj.getTransitionArray(selector,value);
 				}
 				jQuery(selector).css(property,value);
@@ -429,7 +429,7 @@ Last modification on this file: 25 November 2013
 			}
 		}		
 		else{
-			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 			jQuery(selector).css(property);
 		}
 	}
@@ -513,7 +513,7 @@ Last modification on this file: 25 November 2013
 			}
 			for(key in tempArray){
 				var temp = tempArray[key].split(' ');
-				var fix = fixCSS3(temp[0]);
+				var fix = vP(temp[0]);
 				thisObj.CSS3DefaultTransitionArray[selector][fix] = tempArray[key].replace(temp[0],fix).replace(/\*char\*/g,","); 
 			}
 		}
@@ -1061,7 +1061,8 @@ Last modification on this file: 25 November 2013
 		}
 		
 		for(selector in CSSArray)
-			thisObj.setCSS(selector,CSSArray[selector]);
+			for(property in CSSArray[selector])
+				thisObj.setCSS(selector,property,CSSArray[selector][property]);
 		
 		for(selector in classesArray){
 			for(className in classesArray[selector]){
@@ -1355,7 +1356,7 @@ Last modification on this file: 25 November 2013
 				}
 						
 				/*PUTS PREFIX FOR CSS3*/
-				thisObj.settings.elements[key]['property'] = fixCSS3(thisObj.settings.elements[key]['property']);
+				thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
 			}
 		}
 		
@@ -1375,13 +1376,13 @@ Last modification on this file: 25 November 2013
 			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
-					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-property'));
-					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-duration'));
+					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
+					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration'));
 					if(pTemp1!="all" || pTemp2!="0s"){
 						propTempArray.push(pTemp1);
 						propTempArray.push(pTemp2);
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-timing-function')));
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(fixCSS3('transition-delay')));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function')));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-delay')));
 						thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']] = propTempArray;
 					}
 					else
@@ -1882,7 +1883,7 @@ Last modification on this file: 25 November 2013
 				for(selector in thisObj.CSS3TransitionArray){
 					for(property in thisObj.CSS3TransitionArray[selector])
 						delete thisObj.CSS3TransitionArray[selector][property];
-					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+					jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 				}
 
 				if(thisObj.rebuildOnStop){
@@ -2395,7 +2396,8 @@ Last modification on this file: 25 November 2013
 			}
 				
 			for(selector in valuesCSS)
-				thisObj.setCSS(selector,valuesCSS[selector]);
+				for(property in valuesCSS[selector])
+					thisObj.setCSS(selector,property,valuesCSS[selector][property]);
 	
 			if(pointFoundSelector!=-1 ){
 				jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
@@ -2428,8 +2430,7 @@ Last modification on this file: 25 November 2013
 				CSSValues[property] = jQuery(selector).css(property);
 				delete thisObj.CSS3TransitionArray[selector][property];	
 			}
-			
-			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 			jQuery(selector).css(CSSValues);
 		}
 
