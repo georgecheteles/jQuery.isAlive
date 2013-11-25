@@ -27,6 +27,7 @@ Last modification on this file: 26 November 2013
 	var windowWidth;
 	var windowHeight;
 	
+	/*FIX SPACES FOR CSS VALUES*/
 	function fixSpaces(params){
 		if(params.indexOf(' ')==-1)
 			return params;
