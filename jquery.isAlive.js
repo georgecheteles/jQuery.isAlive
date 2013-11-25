@@ -27,6 +27,36 @@ Last modification on this file: 26 November 2013
 	var windowWidth;
 	var windowHeight;
 	
+	function fixSpaces(params){
+		if(params.indexOf(' ')==-1)
+			return params;
+	
+		if(params.indexOf('(')==-1 && params.indexOf(',')!=-1)
+			return params.replace(/ /g,'');
+		
+		params = params.split(' ');
+		var ret = [];
+		for(var key in params)
+			if(params[key]!="")
+				ret.push(params[key]);
+		params = ret.join(' ');
+		
+		if(params.indexOf('(')!=-1){
+			var bracketCount = 0;
+			ret = "";
+			for(var c=0;c<params.length;c++){
+				if(params.charAt(c)=='(')
+					bracketCount++;
+				else if(params.charAt(c)==')')
+					bracketCount--;
+				if(params.charAt(c)!=' ' || (params.charAt(c)==' ' && bracketCount==0))
+					ret = ret + params.charAt(c);
+			}
+			params = ret;
+		}
+		return params;
+	}
+	
 	/*CHECK IF FUNCTION IS COMPATIBLE WITH JQUERY*/
 	function canJQueryAnimate(property){
 		var allowed = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity,scrollLeft,scrollTop').split(',');
@@ -482,6 +512,7 @@ Last modification on this file: 26 November 2013
 			}
 			return params;
 		}
+		params = fixSpaces(params);
 		params = params.replace(/top/g,"0%").replace(/center/g,"50%").replace(/bottom/g,"100%").replace(/left/g,"0%").replace(/right/g,"100%");
 		params = doRecursive(params);
 		if(typeof(format)!='undefined')
