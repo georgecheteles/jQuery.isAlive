@@ -1,5 +1,10 @@
 jQuery isAlive Changelog
 
+ver. 1.4.5 (25 November 2013)
+ - now you can animate "em" values
+ - stop not working on CSS3 bug fixed
+ - small changes
+
 ver. 1.4.4 (25 November 2013)
  - small changes
 

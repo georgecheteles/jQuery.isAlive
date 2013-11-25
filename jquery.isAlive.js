@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.4)
+jQuery.isAlive(1.4.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -246,6 +246,8 @@ Last modification on this file: 25 November 2013
 				format = "%"; 
 			else if(valStart.indexOf("deg")!=-1)
 				format = "deg";
+			else if(valStart.indexOf("em")!=-1)
+				format = "em"; 
 			if(format!=''){
 				valStart = valStart.replace(format,"");
 				valEnd = valEnd.replace(format,"");
@@ -435,10 +437,8 @@ Last modification on this file: 25 November 2013
 	/* REPLACES PARAMS */
 	isAlive.prototype.convertParams = function(params,format){
 		var thisObj = this;
-		if(typeof(params) == "function")
-			params = params(thisObj.mySelector,thisObj.params).toString();
-		else{
-			var nameToPosition = {"top":"0%","center":"50%","bottom":"100%","left":"0%","right":"100%"};
+		
+		if(typeof(params)!="function"){
 			params = params.toString();
 			params = params.replace(/elementTop/g,thisObj.params.elementTop.toString());
 			params = params.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
@@ -448,41 +448,44 @@ Last modification on this file: 25 November 2013
 			params = params.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
 			params = params.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
 			params = params.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
-			var doRecursive = function(params){
-				if(params.indexOf(' ')!=-1){
-					params = params.split(' ');
-					for(var key in params)
-						params[key] = doRecursive(params[key]);
-					return params.join(' ');
-				}
-				if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval')
-					return params.substr(0,params.indexOf('(')) + '(' + doRecursive(getBetweenBrackets(params)) + ')';
-				if(params.indexOf(',')!=-1){
-					params = params.split(',');
-					for(var key in params)
-						params[key] = doRecursive(params[key]);
-					return params.join(',');
-				}
-				if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
-					return getBetweenBrackets(params,true);
-				if(typeof(nameToPosition[params])!="undefined")
-					params = nameToPosition[params];
-				else if(params.charAt(0)=="#"){
-					var convertValue = hexToRgb(params);
-					if(convertValue!=null)
-						params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
-				}
-				else{
-					var convertValue = nameToRgb(params);
-					if(convertValue!=null)
-						params = convertValue;
-				}
-				return params;
-			}
-			params = doRecursive(params);
 		}
+		else	
+			params = params(thisObj.mySelector,thisObj.params).toString();
+			
+		var doRecursive = function(params){
+			if(params.indexOf(' ')!=-1){
+				params = params.split(' ');
+				for(var key in params)
+					params[key] = doRecursive(params[key]);
+				return params.join(' ');
+			}
+			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval')
+				return params.substr(0,params.indexOf('(')) + '(' + doRecursive(getBetweenBrackets(params)) + ')';
+			if(params.indexOf(',')!=-1){
+				params = params.split(',');
+				for(var key in params)
+					params[key] = doRecursive(params[key]);
+				return params.join(',');
+			}
+			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
+				return getBetweenBrackets(params,true);
+			else if(params.charAt(0)=="#"){
+				var convertValue = hexToRgb(params);
+				if(convertValue!=null)
+					params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
+			}
+			else{
+				var convertValue = nameToRgb(params);
+				if(convertValue!=null)
+					params = convertValue;
+			}
+			return params;
+		}
+		params = params.replace(/top/g,"0%").replace(/center/g,"50%").replace(/bottom/g,"100%").replace(/left/g,"0%").replace(/right/g,"100%");
+		params = doRecursive(params);
+			
 		if(typeof(format)!='undefined')
-			params = format.replace('(X)','('+params+')').replace('Xpx',params+'px').replace('X%',params+'%').replace('Xdeg',params+'deg');
+			params = format.replace('(X)','('+params+')').replace('Xpx',params+'px').replace('X%',params+'%').replace('Xdeg',params+'deg').replace('Xem',params+'em');
 		if(isNumber(params))
 			return parseFloat(params);
 		return params;
@@ -1058,8 +1061,7 @@ Last modification on this file: 25 November 2013
 		}
 		
 		for(selector in CSSArray)
-			for(property in CSSArray[selector])
-				thisObj.setCSS(selector,property,CSSArray[selector][property]);
+			thisObj.setCSS(selector,CSSArray[selector]);
 		
 		for(selector in classesArray){
 			for(className in classesArray[selector]){
@@ -1872,13 +1874,14 @@ Last modification on this file: 25 November 2013
 		/* STARTS ANIMATION */
 		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
 			complete : function(){
-				var selector;
+				var selector,property;
 				thisObj.animating = false;
 				thisObj.animationType='none';
 				thisObj.forceAnimation = false;
 				
 				for(selector in thisObj.CSS3TransitionArray){
-					delete thisObj.CSS3TransitionArray[selector];
+					for(property in thisObj.CSS3TransitionArray[selector])
+						delete thisObj.CSS3TransitionArray[selector][property];
 					jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
 				}
 
@@ -2323,92 +2326,93 @@ Last modification on this file: 25 November 2013
 			return false;
 			
 		thisObj.stop();
-		
+
 		if(thisObj.getPos(thisObj.step) == step)
 			return false;
 		
-		var pos,pointFound,pointFoundSelector,direction;
-		var valuesCSS = {};
-		var valuesClasses = {};
-		var selector,property,className;
-		
-		pos = thisObj.step;
-		pointFoundSelector = -1;
-		pointFound = -1;
-			
-		while((pos<=step && thisObj.getPos(thisObj.step)<step) || (pos>=step && thisObj.getPos(thisObj.step)>step)){
-			
-			if(thisObj.haveStepPoints){
-				pointFound=indexOf(thisObj.settings.stepPoints,pos);
-				if(pointFound!=-1)
-					pointFoundSelector = pointFound;
-			}
-			
-			(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = 'forward');
-			if(typeof(thisObj.setArray[direction][pos])!="undefined"){
-				for(selector in thisObj.setArray[direction][pos]){
-					if(typeof(valuesCSS[selector]) == "undefined")
-						valuesCSS[selector] = {};
-					for(property in thisObj.setArray[direction][pos][selector])
-						valuesCSS[selector][property] = thisObj.setArray[direction][pos][selector][property];
-				}
-			}
-			if(typeof(thisObj.onOffClassArray[direction][pos])!="undefined"){
-				for(selector in thisObj.onOffClassArray[direction][pos]){
-					if(typeof(valuesClasses[selector]) == "undefined")
-						valuesClasses[selector] = {}						
-					for(className in thisObj.onOffClassArray[direction][pos][selector])
-						valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
-				}
-			}
-			
-			if(typeof(thisObj.animPositions[pos])!="undefined"){
-				for(selector in thisObj.animPositions[pos]){
-					if(typeof(valuesCSS[selector]) == "undefined")
-						valuesCSS[selector] = {};
-					for(property in thisObj.animPositions[pos][selector])
-						valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
-				}
-			}
+		var skipTimer;
+		(thisObj.animating)?skipTimer=50:skipTimer=0;
+		setTimeout(function(){
+			var pos,pointFound,pointFoundSelector,direction;
+			var valuesCSS = {};
+			var valuesClasses = {};
+			var selector,property,className;
 
-			if(thisObj.settings.onStep!=null)
-				thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
-			
-			if(thisObj.getPos(thisObj.step)<step)
-				pos = pos + 1;
-			else
-				pos = pos - 1;
-		}
-		
-		for(selector in valuesClasses){
-			for(className in valuesClasses[selector]){
-				if(valuesClasses[selector][className]==true)
-					jQuery(selector).addClass(className);	
+			pos = thisObj.step;
+			pointFoundSelector = -1;
+			pointFound = -1;
+				
+			while((pos<=step && thisObj.getPos(thisObj.step)<step) || (pos>=step && thisObj.getPos(thisObj.step)>step)){
+				if(thisObj.haveStepPoints){
+					pointFound=indexOf(thisObj.settings.stepPoints,pos);
+					if(pointFound!=-1)
+						pointFoundSelector = pointFound;
+				}
+				
+				(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = 'forward');
+				if(typeof(thisObj.setArray[direction][pos])!="undefined"){
+					for(selector in thisObj.setArray[direction][pos]){
+						if(typeof(valuesCSS[selector]) == "undefined")
+							valuesCSS[selector] = {};
+						for(property in thisObj.setArray[direction][pos][selector])
+							valuesCSS[selector][property] = thisObj.setArray[direction][pos][selector][property];
+					}
+				}
+				if(typeof(thisObj.onOffClassArray[direction][pos])!="undefined"){
+					for(selector in thisObj.onOffClassArray[direction][pos]){
+						if(typeof(valuesClasses[selector]) == "undefined")
+							valuesClasses[selector] = {}						
+						for(className in thisObj.onOffClassArray[direction][pos][selector])
+							valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
+					}
+				}
+				
+				if(typeof(thisObj.animPositions[pos])!="undefined"){
+					for(selector in thisObj.animPositions[pos]){
+						if(typeof(valuesCSS[selector]) == "undefined")
+							valuesCSS[selector] = {};
+						for(property in thisObj.animPositions[pos][selector])
+							valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
+					}
+				}
+	
+				if(thisObj.settings.onStep!=null)
+					thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
+				
+				if(thisObj.getPos(thisObj.step)<step)
+					pos = pos + 1;
 				else
-					jQuery(selector).removeClass(className);	
+					pos = pos - 1;
 			}
-		}
 			
-		for(selector in valuesCSS)
-			for(property in valuesCSS[selector])
-				thisObj.setCSS(selector,property,valuesCSS[selector][property]);
-
-		if(pointFoundSelector!=-1 ){
-			jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
-			jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
-		}
-		
-		step = step+thisObj.l(thisObj.lastStep);
-		
-		thisObj.step = step;
-		thisObj.lastStep = step;
-		
+			for(selector in valuesClasses){
+				for(className in valuesClasses[selector]){
+					if(valuesClasses[selector][className]==true)
+						jQuery(selector).addClass(className);	
+					else
+						jQuery(selector).removeClass(className);	
+				}
+			}
+				
+			for(selector in valuesCSS)
+				thisObj.setCSS(selector,valuesCSS[selector]);
+	
+			if(pointFoundSelector!=-1 ){
+				jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
+				jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
+			}
+			
+			step = step+thisObj.l(thisObj.lastStep);
+			
+			thisObj.step = step;
+			thisObj.lastStep = step;
+		},skipTimer);
 	}
 	
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
-		var selector;
+		var selector,property;
 
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating = false;
@@ -2419,8 +2423,14 @@ Last modification on this file: 25 November 2013
 		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 
 		for(selector in thisObj.CSS3TransitionArray){
-			delete thisObj.CSS3TransitionArray[selector];
+			var CSSValues = {};
+			for(var property in thisObj.CSS3TransitionArray[selector]){
+				CSSValues[property] = jQuery(selector).css(property);
+				delete thisObj.CSS3TransitionArray[selector][property];	
+			}
+			
 			jQuery(selector).css(fixCSS3('transition'),thisObj.getTransitionArray(selector));
+			jQuery(selector).css(CSSValues);
 		}
 
 		if(thisObj.rebuildOnStop){
@@ -2581,7 +2591,7 @@ Last modification on this file: 25 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.4";
+			return "1.4.5";
 		}
 	};
 	
