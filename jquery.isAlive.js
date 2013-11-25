@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.5)
+jQuery.isAlive(1.4.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 25 November 2013
+Last modification on this file: 26 November 2013
 */
 
 (function(jQuery) {
@@ -190,7 +190,7 @@ Last modification on this file: 25 November 2013
 	function isDinamic(params){
 		if(typeof(params) == "function")
 			return true;
-		if(params.toString().indexOf('eval')!==-1)
+		if(params.toString().indexOf('eval(')!==-1)
 			return true;
 		return false;
 	}
@@ -416,17 +416,18 @@ Last modification on this file: 25 November 2013
 				jQuery(selector).scrollLeft(value);
 				return;
 			}
-			else{
-				if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
-					delete thisObj.CSS3TransitionArray[selector][property];
-					jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
-				}
-				else if(property==vP("transition")){
-					value = thisObj.getTransitionArray(selector,value);
-				}
+			if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
+				delete thisObj.CSS3TransitionArray[selector][property];
+				jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 				jQuery(selector).css(property,value);
 				return;
 			}
+			if(property==vP("transition")){
+				value = thisObj.getTransitionArray(selector,value);
+				jQuery(selector).css(property,value);
+				return;
+			}
+			jQuery(selector).css(property,value);
 		}		
 		else{
 			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
@@ -483,7 +484,6 @@ Last modification on this file: 25 November 2013
 		}
 		params = params.replace(/top/g,"0%").replace(/center/g,"50%").replace(/bottom/g,"100%").replace(/left/g,"0%").replace(/right/g,"100%");
 		params = doRecursive(params);
-			
 		if(typeof(format)!='undefined')
 			params = format.replace('(X)','('+params+')').replace('Xpx',params+'px').replace('X%',params+'%').replace('Xdeg',params+'deg').replace('Xem',params+'em');
 		if(isNumber(params))
@@ -2017,27 +2017,28 @@ Last modification on this file: 25 November 2013
 		var thisObj = this;
 		var directionForward;
 		
-		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0){
+		if(thisObj.settings.scrollDelay!==false){
 			clearTimeout(thisObj.waitScrollTimer);
 			thisObj.waitScrollTimer = setTimeout(function(){
 				thisObj.waitScrollEnd = false;
 			},thisObj.settings.scrollDelay);
 		}
 		
+		
 		if(!thisObj.allowScroll || thisObj.forceAnimation)
 			return false;
 			
-		thisObj.animating?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
-		
-		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0 && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
-			return false;
-			
+		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
+
 		if(thisObj.settings.scrollDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
 		
-		if(thisObj.settings.scrollDelay!==false && thisObj.settings.scrollDelay>0)	
-			thisObj.waitScrollEnd = true;
+		if(thisObj.settings.scrollDelay!==false && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
+			return false;
 			
+		if(thisObj.settings.scrollDelay!==false)	
+			thisObj.waitScrollEnd = true;
+		
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && !pos)||(!directionForward && pos)))){
 
 			var stepPos = thisObj.getPos(Math.round(thisObj.lastStep));
@@ -2331,8 +2332,6 @@ Last modification on this file: 25 November 2013
 		if(thisObj.getPos(thisObj.step) == step)
 			return false;
 		
-		var skipTimer;
-		(thisObj.animating)?skipTimer=50:skipTimer=0;
 		setTimeout(function(){
 			var pos,pointFound,pointFoundSelector,direction;
 			var valuesCSS = {};
@@ -2408,7 +2407,7 @@ Last modification on this file: 25 November 2013
 			
 			thisObj.step = step;
 			thisObj.lastStep = step;
-		},skipTimer);
+		},25);
 	}
 	
 	/*STOPS ANIMATIONS*/	
@@ -2592,7 +2591,7 @@ Last modification on this file: 25 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.5";
+			return "1.4.6";
 		}
 	};
 	
