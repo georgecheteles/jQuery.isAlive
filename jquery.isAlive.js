@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.7)
+jQuery.isAlive(1.4.8)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1965,7 +1965,6 @@ Last modification on this file: 26 November 2013
 
 						/*ANIMATE-SET && SET && ADD && REMOVE CLASS*/
 						if(step==parseInt(step)){
-							//(directionForward)?direction = 'forward':((step!=stepEnd)?direction = 'backward':direction = 'forward');
 							(directionForward)?((step!=stepStart)?direction = 'forward':direction = null):((step!=stepEnd)?direction = 'backward':direction = null);
 							if(direction!=null){
 								if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
@@ -2051,7 +2050,7 @@ Last modification on this file: 26 November 2013
 	isAlive.prototype.doJump = function(pos){
 		
 		var thisObj = this;
-		var directionForward;
+		var directionForward,stepPos;
 		
 		if(thisObj.settings.scrollDelay!==false){
 			clearTimeout(thisObj.waitScrollTimer);
@@ -2076,11 +2075,8 @@ Last modification on this file: 26 November 2013
 			thisObj.waitScrollEnd = true;
 		
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && !pos)||(!directionForward && pos)))){
-
-			var stepPos = thisObj.getPos(Math.round(thisObj.lastStep));
-			
+			(pos) ? stepPos = thisObj.getPos(Math.floor(thisObj.lastStep)):stepPos = thisObj.getPos(Math.ceil(thisObj.lastStep));
 			thisObj.jumpPosition = indexOf(thisObj.settings.jumpPoints,stepPos);
-			
 			if(thisObj.jumpPosition==-1){
 				thisObj.jumpPosition = null;
 				if(stepPos<=thisObj.settings.jumpPoints[0]){
@@ -2181,12 +2177,15 @@ Last modification on this file: 26 November 2013
 	isAlive.prototype.doWipeTouch = function(value){
 		
 		var thisObj = this;
+		var directionForward,stepPos;
 		
 		if(thisObj.forceAnimation)
 			return false;
 		
-		if(thisObj.animationType!='touchWipe' || (thisObj.animationType=='touchWipe' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))){
-			var stepPos = thisObj.getPos(Math.round(thisObj.lastStep));
+		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
+		
+		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='touchWipe') || (thisObj.animating && thisObj.animationType=='touchWipe' && ((directionForward && value==-1)||(!directionForward && value==1)))){
+			(value==1) ? stepPos = thisObj.getPos(Math.floor(thisObj.lastStep)):stepPos = thisObj.getPos(Math.ceil(thisObj.lastStep));
 			thisObj.touchPosition = indexOf(thisObj.settings.wipePoints,stepPos);
 			if(thisObj.touchPosition==-1){
 				thisObj.touchPosition = null;
@@ -2458,7 +2457,7 @@ Last modification on this file: 26 November 2013
 		thisObj.onComplete = null;
 
 		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
-
+		
 		for(selector in thisObj.CSS3TransitionArray){
 			var CSSValues = {};
 			for(var property in thisObj.CSS3TransitionArray[selector]){
@@ -2542,8 +2541,9 @@ Last modification on this file: 26 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if(typeof(options) == "undefined")
-				options = {};
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined")
+				return false;
+			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].goTo(options);
 			return thisObj;
 		},
@@ -2553,6 +2553,7 @@ Last modification on this file: 26 November 2013
 				return false;
 			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined")
 				return false;
+			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].skip(options['to']);
 			return thisObj;
 		},
@@ -2627,7 +2628,7 @@ Last modification on this file: 26 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.7";
+			return "1.4.8";
 		}
 	};
 	

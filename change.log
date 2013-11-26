@@ -1,5 +1,10 @@
 jQuery isAlive Changelog
 
+ver. 1.4.8 (26 November 2013)
+ - small bug fixes
+ - "goTo" and "skip" can receive float values
+ 
+
 ver. 1.4.7 (26 November 2013)
  - small bug fixes
 
