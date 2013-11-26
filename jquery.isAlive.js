@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.8)
+jQuery.isAlive(1.4.9)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 26 November 2013
+Last modification on this file: 27 November 2013
 */
 
 (function(jQuery) {
@@ -299,6 +299,8 @@ Last modification on this file: 26 November 2013
 	
 	function isAlive(selector,options){
 		
+		this.mySelector = selector;
+		this.TimeLine - null;
 		this.step=0;
 		this.lastStep=0;
 		this.animating = false;
@@ -309,7 +311,6 @@ Last modification on this file: 26 November 2013
 		this.touchPosition;
 		this.jumpPosition;
 		this.animationType='none';
-		this.mySelector = selector;
 		this.allowScroll = true;
 		this.allowTouch = true;
 		this.scrollbarActive = null;
@@ -1148,6 +1149,8 @@ Last modification on this file: 26 November 2013
 			jQuery(window).bind('resize',onResizeAction);
 		}
 		
+		/*TIMELINE WRAPPER*/
+		thisObj.TimeLine = document.createElement('wrapper');
 		
 		/*SHOW SCROLL POSITION*/
 		if(thisObj.settings.debug)
@@ -1391,8 +1394,6 @@ Last modification on this file: 26 November 2013
 				thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
 			}
 		}
-		
-		jQuery(thisObj.mySelector).addClass(thisObj.settings.animateClass);
 		
 		/*CHECKS IF ENABLE GPU IS VALID*/
 		if(thisObj.settings.enableGPU=="none" || typeof(browserObj.webkit)=="undefined")
@@ -1748,7 +1749,8 @@ Last modification on this file: 26 November 2013
 		var thisObj = this;
 		
 		//console.log('lastScroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Duration:'+thisObj.animateDuration);
-
+		
+		jQuery(thisObj.TimeLine).stop();
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		thisObj.animating=true;
 		
@@ -1905,7 +1907,7 @@ Last modification on this file: 26 November 2013
 		var lastStep = thisObj.lastStep;
 		
 		/* STARTS ANIMATION */
-		jQuery(thisObj.mySelector).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
+		jQuery(thisObj.TimeLine).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
 			complete : function(){
 				var selector,property;
 				thisObj.animating = false;
@@ -2448,17 +2450,11 @@ Last modification on this file: 26 November 2013
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
-		var selector,property;
-
-		jQuery('.'+thisObj.settings.animateClass).stop();
-		thisObj.animating = false;
-		thisObj.animationType='none';
-		thisObj.forceAnimation = false;
-		thisObj.onComplete = null;
-
-		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 		
-		for(selector in thisObj.CSS3TransitionArray){
+		jQuery(thisObj.TimeLine).stop();
+		
+		jQuery('.'+thisObj.settings.animateClass).stop();
+		for(var selector in thisObj.CSS3TransitionArray){
 			var CSSValues = {};
 			for(var property in thisObj.CSS3TransitionArray[selector]){
 				CSSValues[property] = jQuery(selector).css(property);
@@ -2467,6 +2463,13 @@ Last modification on this file: 26 November 2013
 			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 			jQuery(selector).css(CSSValues);
 		}
+		
+		thisObj.animating = false;
+		thisObj.animationType='none';
+		thisObj.forceAnimation = false;
+		thisObj.onComplete = null;
+		
+		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
 
 		if(thisObj.rebuildOnStop){
 			thisObj.rebuildLayout();
@@ -2628,7 +2631,7 @@ Last modification on this file: 26 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.8";
+			return "1.4.9";
 		}
 	};
 	
