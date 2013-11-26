@@ -1968,9 +1968,6 @@ Last modification on this file: 26 November 2013
 							//(directionForward)?direction = 'forward':((step!=stepEnd)?direction = 'backward':direction = 'forward');
 							(directionForward)?((step!=stepStart)?direction = 'forward':direction = null):((step!=stepEnd)?direction = 'backward':direction = null);
 							if(direction!=null){
-								
-								console.log(step);
-								
 								if(typeof(thisObj.setArray[direction][thisObj.getPos(step)])!="undefined"){ 
 									for(selector in thisObj.setArray[direction][thisObj.getPos(step)]){
 										for(property in thisObj.setArray[direction][thisObj.getPos(step)][selector])
