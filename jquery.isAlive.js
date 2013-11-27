@@ -300,9 +300,9 @@ Last modification on this file: 27 November 2013
 	function isAlive(selector,options){
 		
 		this.mySelector = selector;
-		this.TimeLine - null;
-		this.step=0;
-		this.lastStep=0;
+		this.TimeLine = null;
+		this.step = 0;
+		this.lastStep = 0;
 		this.animating = false;
 		this.forceAnimation = false;
 		this.scrollTimer;
