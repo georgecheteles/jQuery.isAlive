@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.9)
+jQuery.isAlive(1.4.10)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 27 November 2013
+Last modification on this file: 29 November 2013
 */
 
 (function(jQuery) {
@@ -300,9 +300,9 @@ Last modification on this file: 27 November 2013
 	function isAlive(selector,options){
 		
 		this.mySelector = selector;
-		this.TimeLine = null;
-		this.step = 0;
-		this.lastStep = 0;
+		this.TimeLine - null;
+		this.step=0;
+		this.lastStep=0;
 		this.animating = false;
 		this.forceAnimation = false;
 		this.scrollTimer;
@@ -2061,7 +2061,6 @@ Last modification on this file: 27 November 2013
 			},thisObj.settings.scrollDelay);
 		}
 		
-		
 		if(!thisObj.allowScroll || thisObj.forceAnimation)
 			return false;
 			
@@ -2290,9 +2289,9 @@ Last modification on this file: 27 November 2013
 		var thisObj = this;
 		var pos,posNext,posPrev;
 		
-		if(thisObj.forceAnimation || settings.to==null || settings.to<0 || settings.to>thisObj.settings.max-1)
+		if(thisObj.forceAnimation || settings.to==thisObj.getPos(thisObj.step))
 			return false;
-		
+			
 		thisObj.animationType = settings.animationType;
 		thisObj.forceAnimation = settings.force;
 		
@@ -2361,12 +2360,9 @@ Last modification on this file: 27 November 2013
 		
 		var thisObj = this;
 		
-		if(step<0 || step>thisObj.settings.max-1)
-			return false;
-			
 		thisObj.stop();
 
-		if(thisObj.getPos(thisObj.step) == step)
+		if(thisObj.forceAnimation || step == thisObj.getPos(thisObj.step))
 			return false;
 		
 		setTimeout(function(){
@@ -2544,7 +2540,7 @@ Last modification on this file: 27 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined")
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].goTo(options);
@@ -2554,7 +2550,7 @@ Last modification on this file: 27 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined")
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].skip(options['to']);
@@ -2631,7 +2627,7 @@ Last modification on this file: 27 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.9";
+			return "1.4.10";
 		}
 	};
 	
