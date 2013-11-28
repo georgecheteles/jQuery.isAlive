@@ -2540,7 +2540,7 @@ Last modification on this file: 29 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].max-1)
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].settings.max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].goTo(options);
@@ -2550,7 +2550,7 @@ Last modification on this file: 29 November 2013
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].max-1)
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].settings.max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
 			isAliveObjects[selector].skip(options['to']);
