@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.10)
+jQuery.isAlive(1.4.11)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 29 November 2013
+Last modification on this file: 30 November 2013
 */
 
 (function(jQuery) {
@@ -161,7 +161,7 @@ Last modification on this file: 29 November 2013
 	/*MAKES UNIQUE HASH FOR A STRING*/
 	function sdbmCode(str){
 		var hash = 0;
-		for (i = 0; i < str.length; i++) {
+		for (var i = 0; i < str.length; i++) {
 			var c = str.charCodeAt(i);
 			hash = c + (hash << 6) + (hash << 16) - hash;
 		}
@@ -416,7 +416,7 @@ Last modification on this file: 29 November 2013
 	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
 		var thisObj = this;
 		if(startPos==parseInt(startPos))
-			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[startPos][selector][property].toString();
+			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[thisObj.getPos(startPos)][selector][property].toString();
 		var start = thisObj.lastCSS[selector+'|'+property];
 		var end = value.toString();
 		var tempObj = {};
@@ -434,7 +434,6 @@ Last modification on this file: 29 November 2013
 	/*SET CSS VALUES*/
 	isAlive.prototype.setCSS = function(selector,property,value){
 		var thisObj = this;
-		var key,key2;
 		if(typeof(property)=="string"){
 			if(typeof(thisObj.functionsArray[property])!="undefined"){
 				thisObj.functionsArray[property](selector,value);
@@ -757,10 +756,8 @@ Last modification on this file: 29 November 2013
 			jQuery(thisObj.mySelector).each(function(){
 				
 				function onTouchStart(e) {
-				
 					if(!thisObj.allowTouch)
 						return;
-				
 					if(!ie10) {
 						if(e.touches.length != 1) 
 							return;
@@ -791,23 +788,22 @@ Last modification on this file: 29 November 2013
 					isMoving = false;
 					thisObj.dragHorizontal = null;
 				}	
-		
-				function onTouchMove(e) {
-					if(!ie10 && thisObj.settings.preventTouch) {
-						e.preventDefault();
-					}
-		    		 
-					if(isMoving) {
-						if(!ie10) {
-							var x = e.touches[0].clientX;
-							var y = e.touches[0].clientY;
-						} else {
-							var x = e.clientX;
-							var y = e.clientY;
+				
+				if(thisObj.settings.touchType=='wipe'){
+					var onTouchMove = function(e) {
+						if(!ie10 && thisObj.settings.preventTouch) {
+							e.preventDefault();
 						}
-						var dx = startX - x;
-						var dy = startY - y;
-						if(thisObj.settings.touchType=='wipe'){
+						if(isMoving) {
+							if(!ie10) {
+								var x = e.touches[0].clientX;
+								var y = e.touches[0].clientY;
+							} else {
+								var x = e.clientX;
+								var y = e.clientY;
+							}
+							var dx = startX - x;
+							var dy = startY - y;
 							if(Math.abs(dx)>=thisObj.settings.wipeXFrom) {
 								if(thisObj.settings.touchActions.left!=0 && dx>0){
 									cancelTouch();
@@ -832,7 +828,24 @@ Last modification on this file: 29 November 2013
 									return;
 								}
 							}
-						} else {
+						}
+					}
+				}
+				else{
+					var onTouchMove = function (e){
+						if(!ie10 && thisObj.settings.preventTouch) {
+							e.preventDefault();
+						}
+						if(isMoving) {
+							if(!ie10) {
+								var x = e.touches[0].clientX;
+								var y = e.touches[0].clientY;
+							} else {
+								var x = e.clientX;
+								var y = e.clientY;
+							}
+							var dx = startX - x;
+							var dy = startY - y;
 							if(Math.abs(dx)>=thisObj.settings.dragXFrom){
 								if(thisObj.settings.touchActions.left!=0 && dx>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
 									thisObj.dragHorizontal = true;
@@ -843,15 +856,15 @@ Last modification on this file: 29 November 2013
 									thisObj.doDragTouch(thisObj.settings.touchActions.right);
 									startX = x;
 								}
-				    		 }
-			    			 if(Math.abs(dy)>=thisObj.settings.dragYFrom){
-				    			if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
+							 }
+							 if(Math.abs(dy)>=thisObj.settings.dragYFrom){
+								if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
-				    				thisObj.doDragTouch(thisObj.settings.touchActions.up);
+									thisObj.doDragTouch(thisObj.settings.touchActions.up);
 									startY = y;
-				    			}else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
+								}else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
-				    				thisObj.doDragTouch(thisObj.settings.touchActions.down);
+									thisObj.doDragTouch(thisObj.settings.touchActions.down);
 									startY = y;
 								}
 							}
@@ -905,13 +918,7 @@ Last modification on this file: 29 November 2013
 	isAlive.prototype.createElementsArray = function(){
 		var thisObj = this;
 		var myElements = jQuery.extend({},thisObj.settings.elements);
-		var pos;
-		var progress;
-		var moveTo;
-		var key;
-		var selector,property,className;
-		var valStart,valEnd;
-		var stepStart,stepEnd,value;
+		var pos,key,selector,property,className,valStart,valEnd,stepStart,stepEnd,value;
 		var oldValue = {};
 		
 		thisObj.setArray['forward'] = {};
@@ -1118,7 +1125,6 @@ Last modification on this file: 29 November 2013
 	
 	/*THIS FUNCTION MAKES ALL THE INITIALIZATIONS FOR ANIMATIONS*/
 	isAlive.prototype.initAnimations = function(){
-
 		var pos,key,key2;
 		
 		var thisObj = this;
@@ -1184,7 +1190,6 @@ Last modification on this file: 29 November 2013
 		/*FIX JQUERY/CSS3 EASING*/
 		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier')==-1)	
 			thisObj.settings.CSS3Easing  = "linear";
-			
 		if(typeof(jQuery.easing[thisObj.settings.easing])=='undefined')
 			thisObj.settings.easing = "linear";
 		
@@ -2289,7 +2294,7 @@ Last modification on this file: 29 November 2013
 		var thisObj = this;
 		var pos,posNext,posPrev;
 		
-		if(thisObj.forceAnimation || settings.to==thisObj.getPos(thisObj.step))
+		if(thisObj.forceAnimation || (thisObj.animation && settings.to==thisObj.getPos(thisObj.step)))
 			return false;
 			
 		thisObj.animationType = settings.animationType;
@@ -2362,7 +2367,7 @@ Last modification on this file: 29 November 2013
 		
 		thisObj.stop();
 
-		if(thisObj.forceAnimation || step == thisObj.getPos(thisObj.step))
+		if(thisObj.forceAnimation)
 			return false;
 		
 		setTimeout(function(){
@@ -2374,14 +2379,8 @@ Last modification on this file: 29 November 2013
 			pos = thisObj.step;
 			pointFoundSelector = -1;
 			pointFound = -1;
-				
-			while((pos<=step && thisObj.getPos(thisObj.step)<step) || (pos>=step && thisObj.getPos(thisObj.step)>step)){
-				if(thisObj.haveStepPoints){
-					pointFound=indexOf(thisObj.settings.stepPoints,pos);
-					if(pointFound!=-1)
-						pointFoundSelector = pointFound;
-				}
-				
+			
+			while((pos<=step && thisObj.getPos(thisObj.step)<step) || (pos>=step && thisObj.getPos(thisObj.step)>step) || (pos==step && thisObj.getPos(thisObj.step)==step)){
 				(step>thisObj.step)?direction = 'forward':((pos!=step)?direction = 'backward':direction = 'forward');
 				if(typeof(thisObj.setArray[direction][pos])!="undefined"){
 					for(selector in thisObj.setArray[direction][pos]){
@@ -2399,7 +2398,6 @@ Last modification on this file: 29 November 2013
 							valuesClasses[selector][className] = thisObj.onOffClassArray[direction][pos][selector][className];
 					}
 				}
-				
 				if(typeof(thisObj.animPositions[pos])!="undefined"){
 					for(selector in thisObj.animPositions[pos]){
 						if(typeof(valuesCSS[selector]) == "undefined")
@@ -2408,15 +2406,20 @@ Last modification on this file: 29 November 2013
 							valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
 					}
 				}
-	
+				if(thisObj.haveStepPoints){
+					pointFound=indexOf(thisObj.settings.stepPoints,pos);
+					if(pointFound!=-1)
+						pointFoundSelector = pointFound;
+				}
 				if(thisObj.settings.onStep!=null)
 					thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
 				
-				if(thisObj.getPos(thisObj.step)<step)
-					pos = pos + 1;
-				else
-					pos = pos - 1;
+				(thisObj.getPos(thisObj.step)<step)?pos = pos + 1:pos = pos - 1;
 			}
+
+			for(selector in valuesCSS)
+				for(property in valuesCSS[selector])
+					thisObj.setCSS(selector,property,valuesCSS[selector][property]);
 			
 			for(selector in valuesClasses){
 				for(className in valuesClasses[selector]){
@@ -2427,10 +2430,6 @@ Last modification on this file: 29 November 2013
 				}
 			}
 				
-			for(selector in valuesCSS)
-				for(property in valuesCSS[selector])
-					thisObj.setCSS(selector,property,valuesCSS[selector][property]);
-	
 			if(pointFoundSelector!=-1 ){
 				jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
 				jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
@@ -2448,7 +2447,6 @@ Last modification on this file: 29 November 2013
 		var thisObj = this;
 		
 		jQuery(thisObj.TimeLine).stop();
-		
 		jQuery('.'+thisObj.settings.animateClass).stop();
 		for(var selector in thisObj.CSS3TransitionArray){
 			var CSSValues = {};
@@ -2465,7 +2463,7 @@ Last modification on this file: 29 November 2013
 		thisObj.forceAnimation = false;
 		thisObj.onComplete = null;
 		
-		(thisObj.lastStep<thisObj.step)?thisObj.step = Math.floor(thisObj.lastStep):thisObj.step = Math.ceil(thisObj.lastStep);
+		thisObj.step = Math.round(thisObj.lastStep);
 
 		if(thisObj.rebuildOnStop){
 			thisObj.rebuildLayout();
@@ -2627,7 +2625,7 @@ Last modification on this file: 29 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.10";
+			return "1.4.11";
 		}
 	};
 	

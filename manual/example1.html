@@ -1,14 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-
 		<title>jQuery.isAlive Manual </title>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
-		<link type="text/css" rel="stylesheet" href="examples.css" media="screen" />
+		<link type="text/css" rel="stylesheet" href="examples.css?v=1.4.11" media="screen" />
 		<script src="../jquery-1.10.2.min.js"></script>
-		<script src="../jquery.isAlive.js"></script>
+		<script src="../jquery.isAlive.js?v=1.4.11"></script>
 		<script src="../easing.js"></script>
-		<script src="../jquery.isAlive.helper.js"></script>
+		<script src="../jquery.isAlive.helper.js?v=1.4.11"></script>
 		<script>
 			var animations1 = {
 				0:{
@@ -79,21 +79,23 @@
 				8:{
 					"selector":"#drawSurface1 .myDiv4",
 					"method":"set@start",
-					"property":"top",
-					"value":"eval((elementHeight/2)-50)"
+					"property":"left",
+					"value":"eval((elementWidth/2)-50)"
 				},
 				9:{
 					"selector":"#drawSurface1 .myDiv4",
-					"method":"set@start",
+					"method":"animate",
 					"property":"left",
-					"value":"eval((elementWidth/2)-50)"
+					"step-start":0,
+					"step-end":10,
+					"value-end":"eval(elementWidth-100)"
 				},
 				10:{
 					"selector":"#drawSurface1 .myDiv5",
 					"method":"animate",
 					"property":"top",
 					"step-start":0,
-					"step-end":10,
+					"step-end":20,
 					"value-start":0,
 					"value-end":"eval(elementHeight-50)",
 					"easing":"linear",
@@ -136,6 +138,106 @@
 					"step-end":10,
 					"value-start":0,
 					"value-end":180,
+					"format":"rotateY(Xdeg)"
+				},
+				15:{
+					"selector":"#drawSurface1 .myDiv1",
+					"method":"animate",
+					"property":"left",
+					"step-start":10,
+					"step-end":15,
+					"value-end":0
+				},
+				16:{
+					"selector":"#drawSurface1 .myDiv1",
+					"method":"animate",
+					"property":"top",
+					"step-start":15,
+					"step-end":20,
+					"value-end":0
+				},
+				17:{
+					"selector":"#drawSurface1 .myDiv2",
+					"method":"animate-set",
+					"property":"left",
+					"step-start":10,
+					"step-end":20,
+					"value-end":0
+				},
+				18:{
+					"selector":"#drawSurface1 .myDiv3",
+					"method":"animate",
+					"property":"opacity",
+					"step-start":10,
+					"step-end":20,
+					"value-end":1,
+					"easing":"linear"
+				},
+				19:{
+					"selector":"#drawSurface1 .myDiv3",
+					"method":"set",
+					"property":"left",
+					"step-from":15,
+					"value-above":200
+				},
+				20:{
+					"selector":"#drawSurface1 .myDiv3",
+					"method":"set",
+					"property":"left",
+					"step-from":20,
+					"value-above":0
+				},
+				21:{
+					"selector":"#drawSurface1 .myDiv4",
+					"method":"animate",
+					"property":"left",
+					"step-start":10,
+					"step-end":20,
+					"value-end":"eval((elementWidth/2)-50)"
+				},
+				22:{
+					"selector":"#drawSurface1 .myDiv5",
+					"method":"set",
+					"property":"top",
+					"step-from":0,
+					"value-under":"eval(elementHeight-50)",
+					"value-above":0,
+					"easing":"linear",
+					"scrollbar":true
+				},
+				23:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"right",
+					"step-start":10,
+					"step-end":20,
+					"value-end":0,
+					"easing":"linear"
+				},
+				24:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"top",
+					"step-start":10,
+					"step-end":20,
+					"value-end":0,
+					"easing":"linear"
+				},
+				25:{
+					"selector":"#drawSurface1 .myDiv6",
+					"method":"animate",
+					"property":"transform",
+					"step-start":10,
+					"step-end":20,
+					"value-end":"rotate(0deg) scale(1)"
+				},
+				26:{
+					"selector":"#drawSurface1 .myDiv7",
+					"method":"animate",
+					"property":"transform",
+					"step-start":10,
+					"step-end":20,
+					"value-end":0,
 					"format":"rotateY(Xdeg)"
 				}
 			};
@@ -300,7 +402,8 @@
 					touchType:'drag',
 					enableScrollbarTouch:true,
 					debug:true,
-					dragYFrom:40
+					dragYFrom:40,
+					loop:true
 				});
 
 				jQuery('#drawSurface2').isAlive('create',{
@@ -395,7 +498,8 @@
 					 - The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
 					 - The green rectangle shows how set@start method works.<br/>
 					 - The back rectangle shows how transform can be animated <br/>
-					 - The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.
+					 - The "timeline" for this animation is from step 0 to step 20 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
+					 - This animation has a loop.
 				</p>
 			</div>
 			<div class="example-wrapper">
