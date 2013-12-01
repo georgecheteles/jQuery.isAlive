@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.11)
+jQuery.isAlive(1.4.12)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 30 November 2013
+Last modification on this file: 1 December 2013
 */
 
 (function(jQuery) {
@@ -2294,7 +2294,7 @@ Last modification on this file: 30 November 2013
 		var thisObj = this;
 		var pos,posNext,posPrev;
 		
-		if(thisObj.forceAnimation || (thisObj.animation && settings.to==thisObj.getPos(thisObj.step)))
+		if(thisObj.forceAnimation || (thisObj.animating && settings.to==thisObj.getPos(thisObj.step)))
 			return false;
 			
 		thisObj.animationType = settings.animationType;
@@ -2625,7 +2625,7 @@ Last modification on this file: 30 November 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.11";
+			return "1.4.12";
 		}
 	};
 	
