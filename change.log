@@ -1,5 +1,9 @@
 jQuery isAlive Changelog
 
+ver. 1.4.13 (1 December 2013)
+ - bugs fixed
+ - enableGPU can now have TRUE or FALSE values
+
 ver. 1.4.12 (1 December 2013)
  - bugs fixed
 

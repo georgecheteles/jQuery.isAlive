@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.12)
+jQuery.isAlive(1.4.13)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -377,7 +377,7 @@ Last modification on this file: 1 December 2013
 			scrollbarActiveClass:null,
 			enableScrollbarTouch:false,
 			scrollDelay:250, /*number or false*/
-			enableGPU:"none", /*none|webki|chrome|safari|mozilla|msie|opera|mobile*/
+			enableGPU:false, /*false|true|webkit|chrome|safari|mobile*/
 			useIdAttribute:false,
 			onStep:null,
 			onLoadingComplete:null,
@@ -1400,16 +1400,15 @@ Last modification on this file: 1 December 2013
 			}
 		}
 		
-		/*CHECKS IF ENABLE GPU IS VALID*/
-		if(thisObj.settings.enableGPU=="none" || typeof(browserObj.webkit)=="undefined")
-			var validGPU = false;
-		else
-			var validGPU = validateBrowsers(thisObj.settings.enableGPU);
+		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
+		if(typeof(browserObj.webkit)!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU)))){
+			jQuery('.'+thisObj.settings.animateClass).css('-webkit-backface-visibility','hidden');
+			jQuery('.'+thisObj.settings.animateClass).css('-webkit-perspective','1000');
+		}
+			
 		
 		var tempArray = [];
-		var tempArrayGPU = [];
 		for(key in thisObj.settings.elements){
-			
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
 			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
@@ -1433,24 +1432,14 @@ Last modification on this file: 1 December 2013
 				jQuery(thisObj.settings.elements[key]['selector']).css('opacity',cssValue);
 				tempArray.push(thisObj.settings.elements[key]['selector']);
 			}
-			
-			/*MAKES WEBKIT GPU ENABLED*/
-			if(validGPU && thisObj.settings.elements[key]['method']=='animate' && indexOf(tempArrayGPU,thisObj.settings.elements[key]['selector'])==-1){
-				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-backface-visibility','hidden');
-				jQuery(thisObj.settings.elements[key]['selector']).css('-webkit-perspective','1000');
-				tempArrayGPU.push(thisObj.settings.elements[key]['selector']);
-			}
-			
 		}
 		
 		/* DELETES UNWANTED ELEMENTS FROM TRANSITION ARRAY AND MAKES DEFAULT TRANSITION ARRAY*/		
 		for(key in thisObj.CSS3DefaultTransitionArray){
-		
 			if(thisObj.CSS3DefaultTransitionArray[key]==null){
 				delete thisObj.CSS3DefaultTransitionArray[key];
 				continue;
 			}
-			
 			var tempArray = [];
 			for(key2 in thisObj.CSS3DefaultTransitionArray[key]){
 				if(thisObj.CSS3DefaultTransitionArray[key][key2].indexOf('cubic-bezier')==-1) 
@@ -1468,7 +1457,6 @@ Last modification on this file: 1 December 2013
 				}
 				delete(thisObj.CSS3DefaultTransitionArray[key][key2]);
 			}
-			
 			for(key2 in tempArray[0]){
 				var transVal = [];
 				transVal.push(jQuery.trim(tempArray[0][key2]));
@@ -1997,11 +1985,9 @@ Last modification on this file: 1 December 2013
 		    			if(step!=stepEnd && typeof(animations[step])!="undefined"){
 					    	for(selector in animations[step]){
 						    	for(property in animations[step][selector]){
-								
 						    		duration = 0;
 						    		if ((directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0) || (!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0))
 						    			duration = Math.floor(animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step))));
-										
 							    	if(!animations[step][selector][property]['useCSS3']){
 										if(animations[step][selector][property]['useJQuery']){
 											var animObj = {};
@@ -2371,12 +2357,15 @@ Last modification on this file: 1 December 2013
 			return false;
 		
 		setTimeout(function(){
+		
+			
+		
 			var pos,pointFound,pointFoundSelector,direction;
 			var valuesCSS = {};
 			var valuesClasses = {};
 			var selector,property,className;
 
-			pos = thisObj.step;
+			pos = thisObj.getPos(thisObj.step);
 			pointFoundSelector = -1;
 			pointFound = -1;
 			
@@ -2625,7 +2614,7 @@ Last modification on this file: 1 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.12";
+			return "1.4.13";
 		}
 	};
 	
