@@ -2306,11 +2306,11 @@ Last modification on this file: 1 December 2013
 					pos = posNext;
 			}
 			else if(settings.orientation == 'next'){
-				if(thisObj.lastStep>pos)
+				if(thisObj.lastStep>=pos)
 					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)+1)*thisObj.settings.max);
 			}
 			else if(settings.orientation == 'prev'){
-				if(thisObj.lastStep<pos)
+				if(thisObj.lastStep<=pos)
 					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
 			}
 		}
@@ -2357,9 +2357,7 @@ Last modification on this file: 1 December 2013
 			return false;
 		
 		setTimeout(function(){
-		
-			
-		
+
 			var pos,pointFound,pointFoundSelector,direction;
 			var valuesCSS = {};
 			var valuesClasses = {};
