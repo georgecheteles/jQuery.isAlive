@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.4.13+ Manual</h1>
+				<h1>jQuery.isAlive 1.5.0 Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -150,8 +150,22 @@
 						<p class="exp">
 							Type: String<br/>
 							Default: linear<br/>
-							Values: linear | swing<br/>
-							Easing function that will be used for jQuery animation. More can be added.(See chapter)
+							Values: linear | swing | easing.js functions (if easing.js is included)<br/>
+							Easing that will be used for jQuery and CSS3 animation. More can be added.(See example)
+						</p>
+						JSEasing:
+						<p class="exp">
+							Type: String<br/>
+							Default: linear<br/>
+							Values: linear | swing | easing.js function (if easing.js is included)<br/>
+							Set the type of easing you want when having a jQuery animation. This will overwrite the easing option for jQuery animations.
+						</p>
+						CSS3Easing:
+						<p class="exp">
+							Type: String<br/>
+							Default: linear<br/>
+							Values: linear | ease | ease-in | ease-out | ease-in-out | easing.js functions are also included (without easing.js)<br/>
+							Set the type of easing you want when having a CSS3 animation. This will overwrite the easing option for CSS3 animations.
 						</p>
 						start:
 						<p class="exp">
@@ -261,13 +275,6 @@
 						<p class="exp">
 							Type: Array<br/>
 							Define here the steps where you want to have a "playpoint". This will be used only at "play/rewind" method.(See example)
-						</p>
-						CSS3Easing:
-						<p class="exp">
-							Type: String<br/>
-							Default: linear<br/>
-							Values: linear | ease | ease-in | ease-out | ease-in-out<br/>
-							Set the type of easing you want when having a CSS3 animation.
 						</p>
 						stepsOnScroll:
 						<p class="exp">
@@ -394,8 +401,9 @@
 	"value-end": > CSS value at end
 	"format": > this is used for special cases like working with CSS3 transform (optional). Uses: scale(X),rotate(Xdeg),Xpx,X%,,Xdeg,Xem
 	"useCSS3": > true | false > force to use CSS3 or not
-	"easing": > easing for jQuery animations
-	"CSS3Easing": > easing for CSS3 animations
+	"easing": > default easing for both jQuery and CSS3 animations (can be special easings from easings.js)
+	"JSEasing": > easing for jQuery animations. This will be used "easing" is not provided
+	"CSS3Easing": > easing for CSS3 animations. This will be used "easing" is not provided
 	"use-id-attribute": > true or false - with this flag you can overwrite the "useIdAttribute" from settings
 	"+browsers": > define a list of browsers that support this animation<span class="red">**</span>
 	"-browsers": > define a list of browsers that do not support this animation<span class="red">**</span>

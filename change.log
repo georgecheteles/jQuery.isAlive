@@ -1,5 +1,11 @@
 jQuery isAlive Changelog
 
+ver. 1.5.0 (4 December 2013)
+ - bugs fixed
+ - speed improvements
+ - adding CSS3 support identical with jQuery easings
+ - adding easing / CSS3Easing / JSEasing
+
 ver. 1.4.13 (1 December 2013)
  - bugs fixed
  - enableGPU can now have TRUE or FALSE values

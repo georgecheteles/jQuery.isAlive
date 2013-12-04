@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.4.13)
+jQuery.isAlive(1.5.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 1 December 2013
+Last modification on this file: 4 December 2013
 */
 
 (function(jQuery) {
@@ -21,27 +21,31 @@ Last modification on this file: 1 December 2013
 	var isAliveObjects = [];
 	var isReady = false;
 	var browserObj = null;
+	var vPTransition = null;
 	var indexOf = null;
 	
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
 	
+	/*EASING TO BEZIER*/
+	function convertEasing(value){
+		var easings = {'swing':'cubic-bezier(0.02,0.01,0.47,1)','easeInSine':'cubic-bezier(0.47,0,0.745,0.715)','easeOutSine':'cubic-bezier(0.39,0.575,0.565,1)','easeInOutSine':'cubic-bezier(0.445,0.05,0.55,0.95)','easeInQuad':'cubic-bezier(0.55,0.085,0.68,0.53)','easeOutQuad':'cubic-bezier(0.25,0.46,0.45,0.94)','easeInOutQuad':'cubic-bezier(0.455,0.03,0.515,0.955)','easeInCubic':'cubic-bezier(0.55,0.055,0.675,0.19)','easeOutCubic':'cubic-bezier(0.215,0.61,0.355,1)','easeInOutCubic':'cubic-bezier(0.645,0.045,0.355,1)','easeInQuart':'cubic-bezier(0.895,0.03,0.685,0.22)','easeOutQuart':'cubic-bezier(0.165,0.84,0.44,1)','easeInOutQuart':'cubic-bezier(0.77,0,0.175,1)','easeInQuint':'cubic-bezier(0.755,0.05,0.855,0.06)','easeOutQuint':'cubic-bezier(0.23,1,0.32,1)','easeInOutQuint':'cubic-bezier(0.86,0,0.07,1)','easeInExpo':'cubic-bezier(0.95,0.05,0.795,0.035)','easeOutExpo':'cubic-bezier(0.19,1,0.22,1)','easeInOutExpo':'cubic-bezier(1,0,0,1)','easeInCirc':'cubic-bezier(0.6,0.04,0.98,0.335)','easeOutCirc':'cubic-bezier(0.075,0.82,0.165,1)','easeInOutCirc':'cubic-bezier(0.785,0.135,0.15,0.86)','easeInBack':'cubic-bezier(0.6,-0.28,0.735,0.045)','easeOutBack':'cubic-bezier(0.175,0.885,0.32,1.275)','easeInOutBack':'cubic-bezier(0.68,-0.55,0.265,1.55)'};
+		if(typeof(easings[value])!='undefined')
+			return easings[value];
+		return value;
+	}
+	
 	/*FIX SPACES FOR CSS VALUES*/
 	function fixSpaces(params){
 		if(params.indexOf(' ')==-1)
 			return params;
-	
-		if(params.indexOf('(')==-1 && params.indexOf(',')!=-1)
-			return params.replace(/ /g,'');
-		
-		params = params.split(' ');
+		params = jQuery.trim(params).split(' ');
 		var ret = [];
 		for(var key in params)
 			if(params[key]!="")
 				ret.push(params[key]);
 		params = ret.join(' ');
-		
 		if(params.indexOf('(')!=-1){
 			var bracketCount = 0;
 			ret = "";
@@ -92,7 +96,7 @@ Last modification on this file: 1 December 2013
 		var colors={"aliceblue":"rgb(240,248,255)","antiquewhite":"rgb(250,235,215)","aqua":"rgb(0,255,255)","aquamarine":"rgb(127,255,212)","azure":"rgb(240,255,255)","beige":"rgb(245,245,220)","bisque":"rgb(255,228,196)","black":"rgb(0,0,0)","blanchedalmond":"rgb(255,235,205)","blue":"rgb(0,0,255)","blueviolet":"rgb(138,43,226)","brown":"rgb(165,42,42)","burlywood":"rgb(222,184,135)","cadetblue":"rgb(95,158,160)","chartreuse":"rgb(127,255,0)","chocolate":"rgb(210,105,30)","coral":"rgb(255,127,80)","cornflowerblue":"rgb(100,149,237)","cornsilk":"rgb(255,248,220)","crimson":"rgb(220,20,60)","cyan":"rgb(0,255,255)","darkblue":"rgb(0,0,139)","darkcyan":"rgb(0,139,139)","darkgoldenrod":"rgb(184,134,11)","darkgray":"rgb(169,169,169)","darkgreen":"rgb(0,100,0)","darkkhaki":"rgb(189,183,107)","darkmagenta":"rgb(139,0,139)","darkolivegreen":"rgb(85,107,47)","darkorange":"rgb(255,140,0)","darkorchid":"rgb(153,50,204)","darkred":"rgb(139,0,0)","darksalmon":"rgb(233,150,122)","darkseagreen":"rgb(143,188,143)","darkslateblue":"rgb(72,61,139)","darkslategray":"rgb(47,79,79)","darkturquoise":"rgb(0,206,209)","darkviolet":"rgb(148,0,211)","deeppink":"rgb(255,20,147)","deepskyblue":"rgb(0,191,255)","dimgray":"rgb(105,105,105)","dodgerblue":"rgb(30,144,255)","firebrick":"rgb(178,34,34)","floralwhite":"rgb(255,250,240)","forestgreen":"rgb(34,139,34)","fuchsia":"rgb(255,0,255)","gainsboro":"rgb(220,220,220)","ghostwhite":"rgb(248,248,255)","gold":"rgb(255,215,0)","goldenrod":"rgb(218,165,32)","gray":"rgb(128,128,128)","green":"rgb(0,128,0)","greenyellow":"rgb(173,255,47)","honeydew":"rgb(240,255,240)","hotpink":"rgb(255,105,180)","indianred ":"rgb(205,92,92)","indigo ":"rgb(75,0,130)","ivory":"rgb(255,255,240)","khaki":"rgb(240,230,140)","lavender":"rgb(230,230,250)","lavenderblush":"rgb(255,240,245)","lawngreen":"rgb(124,252,0)","lemonchiffon":"rgb(255,250,205)","lightblue":"rgb(173,216,230)","lightcoral":"rgb(240,128,128)","lightcyan":"rgb(224,255,255)","lightgoldenrodyellow":"rgb(250,250,210)","lightgrey":"rgb(211,211,211)","lightgreen":"rgb(144,238,144)","lightpink":"rgb(255,182,193)","lightsalmon":"rgb(255,160,122)","lightseagreen":"rgb(32,178,170)","lightskyblue":"rgb(135,206,250)","lightslategray":"rgb(119,136,153)","lightsteelblue":"rgb(176,196,222)","lightyellow":"rgb(255,255,224)","lime":"rgb(0,255,0)","limegreen":"rgb(50,205,50)","linen":"rgb(250,240,230)","magenta":"rgb(255,0,255)","maroon":"rgb(128,0,0)","mediumaquamarine":"rgb(102,205,170)","mediumblue":"rgb(0,0,205)","mediumorchid":"rgb(186,85,211)","mediumpurple":"rgb(147,112,216)","mediumseagreen":"rgb(60,179,113)","mediumslateblue":"rgb(123,104,238)","mediumspringgreen":"rgb(0,250,154)","mediumturquoise":"rgb(72,209,204)","mediumvioletred":"rgb(199,21,133)","midnightblue":"rgb(25,25,112)","mintcream":"rgb(245,255,250)","mistyrose":"rgb(255,228,225)","moccasin":"rgb(255,228,181)","navajowhite":"rgb(255,222,173)","navy":"rgb(0,0,128)","oldlace":"rgb(253,245,230)","olive":"rgb(128,128,0)","olivedrab":"rgb(107,142,35)","orange":"rgb(255,165,0)","orangered":"rgb(255,69,0)","orchid":"rgb(218,112,214)","palegoldenrod":"rgb(238,232,170)","palegreen":"rgb(152,251,152)","paleturquoise":"rgb(175,238,238)","palevioletred":"rgb(216,112,147)","papayawhip":"rgb(255,239,213)","peachpuff":"rgb(255,218,185)","peru":"rgb(205,133,63)","pink":"rgb(255,192,203)","plum":"rgb(221,160,221)","powderblue":"rgb(176,224,230)","purple":"rgb(128,0,128)","red":"rgb(255,0,0)","rosybrown":"rgb(188,143,143)","royalblue":"rgb(65,105,225)","saddlebrown":"rgb(139,69,19)","salmon":"rgb(250,128,114)","sandybrown":"rgb(244,164,96)","seagreen":"rgb(46,139,87)","seashell":"rgb(255,245,238)","sienna":"rgb(160,82,45)","silver":"rgb(192,192,192)","skyblue":"rgb(135,206,235)","slateblue":"rgb(106,90,205)","slategray":"rgb(112,128,144)","snow":"rgb(255,250,250)","springgreen":"rgb(0,255,127)","steelblue":"rgb(70,130,180)","tan":"rgb(210,180,140)","teal":"rgb(0,128,128)","thistle":"rgb(216,191,216)","tomato":"rgb(255,99,71)","turquoise":"rgb(64,224,208)","violet":"rgb(238,130,238)","wheat":"rgb(245,222,179)","white":"rgb(255,255,255)","whitesmoke":"rgb(245,245,245)","yellow":"rgb(255,255,0)","yellowgreen":"rgb(154,205,50)"};
 		if(typeof(colors[name.toLowerCase()])!="undefined")
 			return colors[name.toLowerCase()];
-		return null
+		return false;
 	}
 	
 	/*CONVERTING HEX TO RGB*/
@@ -102,7 +106,7 @@ Last modification on this file: 1 December 2013
 			return r + r + g + g + b + b;
 		});
 		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		return result ? {r: parseInt(result[1], 16),g: parseInt(result[2], 16),	b: parseInt(result[3], 16)} : null;
+		return result ? {r: parseInt(result[1], 16),g: parseInt(result[2], 16),	b: parseInt(result[3], 16)} : false;
 	}	
 	/*ACTION ON RESIZE*/
 	function onResizeAction(e){
@@ -228,7 +232,7 @@ Last modification on this file: 1 December 2013
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
 	function vP(property){
-		if(property=='transform' || property=='transition' || property=='filter'){
+		if(indexOf(['transform','trasition','filter','transition-property','transition-duration','transition-timing-function','transition-delay'],property)!=-1){
 			if(browserObj.webkit)
 				return "-webkit-"+property;
 			if(browserObj.mozilla)
@@ -270,26 +274,21 @@ Last modification on this file: 1 December 2013
 					value.push(doRecursive(valStart[key],valEnd[key],(colorFound && key<3)));
 				return value.join(','); 
 			}
-			var format = '';
-			if(valStart.indexOf("px")!=-1)
-				format = "px";
-			else if(valStart.indexOf("%")!=-1)
-				format = "%"; 
-			else if(valStart.indexOf("deg")!=-1)
-				format = "deg";
-			else if(valStart.indexOf("em")!=-1)
-				format = "em"; 
-			if(format!=''){
-				valStart = valStart.replace(format,"");
-				valEnd = valEnd.replace(format,"");
+			if(isNumber(valStart))
+				var format = false;
+			else{
+				var format = valStart.replace(valStart.match(/[-]?[0-9]*\.?[0-9]+/)[0],'$');
+				valStart = valStart.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+				valEnd = valEnd.match(/[-]?[0-9]*\.?[0-9]+/)[0];
 			}
 			valStart = parseFloat(valStart);
 			valEnd = parseFloat(valEnd);
 			var value = parseFloat(valStart+((valEnd-valStart)*((pos-stepStart)/(stepEnd-stepStart))));
 			if(colorFound)
 				return Math.round(Math.min(255,Math.max(0,value)));
-			if(format!='')
-				return value + format;
+			if(format!==false){
+				return format.replace('$',value);
+			}
 			return value;
 		}
 		return doRecursive(valStart,valEnd);
@@ -326,7 +325,7 @@ Last modification on this file: 1 December 2013
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
 		this.msTouchAction;
-		this.lastCSS = {};
+		this.lastElemValue = {};
 		this.dragHorizontal = null;
 
 		/* MY CLASS/SET ARRAYS */
@@ -346,7 +345,9 @@ Last modification on this file: 1 December 2013
 			maxScroll:1000000,
 			maxDrag:1000000,
 			debug:false,
-			easing:'linear', /*linear|swing*/
+			easing:'linear',
+			JSEasing:null,
+			CSS3Easing:null,
 			start:0,
 			loop:false,
 			preventScroll:true,
@@ -365,7 +366,6 @@ Last modification on this file: 1 December 2013
 			animateClass:'isalive-'+this.uniqId,
 			rebuildOnResize:true,
 			playPoints:[],
-			CSS3Easing:'linear', /*linear|ease|ease-in|ease-out|ease-in-out*/
 			stepsOnScroll:1,
 			stepsOnDrag:1,
 			stepsOnScrollbar:1,
@@ -416,8 +416,8 @@ Last modification on this file: 1 December 2013
 	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
 		var thisObj = this;
 		if(startPos==parseInt(startPos))
-			thisObj.lastCSS[selector+'|'+property] = thisObj.animPositions[thisObj.getPos(startPos)][selector][property].toString();
-		var start = thisObj.lastCSS[selector+'|'+property];
+			thisObj.lastElemValue[selector+'|'+property] = thisObj.animPositions[thisObj.getPos(startPos)][selector][property].toString();
+		var start = thisObj.lastElemValue[selector+'|'+property];
 		var end = value.toString();
 		var tempObj = {};
 		tempObj[property.replace(/-/g,"")+'Timer']="+=100";
@@ -425,7 +425,7 @@ Last modification on this file: 1 December 2013
 			step: function(step,fx){
 				var pos = step-fx.start;
 				var value = getAtPosValue(pos,start,end,0,100);
-				thisObj.lastCSS[selector+'|'+property] = value;
+				thisObj.lastElemValue[selector+'|'+property] = value;
 				thisObj.setCSS(selector,property,value);
 			}
 		});
@@ -434,36 +434,27 @@ Last modification on this file: 1 December 2013
 	/*SET CSS VALUES*/
 	isAlive.prototype.setCSS = function(selector,property,value){
 		var thisObj = this;
-		if(typeof(property)=="string"){
-			if(typeof(thisObj.functionsArray[property])!="undefined"){
-				thisObj.functionsArray[property](selector,value);
-				return;
-			}
-			if(property=="scrollTop"){
-				jQuery(selector).scrollTop(value);
-				return;
-			}
-			if(property=="scrollLeft"){
-				jQuery(selector).scrollLeft(value);
-				return;
-			}
-			if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
-				delete thisObj.CSS3TransitionArray[selector][property];
-				jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
-				jQuery(selector).css(property,value);
-				return;
-			}
-			if(property==vP("transition")){
-				value = thisObj.getTransitionArray(selector,value);
-				jQuery(selector).css(property,value);
-				return;
-			}
-			jQuery(selector).css(property,value);
-		}		
-		else{
-			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
-			jQuery(selector).css(property);
+		if(typeof(thisObj.functionsArray[property])!="undefined"){
+			thisObj.functionsArray[property](selector,value);
+			return;
 		}
+		if(property=="scrollTop"){
+			jQuery(selector).scrollTop(value);
+			return;
+		}
+		if(property=="scrollLeft"){
+			jQuery(selector).scrollLeft(value);
+			return;
+		}
+		if(property==vPTransition){
+			jQuery(selector).css(property,thisObj.getTransitionArray(selector,value));
+			return;
+		}
+		if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
+			delete thisObj.CSS3TransitionArray[selector][property];
+			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
+		}
+		jQuery(selector).css(property,value);
 	}
 	
 	/* REPLACES PARAMS */
@@ -501,14 +492,14 @@ Last modification on this file: 1 December 2013
 			}
 			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
 				return getBetweenBrackets(params,true);
-			else if(params.charAt(0)=="#"){
+			if(params.charAt(0)=="#"){
 				var convertValue = hexToRgb(params);
-				if(convertValue!=null)
+				if(convertValue!=false)
 					params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
 			}
 			else{
 				var convertValue = nameToRgb(params);
-				if(convertValue!=null)
+				if(convertValue!=false)
 					params = convertValue;
 			}
 			return params;
@@ -703,14 +694,13 @@ Last modification on this file: 1 December 2013
 	
 	/*GETS START VALUES*/
 	isAlive.prototype.getStartCssValue = function(index){
-		var key,pos,value,posFrom,atStart;
+		var key,pos,posFrom;
 		var thisObj = this;
 		if(thisObj.settings.elements[index]['method']=='animate' || thisObj.settings.elements[index]['method']=='animate-set')
 			posFrom = parseInt(thisObj.settings.elements[index]['step-start']);
 		else if(thisObj.settings.elements[index]['method']=='set')
 			posFrom = parseInt(thisObj.settings.elements[index]['step-from']);
 		
-		atStart = null;
 		for(pos=posFrom;pos>=0;pos--){
 			for(key in thisObj.settings.elements){
 				if(key!=index && thisObj.settings.elements[key]['selector']==thisObj.settings.elements[index]['selector'] && thisObj.settings.elements[key]['property']==thisObj.settings.elements[index]['property'] && thisObj.settings.elements[key]['method']=="set" && thisObj.settings.elements[key]['step-from']==pos)
@@ -722,22 +712,16 @@ Last modification on this file: 1 December 2013
 			}
 		}
 		
-		if(typeof(thisObj.functionsArray[thisObj.settings.elements[index]['property']])!="undefined")
-			return 0;
-		
 		if(thisObj.settings.elements[index]['property']=="scrollTop")
 			return jQuery(thisObj.settings.elements[index]['selector']).scrollTop();
-		else if(thisObj.settings.elements[index]['property']=="scrollLeft")
+			
+		if(thisObj.settings.elements[index]['property']=="scrollLeft")
 			return jQuery(thisObj.settings.elements[index]['selector']).scrollLeft();
-		else{
-			value = jQuery(thisObj.settings.elements[index]['selector']).css(thisObj.settings.elements[index]['property']);
-			if(value.toString().indexOf(" ")==-1){
-				value = value.replace(/px/g,'');
-				if(isNumber(value))
-					value = parseFloat(value);
-			}
-			return value;
-		}
+
+		if(typeof(thisObj.functionsArray[thisObj.settings.elements[index]['property']])!="undefined")
+			return 0;
+
+		return jQuery(thisObj.settings.elements[index]['selector']).css(thisObj.settings.elements[index]['property']);
 	}
 	
 	/*FUNCTION FOR BIND MOUSE AND SCROLL EVENTS*/
@@ -1153,6 +1137,9 @@ Last modification on this file: 1 December 2013
 			windowWidth = jQuery(window).width();
 			windowHeight = jQuery(window).height();
 			jQuery(window).bind('resize',onResizeAction);
+			
+			/*SET TRASITION WITH PREFIX VENTOR*/ 
+			vPTransition = vP('transition');
 		}
 		
 		/*TIMELINE WRAPPER*/
@@ -1188,10 +1175,10 @@ Last modification on this file: 1 December 2013
 		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
 		
 		/*FIX JQUERY/CSS3 EASING*/
-		if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.CSS3Easing)==-1 && thisObj.settings.CSS3Easing.indexOf('cubic-bezier')==-1)	
-			thisObj.settings.CSS3Easing  = "linear";
-		if(typeof(jQuery.easing[thisObj.settings.easing])=='undefined')
-			thisObj.settings.easing = "linear";
+		if(thisObj.settings.JSEasing==null)
+			thisObj.settings.JSEasing = thisObj.settings.easing;
+		if(thisObj.settings.CSS3Easing==null)
+			thisObj.settings.CSS3Easing = thisObj.settings.easing;
 		
 		/*MAKE SURE THAT MAXSCROLL AND MAXTOUCH IS NO BIGGER THEN SCROLLJUMP AND TOUCHJUMP*/
 		if(thisObj.settings.maxScroll<thisObj.settings.stepsOnScroll)
@@ -1224,9 +1211,6 @@ Last modification on this file: 1 December 2013
 		/*SORT STOP POINTS*/
 		thisObj.settings.playPoints.sort(function(a,b){return a-b});
 
-		/*KEEP DEFAULT DURATION*/
-		thisObj.animateDuration=thisObj.settings.duration;
-			
 		/*CHECK IF SCROLLBARPOINTS EXIST*/
 		if(thisObj.settings.scrollbarType!="scroll" && thisObj.settings.scrollbarPoints.length==0)
 			thisObj.settings.scrollbarType = "scroll";
@@ -1275,44 +1259,53 @@ Last modification on this file: 1 December 2013
 		var new_elements = [];
 		var idIndex = 0;
 		var keyIndex = 0;
+		var tempArray = [];
 		for(key in thisObj.settings.elements){
-			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined" || jQuery(thisObj.settings.elements[key]['selector']).length==0)
+			/*DELETE INVALID ELEMENTS*/
+			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined"){
 				delete thisObj.settings.elements[key];
-			else{
-				if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
-				
-					if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
-						delete thisObj.settings.elements[key]['use-id-attribute'];			
-				
-					if(jQuery(thisObj.settings.elements[key]['selector']).length==1){
-						var id = jQuery(thisObj.settings.elements[key]['selector']).attr('id');
-						if(typeof(id)=='undefined'){
-							id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+				continue;
+			}
+			/*DELETE NON EXISTING DOM ELEMENTS*/
+			if(indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
+				if(jQuery(thisObj.settings.elements[key]['selector']).length==0){
+					delete thisObj.settings.elements[key];
+					continue;
+				}
+				tempArray.push(thisObj.settings.elements[key]['selector']);
+			}
+			/*ADD IF USEIDATTRIBUTE IS SET TO TRUE*/
+			if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
+				if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
+					delete thisObj.settings.elements[key]['use-id-attribute'];			
+				if(jQuery(thisObj.settings.elements[key]['selector']).length==1){
+					var id = jQuery(thisObj.settings.elements[key]['selector']).attr('id');
+					if(typeof(id)=='undefined'){
+						id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+						idIndex++;
+						jQuery(thisObj.settings.elements[key]['selector']).attr('id', id);
+						thisObj.settings.elements[key]['selector'] = '#'+id;
+					}
+					else
+						thisObj.settings.elements[key]['selector'] = '#'+id;
+				}
+				else{
+					jQuery(thisObj.settings.elements[key]['selector']).each(function(k, child){
+						if(typeof(jQuery(child).attr('id')) == "undefined"){
+							var id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
+							jQuery(child).attr('id', id);
 							idIndex++;
-							jQuery(thisObj.settings.elements[key]['selector']).attr('id', id);
-							thisObj.settings.elements[key]['selector'] = '#'+id;
 						}
 						else
-							thisObj.settings.elements[key]['selector'] = '#'+id;
-					}
-					else{
-						jQuery(thisObj.settings.elements[key]['selector']).each(function(k, child){
-							if(typeof(jQuery(child).attr('id')) == "undefined"){
-								var id = 'isalive-'+thisObj.uniqId+'-element-' + idIndex;
-								jQuery(child).attr('id', id);
-								idIndex++;
-							}
-							else
-								var id = jQuery(child).attr('id');
-							var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
-							newElement['selector'] = "#"+id;
-							new_elements.push(newElement);
-						});
-						delete thisObj.settings.elements[key];
-					}
+							var id = jQuery(child).attr('id');
+						var newElement = jQuery.extend(true, {}, thisObj.settings.elements[key]);
+						newElement['selector'] = "#"+id;
+						new_elements.push(newElement);
+					});
+					delete thisObj.settings.elements[key];
 				}
 			}
-		};
+		}
 		for(key in new_elements){
 			thisObj.settings.elements["ISALIVE_OBJECT_"+keyIndex] = new_elements[key];
 			keyIndex++;
@@ -1323,15 +1316,17 @@ Last modification on this file: 1 December 2013
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
 			
-				/*BUILD FUNCTIONS ARRAY*/
+				/*BUILD FUNCTIONS ARRAY && TRIMS PROPERTY*/
 				if(typeof(thisObj.settings.elements[key]['property'])=='function'){
 					if(typeof(thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])])=="undefined")
 						thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
 					thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
 				}
-				else{
-					/*TRIMS PROPERTY*/
-					thisObj.settings.elements[key]['property'] = jQuery.trim(thisObj.settings.elements[key]['property']);
+				
+				/*ONLY STRING PROPERTIES*/
+				if(typeof(thisObj.settings.elements[key]['property'])!='string'){
+					delete thisObj.settings.elements[key];
+					continue;
 				}
 				
 				/*CSS3 DOES NOT WORK ON IE7&IE8*/
@@ -1347,41 +1342,55 @@ Last modification on this file: 1 December 2013
 				}
 
 				/*PUTS MOVE-ON VALUE TO THE ANIMATE-SET ELEMENTS*/
-				if(thisObj.settings.elements[key]["method"]=="animate-set")
-					if(typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
-						thisObj.settings.elements[key]['move-on'] = 1;
+				if(thisObj.settings.elements[key]["method"]=="animate-set" && typeof(thisObj.settings.elements[key]['move-on'])=='undefined')
+					thisObj.settings.elements[key]['move-on'] = 1;
 				
-				/*DELETES INVALID EASING*/
-				if(typeof(thisObj.settings.elements[key]['easing'])!="undefined" && typeof(jQuery.easing[thisObj.settings.elements[key]['easing']])=="undefined")
-					delete thisObj.settings.elements[key]['easing'];
-				
-				/*DELETES INVALID EASING CSS3*/
-				if(typeof(thisObj.settings.elements[key]['CSS3Easing'])!="undefined" && indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]['CSS3Easing'])==-1 && thisObj.settings.elements[key]['CSS3Easing'].indexOf('cubic-bezier')==-1)
-					delete thisObj.settings.elements[key]['CSS3Easing'];
-					
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
-					if(thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (browserObj.msie && parseInt(browserObj.version)<10)){
+					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined"){
 						thisObj.settings.elements[key]['useCSS3'] = false;
-						if(typeof(thisObj.settings.elements[key]["easing"])=="undefined")
-							thisObj.settings.elements[key]["easing"] = thisObj.settings.easing;
+						if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
+							if(typeof(thisObj.settings.elements[key]["JSEasing"])=="undefined")
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.JSEasing;
+							else
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["JSEasing"];
+						}
+						if(typeof(jQuery.easing[thisObj.settings.elements[key]["easing"]])=='undefined')
+							thisObj.settings.elements[key]["easing"] = "linear";						
+						if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
+							delete thisObj.settings.elements[key]['JSEasing'];
 						if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
 							delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
 					else {
 						if((thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']){
 							thisObj.settings.elements[key]['useCSS3'] = true;
-							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
-								thisObj.settings.elements[key]["easing"] = thisObj.settings.CSS3Easing;
-							else{
-								thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["CSS3Easing"];
-								delete thisObj.settings.elements[key]['CSS3Easing'];
+							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
+								if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
+									thisObj.settings.elements[key]["easing"] = thisObj.settings.CSS3Easing;
+								else
+									thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["CSS3Easing"];
 							}
+							thisObj.settings.elements[key]["easing"] = convertEasing(thisObj.settings.elements[key]["easing"]);
+							if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]["easing"])==-1 && thisObj.settings.elements[key]["easing"].indexOf('cubic-bezier')==-1)
+								thisObj.settings.elements[key]["easing"] = "linear";
+							if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
+								delete thisObj.settings.elements[key]['JSEasing'];
+							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
+								delete thisObj.settings.elements[key]['CSS3Easing'];
 						}
 						else{
 							thisObj.settings.elements[key]['useCSS3'] = false;
-							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined")
-								thisObj.settings.elements[key]["easing"] = thisObj.settings.easing;
+							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
+								if(typeof(thisObj.settings.elements[key]["JSEasing"])=="undefined")
+									thisObj.settings.elements[key]["easing"] = thisObj.settings.JSEasing;
+								else
+									thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["JSEasing"];
+							}
+							if(typeof(jQuery.easing[thisObj.settings.elements[key]["easing"]])=='undefined')
+								thisObj.settings.elements[key]["easing"] = "linear";						
+							if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
+								delete thisObj.settings.elements[key]['JSEasing'];
 							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
 								delete thisObj.settings.elements[key]['CSS3Easing'];
 						}
@@ -1389,23 +1398,23 @@ Last modification on this file: 1 December 2013
 					(canJQueryAnimate(thisObj.settings.elements[key]["property"]))?thisObj.settings.elements[key]['useJQuery'] = true:thisObj.settings.elements[key]['useJQuery'] = false;
 				}
 
+				/*PUTS PREFIX FOR CSS3*/
+				thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
+				
 				/*PUT ANIMATE CLASS FOR ANIMATIONS*/
 				if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 					jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
 					tempArray.push(thisObj.settings.elements[key]['selector']);
 				}
-						
-				/*PUTS PREFIX FOR CSS3*/
-				thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
 			}
 		}
 		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
-		if(typeof(browserObj.webkit)!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU)))){
-			jQuery('.'+thisObj.settings.animateClass).css('-webkit-backface-visibility','hidden');
-			jQuery('.'+thisObj.settings.animateClass).css('-webkit-perspective','1000');
-		}
-			
+		if(typeof(browserObj.webkit)!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
+			jQuery('.'+thisObj.settings.animateClass).css({
+				'-webkit-backface-visibility':'hidden',
+				'-webkit-perspective':'1000'
+			});
 		
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
@@ -1488,7 +1497,7 @@ Last modification on this file: 1 December 2013
 			
 		/*GETS STARING VALUES*/
 		for(key in thisObj.settings.elements){
-			if(thisObj.settings.elements[key]['scrollbar']){
+			if(thisObj.settings.elements[key]['scrollbar'] && thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
 				if(typeof(thisObj.settings.elements[key]['step-start'])=="undefined")
 					thisObj.settings.elements[key]['step-start'] = 0;
 				if(typeof(thisObj.settings.elements[key]['step-end'])=="undefined")
@@ -1553,6 +1562,8 @@ Last modification on this file: 1 December 2013
 						return false;
 				
 				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
+				var valStart = parseInt(thisObj.settings.elements[scrollbarKey]['value-start'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
+				var valEnd = parseInt(thisObj.settings.elements[scrollbarKey]['value-end'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
 				
 				thisObj.scrollbarActive = scrollbarKey; 						
 				
@@ -1601,19 +1612,19 @@ Last modification on this file: 1 December 2013
 							var mouseNow = (e.touches[0].pageX - parentTopLeft)-clickPos;
 					}
 					
-					if(mouseNow>=thisObj.settings.elements[scrollbarKey]['value-start'] && mouseNow<=thisObj.settings.elements[scrollbarKey]['value-end'])
+					if(mouseNow>=valStart && mouseNow<=valEnd)
 						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],mouseNow);
-					else if(mouseNow<thisObj.settings.elements[scrollbarKey]['value-start']){
-						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],thisObj.settings.elements[scrollbarKey]['value-start']);
-						mouseNow = thisObj.settings.elements[scrollbarKey]['value-start'];
+					else if(mouseNow<valStart){
+						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],valStart);
+						mouseNow = valStart;
 					}
-					else if(mouseNow>thisObj.settings.elements[scrollbarKey]['value-end']){
-						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],thisObj.settings.elements[scrollbarKey]['value-end']);
-						mouseNow = thisObj.settings.elements[scrollbarKey]['value-end'];
+					else if(mouseNow>valEnd){
+						jQuery(thisObj.settings.elements[scrollbarKey]['selector']).css(thisObj.settings.elements[scrollbarKey]['property'],valEnd);
+						mouseNow = valEnd;
 					}
 					
 					positionValid = false;
-					position = thisObj.settings.elements[scrollbarKey]['step-start']+Math.round(Math.abs(thisObj.settings.elements[scrollbarKey]['step-end']-thisObj.settings.elements[scrollbarKey]['step-start'])*((mouseNow-thisObj.settings.elements[scrollbarKey]['value-start'])/Math.abs(thisObj.settings.elements[scrollbarKey]['value-end']-thisObj.settings.elements[scrollbarKey]['value-start'])));
+					position = thisObj.settings.elements[scrollbarKey]['step-start']+Math.round(Math.abs(thisObj.settings.elements[scrollbarKey]['step-end']-thisObj.settings.elements[scrollbarKey]['step-start'])*((mouseNow-valStart)/Math.abs(valEnd-valStart)));
 					
 					if(thisObj.settings.scrollbarType=="scroll"){
 						positionTo = thisObj.settings.elements[scrollbarKey]['step-start']+(Math.round((position-thisObj.settings.elements[scrollbarKey]['step-start'])/thisObj.settings.stepsOnScrollbar)*thisObj.settings.stepsOnScrollbar);
@@ -1714,14 +1725,15 @@ Last modification on this file: 1 December 2013
 			}
 			
 			/*DELETES UNUSED ELEMENTS AND FINDS SCROLLBAR*/
-			if(thisObj.settings.elements[key]['scrollbar']!=true){
-				delete thisObj.settings.elements[key]['value-start'];
-				delete thisObj.settings.elements[key]['value-end'];
-			}else if(thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
+			if(thisObj.settings.elements[key]['scrollbar'] && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
 				/*BINDS MOUSEEVENTS TO SCROLLBAR*/
 				jQuery(thisObj.settings.elements[key]['selector']).each(function(){
 					addScrollbarEvents(this,key);
 				});
+			}
+			else {
+				delete thisObj.settings.elements[key]['value-start'];
+				delete thisObj.settings.elements[key]['value-end'];
 			}
 		}
 		
@@ -1910,9 +1922,9 @@ Last modification on this file: 1 December 2013
 				for(selector in thisObj.CSS3TransitionArray){
 					for(property in thisObj.CSS3TransitionArray[selector])
 						delete thisObj.CSS3TransitionArray[selector][property];
-					jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
+					jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 				}
-
+				
 				if(thisObj.rebuildOnStop){
 					thisObj.rebuildLayout();
 					thisObj.rebuildOnStop = false;
@@ -1998,15 +2010,16 @@ Last modification on this file: 1 December 2013
 											thisObj.animateCSS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
 							    	}	
 							    	else{
-										CSS3ValuesArray[property] = animations[step][selector][property]['to'];
+							    		CSS3Found = true;
 										if(typeof(thisObj.CSS3TransitionArray[selector])=="undefined")
 											thisObj.CSS3TransitionArray[selector] = {};
 							    		thisObj.CSS3TransitionArray[selector][property] = property+' '+parseFloat(duration/1000)+'s '+animations[step][selector][property]['easing'];
-							    		CSS3Found = true;
+										CSS3ValuesArray[property] = animations[step][selector][property]['to'];
 							    	}
 						    	}
 						    	if(CSS3Found){
-									thisObj.setCSS(selector,CSS3ValuesArray);
+									jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
+									jQuery(selector).css(CSS3ValuesArray);
 									CSS3ValuesArray = {};
 									CSS3Found = false;
 						    	}
@@ -2441,7 +2454,7 @@ Last modification on this file: 1 December 2013
 				CSSValues[property] = jQuery(selector).css(property);
 				delete thisObj.CSS3TransitionArray[selector][property];	
 			}
-			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
+			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 			jQuery(selector).css(CSSValues);
 		}
 		
@@ -2612,7 +2625,7 @@ Last modification on this file: 1 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.4.13";
+			return "1.5.0";
 		}
 	};
 	
