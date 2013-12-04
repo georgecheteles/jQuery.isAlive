@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.0)
+jQuery.isAlive(1.5.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -2363,14 +2363,11 @@ Last modification on this file: 4 December 2013
 	isAlive.prototype.skip = function(step){
 		
 		var thisObj = this;
-		
-		thisObj.stop();
 
 		if(thisObj.forceAnimation)
 			return false;
 		
-		setTimeout(function(){
-
+		var doSkip = function(step){
 			var pos,pointFound,pointFoundSelector,direction;
 			var valuesCSS = {};
 			var valuesClasses = {};
@@ -2439,12 +2436,24 @@ Last modification on this file: 4 December 2013
 			
 			thisObj.step = step;
 			thisObj.lastStep = step;
-		},25);
+		}
+		
+		if(thisObj.animating){
+			thisObj.stop();
+			setTimeout(function(){
+				doSkip(step);
+			},10);
+		}
+		else
+			doSkip(step);
 	}
 	
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
 		var thisObj = this;
+		
+		if(!thisObj.animating)
+			return false;
 		
 		jQuery(thisObj.TimeLine).stop();
 		jQuery('.'+thisObj.settings.animateClass).stop();
@@ -2625,7 +2634,7 @@ Last modification on this file: 4 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.0";
+			return "1.5.1";
 		}
 	};
 	
