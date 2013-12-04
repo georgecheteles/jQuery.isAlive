@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.1)
+jQuery.isAlive(1.5.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 4 December 2013
+Last modification on this file: 5 December 2013
 */
 
 (function(jQuery) {
@@ -2144,17 +2144,18 @@ Last modification on this file: 4 December 2013
 		else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		
+		
 		if(pos){
-			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep)<=thisObj.settings.maxScroll)
+			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && Math.floor((thisObj.step+thisObj.settings.stepsOnScroll)/thisObj.settings.max)-Math.floor(thisObj.lastStep/thisObj.settings.max)<=1 && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnScroll;
-			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnScroll>thisObj.settings.max-1 && !thisObj.settings.loop && Math.abs((thisObj.settings.max-1)-thisObj.lastStep)<=thisObj.settings.maxScroll){
+			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnScroll>thisObj.settings.max-1 && !thisObj.settings.loop && (thisObj.settings.max-1)-thisObj.lastStep<=thisObj.settings.maxScroll){
 					thisObj.step = thisObj.settings.max-1;
 			}else
 				return;
 		}else{
-			if((thisObj.step-thisObj.settings.stepsOnScroll>=thisObj.settings.min || thisObj.settings.loop) && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnScroll)<thisObj.settings.max*2 && Math.abs((thisObj.step-thisObj.settings.stepsOnScroll)-thisObj.lastStep)<=thisObj.settings.maxScroll)
+			if((thisObj.step-thisObj.settings.stepsOnScroll>=thisObj.settings.min || thisObj.settings.loop) && Math.floor(thisObj.lastStep/thisObj.settings.max)-Math.floor((thisObj.step-thisObj.settings.stepsOnScroll)/thisObj.settings.max)<=1 && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnScroll)<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step-thisObj.settings.stepsOnScroll;
-			else if(thisObj.step>thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnScroll<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep<=thisObj.settings.maxScroll)
+			else if(thisObj.step>thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnScroll<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep-thisObj.settings.min<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.settings.min;
 			else
 				return;
@@ -2254,16 +2255,16 @@ Last modification on this file: 4 December 2013
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		if(value==1){
-			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<thisObj.settings.max*2 && Math.abs((thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep)<=thisObj.settings.maxDrag)
+			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && Math.floor((thisObj.step+thisObj.settings.stepsOnDrag)/thisObj.settings.max)-Math.floor(thisObj.lastStep/thisObj.settings.max)<=1 && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnDrag;
-			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnDrag>thisObj.settings.max-1 && !thisObj.settings.loop && Math.abs((thisObj.settings.max-1)-thisObj.lastStep)<=thisObj.settings.maxDrag)
+			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnDrag>thisObj.settings.max-1 && !thisObj.settings.loop && (thisObj.settings.max-1)-thisObj.lastStep<=thisObj.settings.maxDrag)
 					thisObj.step = thisObj.settings.max-1;
 			else
 				return;
 		}else{
-			if((thisObj.step-thisObj.settings.stepsOnDrag>=thisObj.settings.min || thisObj.settings.loop) && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnDrag)<thisObj.settings.max*2 && Math.abs((thisObj.step-thisObj.settings.stepsOnDrag)-thisObj.lastStep)<=thisObj.settings.maxDrag)
+			if((thisObj.step-thisObj.settings.stepsOnDrag>=thisObj.settings.min || thisObj.settings.loop) && Math.floor(thisObj.lastStep/thisObj.settings.max)-Math.floor((thisObj.step-thisObj.settings.stepsOnDrag)/thisObj.settings.max)<=1 && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnDrag)<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.step-thisObj.settings.stepsOnDrag;
-			else if(thisObj.step > thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnDrag<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep<=thisObj.settings.maxDrag)
+			else if(thisObj.step>thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnDrag<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep-thisObj.settings.min<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.settings.min;
 			else
 				return;
@@ -2634,7 +2635,7 @@ Last modification on this file: 4 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.1";
+			return "1.5.2";
 		}
 	};
 	

@@ -86,6 +86,7 @@ body.example-1 .myDiv3{
 
 body.example-1 .myDiv4.round{
 	border-radius:100%;
+	border:1px solid white;
 }
 
 a.action{
