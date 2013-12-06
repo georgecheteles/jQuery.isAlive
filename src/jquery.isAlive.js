@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.3)
+jQuery.isAlive(1.5.4)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -2079,31 +2079,21 @@ Last modification on this file: 6 December 2013
 		if(thisObj.settings.scrollDelay!==false)	
 			thisObj.waitScrollEnd = true;
 		
-		(pos) ? stepPos = thisObj.getPos(Math.floor(thisObj.lastStep)):stepPos = thisObj.getPos(Math.ceil(thisObj.lastStep));
+		stepPos = thisObj.getPos(thisObj.lastStep);
 		currentPosition = indexOf(thisObj.settings.jumpPoints,stepPos);
 		if(currentPosition==-1){
 			currentPosition = null;
-			if(stepPos<=thisObj.settings.jumpPoints[0]){
-				if(pos)
-					currentPosition=-1;
-				else
-					currentPosition=0;
-			}else{
+			if(stepPos<=thisObj.settings.jumpPoints[0])
+				currentPosition=-0.5;
+			else{
 				for(var i=0;i<=thisObj.settings.jumpPoints.length-2;i++){
 					if(stepPos>thisObj.settings.jumpPoints[i] && stepPos<thisObj.settings.jumpPoints[i+1]){
-						if(pos)
-							currentPosition=i;
-						else
-							currentPosition=i+1;
+						currentPosition = i + 0.5;
 						break;
 					}
 				}
-				if(currentPosition==null){
-					if(pos)
-						currentPosition=thisObj.settings.jumpPoints.length-1;
-					else
-						currentPosition=thisObj.settings.jumpPoints.length
-				}
+				if(currentPosition==null)
+					currentPosition=(thisObj.settings.jumpPoints.length-1)+0.5;
 			}
 		}
 		
@@ -2117,29 +2107,32 @@ Last modification on this file: 6 December 2013
 		
 		if(pos){
 			if(nextPosition<(thisObj.settings.jumpPoints.length-1))
-				nextPosition++;
-			else if(nextPosition==(thisObj.settings.jumpPoints.length-1) && thisObj.settings.loop)
+				nextPosition = Math.floor(nextPosition+1);
+			else if(thisObj.settings.loop)
 				nextPosition=0;
+			else
+				return;
 		}
 		else{
 			if(nextPosition>0)
-				nextPosition--;
-			else if(nextPosition==0 && thisObj.settings.loop)
+				nextPosition = Math.ceil(nextPosition-1);
+			else if(thisObj.settings.loop)
 				nextPosition=thisObj.settings.jumpPoints.length-1
+			else
+				return;
 		}
-			
+		
 		if(pos){
-			if(changeDirection || nextPosition!=currentPosition){
-				thisObj.jumpPosition = nextPosition;
-				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'next',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
-			}
+			if(!changeDirection && nextPosition == Math.min(thisObj.settings.jumpPoints.length-1,Math.ceil(currentPosition)))
+				return false;
+			thisObj.jumpPosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'next',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
 		}else{
-			if(changeDirection || nextPosition!=(currentPosition-1)){
-				thisObj.jumpPosition = nextPosition;
-				thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'prev',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
-			}
-		}
-			
+			if(!changeDirection && nextPosition == Math.max(0,Math.floor(currentPosition)))
+				return false;
+			thisObj.jumpPosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'prev',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
+		}		
 	}
 	
 	/* FUNCTION FOR SCROLL */
@@ -2203,33 +2196,24 @@ Last modification on this file: 6 December 2013
 		
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
 		
-		(value==1) ? stepPos = thisObj.getPos(Math.floor(thisObj.lastStep)):stepPos = thisObj.getPos(Math.ceil(thisObj.lastStep));
+		stepPos = thisObj.getPos(thisObj.lastStep);
 		currentPosition = indexOf(thisObj.settings.wipePoints,stepPos);
 		if(currentPosition==-1){
 			currentPosition = null;
-			if(stepPos<=thisObj.settings.wipePoints[0]){
-				if(value==1)
-					currentPosition=-1;
-				else
-					currentPosition=0;
-			}else{
-				for(var i=0;i<=thisObj.settings.wipePoints.length-2;i++)
+			if(stepPos<=thisObj.settings.wipePoints[0])
+				currentPosition=-0.5;
+			else{
+				for(var i=0;i<=thisObj.settings.wipePoints.length-2;i++){
 					if(stepPos>thisObj.settings.wipePoints[i] && stepPos<thisObj.settings.wipePoints[i+1]){
-						if(value==1)
-							currentPosition=i;
-						else
-							currentPosition=i+1;
+						currentPosition = i + 0.5;
 						break;
 					}
-				if(currentPosition==null){
-					if(value==1)
-						currentPosition=thisObj.settings.wipePoints.length-1;
-					else
-						currentPosition=thisObj.settings.wipePoints.length
 				}
+				if(currentPosition==null)
+					currentPosition=(thisObj.settings.wipePoints.length-1)+0.5;
 			}
 		}
-			
+		
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='touchWipe') || (thisObj.animating && thisObj.animationType=='touchWipe' && ((directionForward && value==-1)||(!directionForward && value==1)))){
 			changeDirection = true;
 			nextPosition = currentPosition;
@@ -2240,29 +2224,31 @@ Last modification on this file: 6 December 2013
 		
 		if(value==1){
 			if(nextPosition<(thisObj.settings.wipePoints.length-1))
-				nextPosition++;
-			else if(nextPosition==(thisObj.settings.wipePoints.length-1) && thisObj.settings.loop)
+				nextPosition = Math.floor(nextPosition+1);
+			else if(thisObj.settings.loop)
 				nextPosition=0;
+			else
+				return;
 		}
 		else{
 			if(nextPosition>0)
-				nextPosition--;
-			else if(nextPosition==0 && thisObj.settings.loop)
-				nextPosition=thisObj.settings.wipePoints.length-1;
-		}
-		
+				nextPosition = Math.ceil(nextPosition-1);
+			else if(thisObj.settings.loop)
+				nextPosition=thisObj.settings.wipePoints.length-1
+			else
+				return;
+		}		
 		if(value==1){
-			if(changeDirection || nextPosition!=currentPosition){
-				thisObj.touchPosition = nextPosition;
-				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
-			}
-		}
-		else{
-			if(changeDirection || nextPosition!=(currentPosition-1)){
-				thisObj.touchPosition = nextPosition;
-				thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
-			}
-		}
+			if(!changeDirection && nextPosition == Math.min(thisObj.settings.wipePoints.length-1,Math.ceil(currentPosition)))
+				return false;
+			thisObj.touchPosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
+		}else{
+			if(!changeDirection && nextPosition == Math.max(0,Math.floor(currentPosition)))
+				return false;
+			thisObj.touchPosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
+		}		
 	}
 	
 	/*DO TOUCH DRAG*/
@@ -2320,12 +2306,9 @@ Last modification on this file: 6 December 2013
 		var thisObj = this;
 		var pos,posNext,posPrev;
 		
-		if(thisObj.forceAnimation || (thisObj.animating && settings.to==thisObj.getPos(thisObj.step)))
+		if(thisObj.forceAnimation)
 			return false;
 			
-		thisObj.animationType = settings.animationType;
-		thisObj.forceAnimation = settings.force;
-		
 		pos = settings.to+(Math.floor(thisObj.lastStep/thisObj.settings.max)*thisObj.settings.max);
 		
 		if(thisObj.settings.loop){
@@ -2355,6 +2338,12 @@ Last modification on this file: 6 December 2013
 			}
 		}
 		
+		
+		if(thisObj.animating && pos==thisObj.step)
+			return false;
+		
+		thisObj.animationType = settings.animationType;
+		thisObj.forceAnimation = settings.force;
 		thisObj.step = pos;
 		
 		/*MIN VALUE FOR DURATION*/
@@ -2662,7 +2651,7 @@ Last modification on this file: 6 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.3";
+			return "1.5.4";
 		}
 	};
 	
