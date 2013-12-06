@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.4)
+jQuery.isAlive(1.5.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1561,6 +1561,8 @@ Last modification on this file: 6 December 2013
 					if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
 						return false;
 				
+				thisObj.stop();
+				
 				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
 				var valStart = parseInt(thisObj.settings.elements[scrollbarKey]['value-start'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
 				var valEnd = parseInt(thisObj.settings.elements[scrollbarKey]['value-end'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
@@ -1755,8 +1757,12 @@ Last modification on this file: 6 December 2013
 		
 		//console.log('lastScroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Duration:'+thisObj.animateDuration);
 		
-		jQuery(thisObj.TimeLine).stop();
-		jQuery('.'+thisObj.settings.animateClass).stop();
+		if(thisObj.animating){
+			jQuery(thisObj.TimeLine).stop();
+			jQuery('.'+thisObj.settings.animateClass).stop();
+			thisObj.stopTransitions();
+		}
+		
 		thisObj.animating=true;
 		
 		var key;
@@ -2056,7 +2062,7 @@ Last modification on this file: 6 December 2013
 	isAlive.prototype.doJump = function(pos){
 		
 		var thisObj = this;
-		var directionForward,stepPos,currentPosition,nextPosition,changeDirection;
+		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 		
 		if(thisObj.settings.scrollDelay!==false){
 			clearTimeout(thisObj.waitScrollTimer);
@@ -2098,10 +2104,21 @@ Last modification on this file: 6 December 2013
 		}
 		
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && !pos)||(!directionForward && pos)))){
-			changeDirection = true;
+			notAllowed = null;
 			nextPosition = currentPosition;
 		}else{
-			changeDirection = false;
+			if(pos){
+				if(currentPosition<thisObj.settings.jumpPoints.length-1)
+					notAllowed = Math.ceil(currentPosition);
+				else
+					notAllowed = 0;
+			}
+			else{
+				if(currentPosition>0)
+					notAllowed = Math.floor(currentPosition);
+				else
+					notAllowed = thisObj.settings.jumpPoints.length-1;
+			}
 			nextPosition = thisObj.jumpPosition;
 		}
 		
@@ -2123,12 +2140,12 @@ Last modification on this file: 6 December 2013
 		}
 		
 		if(pos){
-			if(!changeDirection && nextPosition == Math.min(thisObj.settings.jumpPoints.length-1,Math.ceil(currentPosition)))
+			if(nextPosition === notAllowed)
 				return false;
 			thisObj.jumpPosition = nextPosition;
 			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'next',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
 		}else{
-			if(!changeDirection && nextPosition == Math.max(0,Math.floor(currentPosition)))
+			if(nextPosition === notAllowed)
 				return false;
 			thisObj.jumpPosition = nextPosition;
 			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'prev',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
@@ -2189,13 +2206,12 @@ Last modification on this file: 6 December 2013
 	isAlive.prototype.doWipeTouch = function(value){
 		
 		var thisObj = this;
-		var directionForward,stepPos,currentPosition,nextPosition,changeDirection;
+		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 		
 		if(thisObj.forceAnimation)
 			return false;
-		
+			
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
-		
 		stepPos = thisObj.getPos(thisObj.lastStep);
 		currentPosition = indexOf(thisObj.settings.wipePoints,stepPos);
 		if(currentPosition==-1){
@@ -2215,10 +2231,21 @@ Last modification on this file: 6 December 2013
 		}
 		
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='touchWipe') || (thisObj.animating && thisObj.animationType=='touchWipe' && ((directionForward && value==-1)||(!directionForward && value==1)))){
-			changeDirection = true;
+			notAllowed = null;
 			nextPosition = currentPosition;
 		}else{
-			changeDirection = false;
+			if(value==1){
+				if(currentPosition<thisObj.settings.wipePoints.length-1)
+					notAllowed = Math.ceil(currentPosition);
+				else
+					notAllowed = 0;
+			}
+			else{
+				if(currentPosition>0)
+					notAllowed = Math.floor(currentPosition);
+				else
+					notAllowed = thisObj.settings.wipePoints.length-1;
+			}
 			nextPosition = thisObj.touchPosition;
 		}
 		
@@ -2237,14 +2264,15 @@ Last modification on this file: 6 December 2013
 				nextPosition=thisObj.settings.wipePoints.length-1
 			else
 				return;
-		}		
+		}		
+
 		if(value==1){
-			if(!changeDirection && nextPosition == Math.min(thisObj.settings.wipePoints.length-1,Math.ceil(currentPosition)))
+			if(nextPosition===notAllowed)
 				return false;
 			thisObj.touchPosition = nextPosition;
 			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
 		}else{
-			if(!changeDirection && nextPosition == Math.max(0,Math.floor(currentPosition)))
+			if(nextPosition===notAllowed)
 				return false;
 			thisObj.touchPosition = nextPosition;
 			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
@@ -2337,10 +2365,6 @@ Last modification on this file: 6 December 2013
 					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
 			}
 		}
-		
-		
-		if(thisObj.animating && pos==thisObj.step)
-			return false;
 		
 		thisObj.animationType = settings.animationType;
 		thisObj.forceAnimation = settings.force;
@@ -2464,6 +2488,21 @@ Last modification on this file: 6 December 2013
 		else
 			doSkip(step);
 	}
+
+	/*STOPS ANIMATIONS*/	
+	isAlive.prototype.stopTransitions = function(){
+		var thisObj = this;
+		for(var selector in thisObj.CSS3TransitionArray){
+			var CSSValues = {};
+			for(var property in thisObj.CSS3TransitionArray[selector]){
+				CSSValues[property] = jQuery(selector).css(property);
+				delete thisObj.CSS3TransitionArray[selector][property];	
+			}
+			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
+			jQuery(selector).css(CSSValues);
+		}
+	}
+
 	
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
@@ -2474,15 +2513,7 @@ Last modification on this file: 6 December 2013
 		
 		jQuery(thisObj.TimeLine).stop();
 		jQuery('.'+thisObj.settings.animateClass).stop();
-		for(var selector in thisObj.CSS3TransitionArray){
-			var CSSValues = {};
-			for(var property in thisObj.CSS3TransitionArray[selector]){
-				CSSValues[property] = jQuery(selector).css(property);
-				delete thisObj.CSS3TransitionArray[selector][property];	
-			}
-			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
-			jQuery(selector).css(CSSValues);
-		}
+		thisObj.stopTransitions();
 		
 		thisObj.animating = false;
 		thisObj.animationType='none';
@@ -2651,7 +2682,7 @@ Last modification on this file: 6 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.4";
+			return "1.5.5";
 		}
 	};
 	
