@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.5)
+jQuery.isAlive(1.5.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 6 December 2013
+Last modification on this file: 7 December 2013
 */
 
 (function(jQuery) {
@@ -1554,14 +1554,12 @@ Last modification on this file: 6 December 2013
 
 			var mousedownFunction = function(e,eType,myObj){
 			
-				if(thisObj.forceAnimation)
+				if((thisObj.animating && thisObj.animationType!="scrollbar") || thisObj.forceAnimation)
 					return false;
 					
 				if(window.navigator.msPointerEnabled && !thisObj.settings.enableScrollbarTouch)
 					if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
 						return false;
-				
-				thisObj.stop();
 				
 				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
 				var valStart = parseInt(thisObj.settings.elements[scrollbarKey]['value-start'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
@@ -2682,7 +2680,7 @@ Last modification on this file: 6 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.5";
+			return "1.5.6";
 		}
 	};
 	
