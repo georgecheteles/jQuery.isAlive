@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.6)
+jQuery.isAlive(1.5.7)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 7 December 2013
+Last modification on this file: 11 December 2013
 */
 
 (function(jQuery) {
@@ -93,9 +93,9 @@ Last modification on this file: 7 December 2013
 	
 	/*CONVERT COLORS TO CODE*/
 	function nameToRgb(name){
-		var colors={"aliceblue":"rgb(240,248,255)","antiquewhite":"rgb(250,235,215)","aqua":"rgb(0,255,255)","aquamarine":"rgb(127,255,212)","azure":"rgb(240,255,255)","beige":"rgb(245,245,220)","bisque":"rgb(255,228,196)","black":"rgb(0,0,0)","blanchedalmond":"rgb(255,235,205)","blue":"rgb(0,0,255)","blueviolet":"rgb(138,43,226)","brown":"rgb(165,42,42)","burlywood":"rgb(222,184,135)","cadetblue":"rgb(95,158,160)","chartreuse":"rgb(127,255,0)","chocolate":"rgb(210,105,30)","coral":"rgb(255,127,80)","cornflowerblue":"rgb(100,149,237)","cornsilk":"rgb(255,248,220)","crimson":"rgb(220,20,60)","cyan":"rgb(0,255,255)","darkblue":"rgb(0,0,139)","darkcyan":"rgb(0,139,139)","darkgoldenrod":"rgb(184,134,11)","darkgray":"rgb(169,169,169)","darkgreen":"rgb(0,100,0)","darkkhaki":"rgb(189,183,107)","darkmagenta":"rgb(139,0,139)","darkolivegreen":"rgb(85,107,47)","darkorange":"rgb(255,140,0)","darkorchid":"rgb(153,50,204)","darkred":"rgb(139,0,0)","darksalmon":"rgb(233,150,122)","darkseagreen":"rgb(143,188,143)","darkslateblue":"rgb(72,61,139)","darkslategray":"rgb(47,79,79)","darkturquoise":"rgb(0,206,209)","darkviolet":"rgb(148,0,211)","deeppink":"rgb(255,20,147)","deepskyblue":"rgb(0,191,255)","dimgray":"rgb(105,105,105)","dodgerblue":"rgb(30,144,255)","firebrick":"rgb(178,34,34)","floralwhite":"rgb(255,250,240)","forestgreen":"rgb(34,139,34)","fuchsia":"rgb(255,0,255)","gainsboro":"rgb(220,220,220)","ghostwhite":"rgb(248,248,255)","gold":"rgb(255,215,0)","goldenrod":"rgb(218,165,32)","gray":"rgb(128,128,128)","green":"rgb(0,128,0)","greenyellow":"rgb(173,255,47)","honeydew":"rgb(240,255,240)","hotpink":"rgb(255,105,180)","indianred ":"rgb(205,92,92)","indigo ":"rgb(75,0,130)","ivory":"rgb(255,255,240)","khaki":"rgb(240,230,140)","lavender":"rgb(230,230,250)","lavenderblush":"rgb(255,240,245)","lawngreen":"rgb(124,252,0)","lemonchiffon":"rgb(255,250,205)","lightblue":"rgb(173,216,230)","lightcoral":"rgb(240,128,128)","lightcyan":"rgb(224,255,255)","lightgoldenrodyellow":"rgb(250,250,210)","lightgrey":"rgb(211,211,211)","lightgreen":"rgb(144,238,144)","lightpink":"rgb(255,182,193)","lightsalmon":"rgb(255,160,122)","lightseagreen":"rgb(32,178,170)","lightskyblue":"rgb(135,206,250)","lightslategray":"rgb(119,136,153)","lightsteelblue":"rgb(176,196,222)","lightyellow":"rgb(255,255,224)","lime":"rgb(0,255,0)","limegreen":"rgb(50,205,50)","linen":"rgb(250,240,230)","magenta":"rgb(255,0,255)","maroon":"rgb(128,0,0)","mediumaquamarine":"rgb(102,205,170)","mediumblue":"rgb(0,0,205)","mediumorchid":"rgb(186,85,211)","mediumpurple":"rgb(147,112,216)","mediumseagreen":"rgb(60,179,113)","mediumslateblue":"rgb(123,104,238)","mediumspringgreen":"rgb(0,250,154)","mediumturquoise":"rgb(72,209,204)","mediumvioletred":"rgb(199,21,133)","midnightblue":"rgb(25,25,112)","mintcream":"rgb(245,255,250)","mistyrose":"rgb(255,228,225)","moccasin":"rgb(255,228,181)","navajowhite":"rgb(255,222,173)","navy":"rgb(0,0,128)","oldlace":"rgb(253,245,230)","olive":"rgb(128,128,0)","olivedrab":"rgb(107,142,35)","orange":"rgb(255,165,0)","orangered":"rgb(255,69,0)","orchid":"rgb(218,112,214)","palegoldenrod":"rgb(238,232,170)","palegreen":"rgb(152,251,152)","paleturquoise":"rgb(175,238,238)","palevioletred":"rgb(216,112,147)","papayawhip":"rgb(255,239,213)","peachpuff":"rgb(255,218,185)","peru":"rgb(205,133,63)","pink":"rgb(255,192,203)","plum":"rgb(221,160,221)","powderblue":"rgb(176,224,230)","purple":"rgb(128,0,128)","red":"rgb(255,0,0)","rosybrown":"rgb(188,143,143)","royalblue":"rgb(65,105,225)","saddlebrown":"rgb(139,69,19)","salmon":"rgb(250,128,114)","sandybrown":"rgb(244,164,96)","seagreen":"rgb(46,139,87)","seashell":"rgb(255,245,238)","sienna":"rgb(160,82,45)","silver":"rgb(192,192,192)","skyblue":"rgb(135,206,235)","slateblue":"rgb(106,90,205)","slategray":"rgb(112,128,144)","snow":"rgb(255,250,250)","springgreen":"rgb(0,255,127)","steelblue":"rgb(70,130,180)","tan":"rgb(210,180,140)","teal":"rgb(0,128,128)","thistle":"rgb(216,191,216)","tomato":"rgb(255,99,71)","turquoise":"rgb(64,224,208)","violet":"rgb(238,130,238)","wheat":"rgb(245,222,179)","white":"rgb(255,255,255)","whitesmoke":"rgb(245,245,245)","yellow":"rgb(255,255,0)","yellowgreen":"rgb(154,205,50)"};
+		var colors={"aliceblue":"240,248,255","antiquewhite":"250,235,215","aqua":"0,255,255","aquamarine":"127,255,212","azure":"240,255,255","beige":"245,245,220","bisque":"255,228,196","black":"0,0,0","blanchedalmond":"255,235,205","blue":"0,0,255","blueviolet":"138,43,226","brown":"165,42,42","burlywood":"222,184,135","cadetblue":"95,158,160","chartreuse":"127,255,0","chocolate":"210,105,30","coral":"255,127,80","cornflowerblue":"100,149,237","cornsilk":"255,248,220","crimson":"220,20,60","cyan":"0,255,255","darkblue":"0,0,139","darkcyan":"0,139,139","darkgoldenrod":"184,134,11","darkgray":"169,169,169","darkgreen":"0,100,0","darkkhaki":"189,183,107","darkmagenta":"139,0,139","darkolivegreen":"85,107,47","darkorange":"255,140,0","darkorchid":"153,50,204","darkred":"139,0,0","darksalmon":"233,150,122","darkseagreen":"143,188,143","darkslateblue":"72,61,139","darkslategray":"47,79,79","darkturquoise":"0,206,209","darkviolet":"148,0,211","deeppink":"255,20,147","deepskyblue":"0,191,255","dimgray":"105,105,105","dodgerblue":"30,144,255","firebrick":"178,34,34","floralwhite":"255,250,240","forestgreen":"34,139,34","fuchsia":"255,0,255","gainsboro":"220,220,220","ghostwhite":"248,248,255","gold":"255,215,0","goldenrod":"218,165,32","gray":"128,128,128","green":"0,128,0","greenyellow":"173,255,47","honeydew":"240,255,240","hotpink":"255,105,180","indianred ":"205,92,92","indigo ":"75,0,130","ivory":"255,255,240","khaki":"240,230,140","lavender":"230,230,250","lavenderblush":"255,240,245","lawngreen":"124,252,0","lemonchiffon":"255,250,205","lightblue":"173,216,230","lightcoral":"240,128,128","lightcyan":"224,255,255","lightgoldenrodyellow":"250,250,210","lightgrey":"211,211,211","lightgreen":"144,238,144","lightpink":"255,182,193","lightsalmon":"255,160,122","lightseagreen":"32,178,170","lightskyblue":"135,206,250","lightslategray":"119,136,153","lightsteelblue":"176,196,222","lightyellow":"255,255,224","lime":"0,255,0","limegreen":"50,205,50","linen":"250,240,230","magenta":"255,0,255","maroon":"128,0,0","mediumaquamarine":"102,205,170","mediumblue":"0,0,205","mediumorchid":"186,85,211","mediumpurple":"147,112,216","mediumseagreen":"60,179,113","mediumslateblue":"123,104,238","mediumspringgreen":"0,250,154","mediumturquoise":"72,209,204","mediumvioletred":"199,21,133","midnightblue":"25,25,112","mintcream":"245,255,250","mistyrose":"255,228,225","moccasin":"255,228,181","navajowhite":"255,222,173","navy":"0,0,128","oldlace":"253,245,230","olive":"128,128,0","olivedrab":"107,142,35","orange":"255,165,0","orangered":"255,69,0","orchid":"218,112,214","palegoldenrod":"238,232,170","palegreen":"152,251,152","paleturquoise":"175,238,238","palevioletred":"216,112,147","papayawhip":"255,239,213","peachpuff":"255,218,185","peru":"205,133,63","pink":"255,192,203","plum":"221,160,221","powderblue":"176,224,230","purple":"128,0,128","red":"255,0,0","rosybrown":"188,143,143","royalblue":"65,105,225","saddlebrown":"139,69,19","salmon":"250,128,114","sandybrown":"244,164,96","seagreen":"46,139,87","seashell":"255,245,238","sienna":"160,82,45","silver":"192,192,192","skyblue":"135,206,235","slateblue":"106,90,205","slategray":"112,128,144","snow":"255,250,250","springgreen":"0,255,127","steelblue":"70,130,180","tan":"210,180,140","teal":"0,128,128","thistle":"216,191,216","tomato":"255,99,71","turquoise":"64,224,208","violet":"238,130,238","wheat":"245,222,179","white":"255,255,255","whitesmoke":"245,245,245","yellow":"255,255,0","yellowgreen":"154,205,50"};
 		if(typeof(colors[name.toLowerCase()])!="undefined")
-			return colors[name.toLowerCase()];
+			return "rgb("+colors[name.toLowerCase()]+")";
 		return false;
 	}
 	
@@ -106,7 +106,9 @@ Last modification on this file: 7 December 2013
 			return r + r + g + g + b + b;
 		});
 		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		return result ? {r: parseInt(result[1], 16),g: parseInt(result[2], 16),	b: parseInt(result[3], 16)} : false;
+		if(result)
+			return "rgb("+parseInt(result[1],16)+","+parseInt(result[2],16)+","+parseInt(result[3], 16)+")";
+		return false;
 	}	
 	/*ACTION ON RESIZE*/
 	function onResizeAction(e){
@@ -299,7 +301,7 @@ Last modification on this file: 7 December 2013
 	function isAlive(selector,options){
 		
 		this.mySelector = selector;
-		this.TimeLine - null;
+		this.TimeLine;
 		this.step=0;
 		this.lastStep=0;
 		this.animating = false;
@@ -495,7 +497,7 @@ Last modification on this file: 7 December 2013
 			if(params.charAt(0)=="#"){
 				var convertValue = hexToRgb(params);
 				if(convertValue!=false)
-					params = 'rgb(' + convertValue.r.toString()+','+convertValue.g.toString()+','+convertValue.b.toString() + ')';
+					params = convertValue;
 			}
 			else{
 				var convertValue = nameToRgb(params);
@@ -1554,7 +1556,7 @@ Last modification on this file: 7 December 2013
 
 			var mousedownFunction = function(e,eType,myObj){
 			
-				if((thisObj.animating && thisObj.animationType!="scrollbar") || thisObj.forceAnimation)
+				if(thisObj.animating && thisObj.animationType!="scrollbar")
 					return false;
 					
 				if(window.navigator.msPointerEnabled && !thisObj.settings.enableScrollbarTouch)
@@ -1758,7 +1760,6 @@ Last modification on this file: 7 December 2013
 		if(thisObj.animating){
 			jQuery(thisObj.TimeLine).stop();
 			jQuery('.'+thisObj.settings.animateClass).stop();
-			thisObj.stopTransitions();
 		}
 		
 		thisObj.animating=true;
@@ -2364,9 +2365,13 @@ Last modification on this file: 7 December 2013
 			}
 		}
 		
+		if(!thisObj.animating && pos==thisObj.lastStep)
+			return;
+		
+		thisObj.step = pos;
 		thisObj.animationType = settings.animationType;
 		thisObj.forceAnimation = settings.force;
-		thisObj.step = pos;
+		(settings.onComplete!==null)?thisObj.onComplete=settings.onComplete:thisObj.onComplete=null;
 		
 		/*MIN VALUE FOR DURATION*/
 		if(settings.minStepDuration==null) 
@@ -2394,7 +2399,6 @@ Last modification on this file: 7 December 2013
 			}
 		}
 		
-		(settings.onComplete!==null)?thisObj.onComplete=settings.onComplete:thisObj.onComplete=null;
 		thisObj.animateSite();
 	}
 	
@@ -2481,7 +2485,7 @@ Last modification on this file: 7 December 2013
 			thisObj.stop();
 			setTimeout(function(){
 				doSkip(step);
-			},10);
+			},25);
 		}
 		else
 			doSkip(step);
@@ -2680,7 +2684,7 @@ Last modification on this file: 7 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.6";
+			return "1.5.7";
 		}
 	};
 	
