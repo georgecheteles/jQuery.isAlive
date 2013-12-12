@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.7)
+jQuery.isAlive(1.5.8)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 11 December 2013
+Last modification on this file: 12 December 2013
 */
 
 (function(jQuery) {
@@ -136,7 +136,8 @@ Last modification on this file: 11 December 2013
 			if(browser=="msie8" && browserObj.msie && parseInt(browserObj.version)==8) validBrowser = true;
 			if(browser=="msie9" && browserObj.msie && parseInt(browserObj.version)==9) validBrowser = true;
 			if(browser=="msie10" && browserObj.msie && parseInt(browserObj.version)==10) validBrowser = true;
-			if(browser=="msie10+" && browserObj.msie && parseInt(browserObj.version)>10) validBrowser = true;
+			if(browser=="msie11" && browserObj.msie && parseInt(browserObj.version)==11) validBrowser = true;
+			if(browser=="msie11+" && browserObj.msie && parseInt(browserObj.version)>11) validBrowser = true;
 			if(browser=="unknown" && typeof(browserObj.webkit)=="undefined" && typeof(browserObj.mozilla)=="undefined" && typeof(browserObj.opera)=="undefined" && typeof(browserObj.msie)=="undefined") validBrowser = true;
 			return validBrowser;
 		}
@@ -213,6 +214,12 @@ Last modification on this file: 11 December 2013
 			browser.webkit = true;
 		} else if( browser.webkit ) {
 			browser.safari = true;
+		}
+		if( browser.mozilla ) {
+			if( (/Trident\/7\./).test(navigator.userAgent) ){
+				delete browser.mozilla;
+				browser.msie = true;
+			}
 		}
 		return browser;
 	}
@@ -1426,7 +1433,7 @@ Last modification on this file: 11 December 2013
 					var propTempArray = [];
 					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
 					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration'));
-					if(pTemp1!="all" || pTemp2!="0s"){
+					if(typeof(pTemp1)!="undefined" && typeof(pTemp2)!="undefined" && (pTemp1!="all" || pTemp2!="0s")){
 						propTempArray.push(pTemp1);
 						propTempArray.push(pTemp2);
 						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function')));
@@ -2684,7 +2691,7 @@ Last modification on this file: 11 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.7";
+			return "1.5.8";
 		}
 	};
 	

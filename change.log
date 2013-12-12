@@ -1,5 +1,9 @@
 jQuery isAlive ChangeLog
 
+ver. 1.5.8 (12 December 2013)
+ - Internet Explorer 11 bugs
+ - getBrowsers now detects IE11
+
 ver. 1.5.7 (11 December 2013)
  - bugs fixed
 
