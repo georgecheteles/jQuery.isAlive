@@ -1,5 +1,8 @@
 jQuery isAlive ChangeLog
 
+ver. 1.5.9 (14 December 2013)
+ - CSS3 updating animation duration bug fixed
+
 ver. 1.5.8 (12 December 2013)
  - Internet Explorer 11 bugs
  - getBrowsers now detects IE11

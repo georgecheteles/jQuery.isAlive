@@ -6,7 +6,7 @@
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 		<link type="text/css" rel="stylesheet" href="examples.css?v=1.5.2" media="screen" />
 		<script src="../jquery-1.10.2.min.js"></script>
-		<script src="../src/jquery.isAlive.js?v=1.5.8"></script>
+		<script src="../src/jquery.isAlive.js?v=1.5.9"></script>
 		<script src="../easing.js"></script>
 		<script src="../src/jquery.isAlive.helper.js?v=1.4.11"></script>
 		<script>
@@ -450,12 +450,12 @@
 				});
 
 				$('#drawSurface2 a.btn1').click(function(){
-					jQuery('#drawSurface2').isAlive('play',{duration:1000});
+					jQuery('#drawSurface2').isAlive('play',{duration:1000,force:true});
 					return false;
 				});
 
 				$('#drawSurface2 a.btn2').click(function(){
-					jQuery('#drawSurface2').isAlive('rewind',{duration:1000});
+					jQuery('#drawSurface2').isAlive('rewind',{duration:1000,force:true});
 					return false;
 				});
 

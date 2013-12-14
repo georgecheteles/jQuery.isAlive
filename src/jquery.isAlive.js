@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.8)
+jQuery.isAlive(1.5.9)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 12 December 2013
+Last modification on this file: 14 December 2013
 */
 
 (function(jQuery) {
@@ -28,11 +28,63 @@ Last modification on this file: 12 December 2013
 	var windowWidth;
 	var windowHeight;
 	
+	/*FIXES CSS3 TRANSITION DURATION BUG*/
+	function fixCSS3(value){
+		var success = false;
+		var fix = function(value,rgbFound,scaleFound){
+			if(value.indexOf(' ')!=-1){
+				value = value.split(' ');
+				for(var key in value)
+					value[key] = fix(value[key],rgbFound,scaleFound);
+				return value.join(' ');
+			}
+			if(value.indexOf('(')!=-1){
+				var format = value.substr(0,value.indexOf('('));
+				if(format=='url')
+					return value;
+				if(format=='rgb' || format=='rgba')
+					rgbFound = true;
+				if(format.indexOf('scale')==0)
+					scaleFound = true;
+				value = value.substr(value.indexOf('(')+1,value.indexOf(')')-value.indexOf('(')-1);
+				return format + '(' + fix(value,rgbFound,scaleFound) + ')';
+			}
+			if(value.indexOf(',')!=-1){
+				value = value.split(',');
+				for(var key in value)
+					value[key] = fix(value[key],rgbFound,scaleFound);
+				return value.join(',');
+			}
+			if(success)
+				return value;
+			if(scaleFound){
+				success = true;
+				return parseInt(value) + 0.001;
+			}
+			if(rgbFound){
+				success = true;
+				if(value<255)
+					return parseInt(value) + 1;
+				else
+					return parseInt(value) - 1;
+			}
+			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
+				var fNumber = value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+				if(fNumber!=null){
+					success = true;
+					return value.replace(fNumber,parseFloat(fNumber)+0.01);
+				}
+			}
+			return value;
+		}
+		return fix(value,false,false);
+	}
+	
 	/*EASING TO BEZIER*/
 	function convertEasing(value){
-		var easings = {'swing':'cubic-bezier(0.02,0.01,0.47,1)','easeInSine':'cubic-bezier(0.47,0,0.745,0.715)','easeOutSine':'cubic-bezier(0.39,0.575,0.565,1)','easeInOutSine':'cubic-bezier(0.445,0.05,0.55,0.95)','easeInQuad':'cubic-bezier(0.55,0.085,0.68,0.53)','easeOutQuad':'cubic-bezier(0.25,0.46,0.45,0.94)','easeInOutQuad':'cubic-bezier(0.455,0.03,0.515,0.955)','easeInCubic':'cubic-bezier(0.55,0.055,0.675,0.19)','easeOutCubic':'cubic-bezier(0.215,0.61,0.355,1)','easeInOutCubic':'cubic-bezier(0.645,0.045,0.355,1)','easeInQuart':'cubic-bezier(0.895,0.03,0.685,0.22)','easeOutQuart':'cubic-bezier(0.165,0.84,0.44,1)','easeInOutQuart':'cubic-bezier(0.77,0,0.175,1)','easeInQuint':'cubic-bezier(0.755,0.05,0.855,0.06)','easeOutQuint':'cubic-bezier(0.23,1,0.32,1)','easeInOutQuint':'cubic-bezier(0.86,0,0.07,1)','easeInExpo':'cubic-bezier(0.95,0.05,0.795,0.035)','easeOutExpo':'cubic-bezier(0.19,1,0.22,1)','easeInOutExpo':'cubic-bezier(1,0,0,1)','easeInCirc':'cubic-bezier(0.6,0.04,0.98,0.335)','easeOutCirc':'cubic-bezier(0.075,0.82,0.165,1)','easeInOutCirc':'cubic-bezier(0.785,0.135,0.15,0.86)','easeInBack':'cubic-bezier(0.6,-0.28,0.735,0.045)','easeOutBack':'cubic-bezier(0.175,0.885,0.32,1.275)','easeInOutBack':'cubic-bezier(0.68,-0.55,0.265,1.55)'};
+		var easings = {'swing':'0.02,0.01,0.47,1','easeInSine':'0.47,0,0.745,0.715','easeOutSine':'0.39,0.575,0.565,1','easeInOutSine':'0.445,0.05,0.55,0.95','easeInQuad':'0.55,0.085,0.68,0.53','easeOutQuad':'0.25,0.46,0.45,0.94','easeInOutQuad':'0.455,0.03,0.515,0.955','easeInCubic':'0.55,0.055,0.675,0.19','easeOutCubic':'0.215,0.61,0.355,1','easeInOutCubic':'0.645,0.045,0.355,1','easeInQuart':'0.895,0.03,0.685,0.22','easeOutQuart':'0.165,0.84,0.44,1','easeInOutQuart':'0.77,0,0.175,1','easeInQuint':'0.755,0.05,0.855,0.06','easeOutQuint':'0.23,1,0.32,1','easeInOutQuint':'0.86,0,0.07,1','easeInExpo':'0.95,0.05,0.795,0.035','easeOutExpo':'0.19,1,0.22,1','easeInOutExpo':'1,0,0,1','easeInCirc':'0.6,0.04,0.98,0.335','easeOutCirc':'0.075,0.82,0.165,1','easeInOutCirc':'0.785,0.135,0.15,0.86','easeInBack':'0.6,-0.28,0.735,0.045','easeOutBack':'0.175,0.885,0.32,1.275','easeInOutBack':'0.68,-0.55,0.265,1.55'};
 		if(typeof(easings[value])!='undefined')
-			return easings[value];
+			return 'cubic-bezier('+easings[value]+')';
 		return value;
 	}
 	
@@ -328,8 +380,9 @@ Last modification on this file: 12 December 2013
 		this.params = {};
 		this.onComplete = null;
 		this.uniqId = Math.round(Math.random()*1000)+1;
-		this.CSS3TransitionArray = {};
 		this.CSS3DefaultTransitionArray = {};
+		this.CSS3TransitionArray = {};
+		this.CSS3ValuesArray = {};
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
@@ -420,9 +473,32 @@ Last modification on this file: 12 December 2013
 		else
 			return val%this.settings.max;
 	}
+
+	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
+	isAlive.prototype.animateCSS3 = function(selector,property,value,duration,easing){
+		var thisObj = this;
+		
+		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing;
+		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
+		
+		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value){
+			if(property=='opacity'){
+				if(value<=0.5)
+					value = value + 0.001;
+				else
+					value = value - 0.001;
+			} else if(isNumber(value))
+				value = value + 0.01;
+			else
+				value = fixCSS3(value);
+		}
+		thisObj.CSS3ValuesArray[selector][property] = value;
+		
+		jQuery(selector).css(property,value);
+	}
 	
-	/*ANIMATE FUNCTION THAT WORKS FOR BACKGROUND-POSITION TOO*/
-	isAlive.prototype.animateCSS = function(startPos,selector,property,value,duration,easing){
+	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
+	isAlive.prototype.animateJS = function(startPos,selector,property,value,duration,easing){
 		var thisObj = this;
 		if(startPos==parseInt(startPos))
 			thisObj.lastElemValue[selector+'|'+property] = thisObj.animPositions[thisObj.getPos(startPos)][selector][property].toString();
@@ -461,6 +537,7 @@ Last modification on this file: 12 December 2013
 		}
 		if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
 			delete thisObj.CSS3TransitionArray[selector][property];
+			delete thisObj.CSS3ValuesArray[selector][property];
 			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 		}
 		jQuery(selector).css(property,value);
@@ -491,8 +568,11 @@ Last modification on this file: 12 December 2013
 					params[key] = doRecursive(params[key]);
 				return params.join(' ');
 			}
-			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval')
+			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval'){
+				if(params.substr(0,params.indexOf('('))=="url")
+					return params;
 				return params.substr(0,params.indexOf('(')) + '(' + doRecursive(getBetweenBrackets(params)) + ')';
+			}
 			if(params.indexOf(',')!=-1){
 				params = params.split(',');
 				for(var key in params)
@@ -1387,6 +1467,12 @@ Last modification on this file: 12 December 2013
 								delete thisObj.settings.elements[key]['JSEasing'];
 							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
 								delete thisObj.settings.elements[key]['CSS3Easing'];
+							
+							/*BUILD CSS3 ARRAYS*/
+							if(typeof(thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]])=="undefined")
+								thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]] = {};
+							if(typeof(thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]])=="undefined")
+								thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]] = {};
 						}
 						else{
 							thisObj.settings.elements[key]['useCSS3'] = false;
@@ -1919,8 +2005,6 @@ Last modification on this file: 12 December 2013
 		var stepStart = thisObj.lastStep;
 		var stepEnd = thisObj.step;
 		var firstTime = true;
-		var CSS3Found = false;
-		var CSS3ValuesArray = {};
 		var lastStep = thisObj.lastStep;
 		
 		/* STARTS ANIMATION */
@@ -1932,8 +2016,8 @@ Last modification on this file: 12 December 2013
 				thisObj.forceAnimation = false;
 				
 				for(selector in thisObj.CSS3TransitionArray){
-					for(property in thisObj.CSS3TransitionArray[selector])
-						delete thisObj.CSS3TransitionArray[selector][property];
+					thisObj.CSS3TransitionArray[selector] = {};
+					thisObj.CSS3ValuesArray[selector] = {};
 					jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 				}
 				
@@ -2019,21 +2103,10 @@ Last modification on this file: 12 December 2013
 											jQuery(selector).animate(animObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
 										}
 										else
-											thisObj.animateCSS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
+											thisObj.animateJS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
 							    	}	
-							    	else{
-							    		CSS3Found = true;
-										if(typeof(thisObj.CSS3TransitionArray[selector])=="undefined")
-											thisObj.CSS3TransitionArray[selector] = {};
-							    		thisObj.CSS3TransitionArray[selector][property] = property+' '+parseFloat(duration/1000)+'s '+animations[step][selector][property]['easing'];
-										CSS3ValuesArray[property] = animations[step][selector][property]['to'];
-							    	}
-						    	}
-						    	if(CSS3Found){
-									jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
-									jQuery(selector).css(CSS3ValuesArray);
-									CSS3ValuesArray = {};
-									CSS3Found = false;
+							    	else
+										thisObj.animateCSS3(selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
 						    	}
 					    	}
 		    			}
@@ -2503,10 +2576,10 @@ Last modification on this file: 12 December 2013
 		var thisObj = this;
 		for(var selector in thisObj.CSS3TransitionArray){
 			var CSSValues = {};
-			for(var property in thisObj.CSS3TransitionArray[selector]){
+			for(var property in thisObj.CSS3TransitionArray[selector])
 				CSSValues[property] = jQuery(selector).css(property);
-				delete thisObj.CSS3TransitionArray[selector][property];	
-			}
+			thisObj.CSS3TransitionArray[selector] = {};
+			thisObj.CSS3ValuesArray[selector] = {};
 			jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 			jQuery(selector).css(CSSValues);
 		}
@@ -2691,7 +2764,7 @@ Last modification on this file: 12 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.8";
+			return "1.5.9";
 		}
 	};
 	
