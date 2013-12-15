@@ -1,5 +1,9 @@
 jQuery isAlive ChangeLog
 
+ver. 1.5.10 (15 December 2013)
+ - webkit filters can now be animated with CSS3
+ - rgb / rgba / colorname / hex code for color supported
+
 ver. 1.5.9 (14 December 2013)
  - CSS3 updating animation duration bug fixed
 

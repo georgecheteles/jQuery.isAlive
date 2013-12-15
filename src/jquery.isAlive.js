@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.9)
+jQuery.isAlive(1.5.10)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 14 December 2013
+Last modification on this file: 15 December 2013
 */
 
 (function(jQuery) {
@@ -29,44 +29,56 @@ Last modification on this file: 14 December 2013
 	var windowHeight;
 	
 	/*FIXES CSS3 TRANSITION DURATION BUG*/
-	function fixCSS3(value){
+	function breakCSS3(property,value){
 		var success = false;
-		var fix = function(value,rgbFound,scaleFound){
+		var fix = function(value,format){
 			if(value.indexOf(' ')!=-1){
 				value = value.split(' ');
 				for(var key in value)
-					value[key] = fix(value[key],rgbFound,scaleFound);
+					value[key] = fix(value[key],format);
 				return value.join(' ');
 			}
 			if(value.indexOf('(')!=-1){
-				var format = value.substr(0,value.indexOf('('));
+				format = value.substr(0,value.indexOf('('));
 				if(format=='url')
 					return value;
-				if(format=='rgb' || format=='rgba')
-					rgbFound = true;
-				if(format.indexOf('scale')==0)
-					scaleFound = true;
 				value = value.substr(value.indexOf('(')+1,value.indexOf(')')-value.indexOf('(')-1);
-				return format + '(' + fix(value,rgbFound,scaleFound) + ')';
+				return format + '(' + fix(value,format) + ')';
 			}
 			if(value.indexOf(',')!=-1){
 				value = value.split(',');
 				for(var key in value)
-					value[key] = fix(value[key],rgbFound,scaleFound);
+					value[key] = fix(value[key],format);
 				return value.join(',');
 			}
 			if(success)
 				return value;
-			if(scaleFound){
-				success = true;
-				return parseInt(value) + 0.001;
-			}
-			if(rgbFound){
-				success = true;
-				if(value<255)
-					return parseInt(value) + 1;
-				else
-					return parseInt(value) - 1;
+			if(format!=null){
+				if(format=='rgb' || format=='rgba'){
+					success = true;
+					if(value<255)
+						return parseInt(value) + 1;
+					else
+						return parseInt(value) - 1;
+				}
+				if(property==vP('transform') && format.indexOf('scale')==0){
+					success = true;
+					return parseInt(value) + 0.001;
+				}
+				if(property=='-webkit-filter'){
+					if(format=='grayscale' || format=='sepia' || format=='ínvert' || format=='opacity'){
+						if(value<=0.5)
+							value = parseFloat(value) + 0.001;
+						else
+							value = parseFloat(value) - 0.001;
+						success = true;
+						return value;
+					}
+					if(format=='brightness' || format=='contrast' || format=='saturate'){
+						success = true;
+						return parseFloat(value) + 0.001;
+					}
+				}
 			}
 			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
 				var fNumber = value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
@@ -77,7 +89,16 @@ Last modification on this file: 14 December 2013
 			}
 			return value;
 		}
-		return fix(value,false,false);
+		if(property=='opacity'){
+			if(value<=0.5)
+				value = parseFloat(value) + 0.001;
+			else
+				value = parseFloat(value) - 0.001;
+		} else if(isNumber(value))
+			value = parseFloat(value) + 0.01;
+		else
+			value = fix(value,null);
+		return value;
 	}
 	
 	/*EASING TO BEZIER*/
@@ -135,7 +156,6 @@ Last modification on this file: 14 December 2013
 				break;
 		if(typeof(doEval)=='undefined')
 			return text.substr(text.indexOf('(')+1,lastBracket-text.indexOf('(')-1);
-
 		var evalExp = text.substr(text.indexOf('(')+1,lastBracket-text.indexOf('(')-1);
 		try{
 			eval("evalExp = "+evalExp+';');
@@ -146,8 +166,12 @@ Last modification on this file: 14 December 2013
 	/*CONVERT COLORS TO CODE*/
 	function nameToRgb(name){
 		var colors={"aliceblue":"240,248,255","antiquewhite":"250,235,215","aqua":"0,255,255","aquamarine":"127,255,212","azure":"240,255,255","beige":"245,245,220","bisque":"255,228,196","black":"0,0,0","blanchedalmond":"255,235,205","blue":"0,0,255","blueviolet":"138,43,226","brown":"165,42,42","burlywood":"222,184,135","cadetblue":"95,158,160","chartreuse":"127,255,0","chocolate":"210,105,30","coral":"255,127,80","cornflowerblue":"100,149,237","cornsilk":"255,248,220","crimson":"220,20,60","cyan":"0,255,255","darkblue":"0,0,139","darkcyan":"0,139,139","darkgoldenrod":"184,134,11","darkgray":"169,169,169","darkgreen":"0,100,0","darkkhaki":"189,183,107","darkmagenta":"139,0,139","darkolivegreen":"85,107,47","darkorange":"255,140,0","darkorchid":"153,50,204","darkred":"139,0,0","darksalmon":"233,150,122","darkseagreen":"143,188,143","darkslateblue":"72,61,139","darkslategray":"47,79,79","darkturquoise":"0,206,209","darkviolet":"148,0,211","deeppink":"255,20,147","deepskyblue":"0,191,255","dimgray":"105,105,105","dodgerblue":"30,144,255","firebrick":"178,34,34","floralwhite":"255,250,240","forestgreen":"34,139,34","fuchsia":"255,0,255","gainsboro":"220,220,220","ghostwhite":"248,248,255","gold":"255,215,0","goldenrod":"218,165,32","gray":"128,128,128","green":"0,128,0","greenyellow":"173,255,47","honeydew":"240,255,240","hotpink":"255,105,180","indianred ":"205,92,92","indigo ":"75,0,130","ivory":"255,255,240","khaki":"240,230,140","lavender":"230,230,250","lavenderblush":"255,240,245","lawngreen":"124,252,0","lemonchiffon":"255,250,205","lightblue":"173,216,230","lightcoral":"240,128,128","lightcyan":"224,255,255","lightgoldenrodyellow":"250,250,210","lightgrey":"211,211,211","lightgreen":"144,238,144","lightpink":"255,182,193","lightsalmon":"255,160,122","lightseagreen":"32,178,170","lightskyblue":"135,206,250","lightslategray":"119,136,153","lightsteelblue":"176,196,222","lightyellow":"255,255,224","lime":"0,255,0","limegreen":"50,205,50","linen":"250,240,230","magenta":"255,0,255","maroon":"128,0,0","mediumaquamarine":"102,205,170","mediumblue":"0,0,205","mediumorchid":"186,85,211","mediumpurple":"147,112,216","mediumseagreen":"60,179,113","mediumslateblue":"123,104,238","mediumspringgreen":"0,250,154","mediumturquoise":"72,209,204","mediumvioletred":"199,21,133","midnightblue":"25,25,112","mintcream":"245,255,250","mistyrose":"255,228,225","moccasin":"255,228,181","navajowhite":"255,222,173","navy":"0,0,128","oldlace":"253,245,230","olive":"128,128,0","olivedrab":"107,142,35","orange":"255,165,0","orangered":"255,69,0","orchid":"218,112,214","palegoldenrod":"238,232,170","palegreen":"152,251,152","paleturquoise":"175,238,238","palevioletred":"216,112,147","papayawhip":"255,239,213","peachpuff":"255,218,185","peru":"205,133,63","pink":"255,192,203","plum":"221,160,221","powderblue":"176,224,230","purple":"128,0,128","red":"255,0,0","rosybrown":"188,143,143","royalblue":"65,105,225","saddlebrown":"139,69,19","salmon":"250,128,114","sandybrown":"244,164,96","seagreen":"46,139,87","seashell":"255,245,238","sienna":"160,82,45","silver":"192,192,192","skyblue":"135,206,235","slateblue":"106,90,205","slategray":"112,128,144","snow":"255,250,250","springgreen":"0,255,127","steelblue":"70,130,180","tan":"210,180,140","teal":"0,128,128","thistle":"216,191,216","tomato":"255,99,71","turquoise":"64,224,208","violet":"238,130,238","wheat":"245,222,179","white":"255,255,255","whitesmoke":"245,245,245","yellow":"255,255,0","yellowgreen":"154,205,50"};
-		if(typeof(colors[name.toLowerCase()])!="undefined")
-			return "rgb("+colors[name.toLowerCase()]+")";
+		if(typeof(colors[name.toLowerCase()])!="undefined"){
+			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>=9))
+				return "rgba("+colors[name.toLowerCase()]+",1)";
+			else
+				return "rgb("+colors[name.toLowerCase()]+")";
+		}
 		return false;
 	}
 	
@@ -158,8 +182,12 @@ Last modification on this file: 14 December 2013
 			return r + r + g + g + b + b;
 		});
 		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-		if(result)
-			return "rgb("+parseInt(result[1],16)+","+parseInt(result[2],16)+","+parseInt(result[3], 16)+")";
+		if(result){
+			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>=9))
+				return "rgba("+parseInt(result[1],16)+","+parseInt(result[2],16)+","+parseInt(result[3], 16)+",1)";
+			else
+				return "rgb("+parseInt(result[1],16)+","+parseInt(result[2],16)+","+parseInt(result[3], 16)+")";
+		}
 		return false;
 	}	
 	/*ACTION ON RESIZE*/
@@ -237,7 +265,7 @@ Last modification on this file: 14 December 2013
 		/* DEPRECATED FUNCTION COPIED FROM "jQuery JavaScript Library v1.8.2"*/ 
 		var matched, browser;
 		var userAgent = (navigator.userAgent||navigator.vendor||window.opera);
-		jQuery.uaMatch = function( ua ) {
+		jQuery.uaMatch = function(ua) {
 			ua = ua.toLowerCase();
 			var match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
 				/(webkit)[ \/]([\w.]+)/.exec( ua ) ||
@@ -247,8 +275,8 @@ Last modification on this file: 14 December 2013
 				[];
 
 			return {
-				browser: match[ 1 ] || "",
-				version: match[ 2 ] || "0"
+				browser: match[1] || "",
+				version: match[2] || "0"
 			};
 		};
 		matched = jQuery.uaMatch( navigator.userAgent );
@@ -258,16 +286,16 @@ Last modification on this file: 14 December 2013
 		if(mobile)
 			browser.mobile = true;
 		
-		if( matched.browser ) {
+		if(matched.browser) {
 			browser[ matched.browser ] = true;
 			browser.version = matched.version;
 		}
-		if( browser.chrome ) {
+		if(browser.chrome) {
 			browser.webkit = true;
-		} else if( browser.webkit ) {
+		} else if(browser.webkit) {
 			browser.safari = true;
 		}
-		if( browser.mozilla ) {
+		if(browser.mozilla) {
 			if( (/Trident\/7\./).test(navigator.userAgent) ){
 				delete browser.mozilla;
 				browser.msie = true;
@@ -293,7 +321,7 @@ Last modification on this file: 14 December 2013
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
 	function vP(property){
-		if(indexOf(['transform','trasition','filter','transition-property','transition-duration','transition-timing-function','transition-delay'],property)!=-1){
+		if(indexOf(['transform','trasition','transition-property','transition-duration','transition-timing-function','transition-delay'],property)!=-1){
 			if(browserObj.webkit)
 				return "-webkit-"+property;
 			if(browserObj.mozilla)
@@ -481,17 +509,9 @@ Last modification on this file: 14 December 2013
 		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing;
 		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 		
-		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value){
-			if(property=='opacity'){
-				if(value<=0.5)
-					value = value + 0.001;
-				else
-					value = value - 0.001;
-			} else if(isNumber(value))
-				value = value + 0.01;
-			else
-				value = fixCSS3(value);
-		}
+		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
+			value = breakCSS3(property,value)
+		
 		thisObj.CSS3ValuesArray[selector][property] = value;
 		
 		jQuery(selector).css(property,value);
@@ -569,9 +589,12 @@ Last modification on this file: 14 December 2013
 				return params.join(' ');
 			}
 			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))!='eval'){
-				if(params.substr(0,params.indexOf('('))=="url")
+				var format = params.substr(0,params.indexOf('('));
+				if(format=="url")
 					return params;
-				return params.substr(0,params.indexOf('(')) + '(' + doRecursive(getBetweenBrackets(params)) + ')';
+				if(format=='rgb' && (!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>=9)))
+					return 'rgba(' + doRecursive(getBetweenBrackets(params)) + ',1)';
+				return format + '(' + doRecursive(getBetweenBrackets(params)) + ')';
 			}
 			if(params.indexOf(',')!=-1){
 				params = params.split(',');
@@ -605,9 +628,7 @@ Last modification on this file: 14 December 2013
 	
 	/* CREATES AND GETS CSS3 ARRAY */
 	isAlive.prototype.getTransitionArray = function(selector,value){
-		
 		var thisObj = this;
-		
 		if(typeof(value)!="undefined"){
 			thisObj.CSS3DefaultTransitionArray[selector] = {};
 			if(value.indexOf('cubic-bezier')==-1)
@@ -1420,6 +1441,11 @@ Last modification on this file: 14 December 2013
 				
 				/*CSS3 DOES NOT WORK ON IE7&IE8*/
 				if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
+					delete thisObj.settings.elements[key];
+					continue;
+				}
+				
+				if((thisObj.settings.elements[key]['property'].indexOf('-webkit-')==0 && !browserObj.webkit) || (thisObj.settings.elements[key]['property'].indexOf('-moz-')==0 && !browserObj.mozilla) || (thisObj.settings.elements[key]['property'].indexOf('-ms-')==0 && !browserObj.msie) || (thisObj.settings.elements[key]['property'].indexOf('-o-')==0 && !browserObj.opera)){
 					delete thisObj.settings.elements[key];
 					continue;
 				}
@@ -2764,7 +2790,7 @@ Last modification on this file: 14 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.9";
+			return "1.5.10";
 		}
 	};
 	

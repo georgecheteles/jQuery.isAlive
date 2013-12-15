@@ -6,7 +6,7 @@
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 		<link type="text/css" rel="stylesheet" href="examples.css?v=1.5.2" media="screen" />
 		<script src="../jquery-1.10.2.min.js"></script>
-		<script src="../src/jquery.isAlive.js?v=1.5.9"></script>
+		<script src="../src/jquery.isAlive.js?v=1.5.10"></script>
 		<script src="../easing.js"></script>
 		<script src="../src/jquery.isAlive.helper.js?v=1.4.11"></script>
 		<script>
@@ -352,7 +352,16 @@
 						"value-start":0,
 						"value-end":90,
 						"+browsers":"msie7|msie8" /*THIS WILL WORK ONLY ON IE7 & IE8*/
+					},
+					5:{
+						"method":"animate",
+						"property":"-webkit-filter",
+						"step-start":0,
+						"step-end":10,
+						"value-start":"blur(0px)",
+						"value-end":"blur(2px)"
 					}
+					
 				},
 				"#drawSurface2 .myDiv5":{
 					0:{
@@ -524,6 +533,7 @@
 					 - The blue rectangle has an opacity animation.<br/>
 					 - The green rectangle will have a "round" class added on step 5 and on step 5 this class will be removed.<br/>
 					 - The green rectangle shows how static method works and rotates if IE7 & IE8 is found by using external function.<br/>
+					 - The green rectangle has a webkit filter blur animation.<br/>
 					 - The gold color rectangle changes his color.<br/>
 					 - The "timeline" for this animation is from step 0 to step 10 because a "max" value was not set and all the elements animate to a max of step 10.<br/>
 					 - CSS3 is used for this animations.
