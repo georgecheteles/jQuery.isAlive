@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.10)
+jQuery.isAlive(1.5.11)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 15 December 2013
+Last modification on this file: 16 December 2013
 */
 
 (function(jQuery) {
@@ -68,9 +68,11 @@ Last modification on this file: 15 December 2013
 					else
 						return parseInt(value) - 1;
 				}
-				if(property==vP('transform') && format.indexOf('scale')==0){
-					success = true;
-					return parseInt(value) + 0.001;
+				if(property==vP('transform')){
+					if(format.indexOf('matrix')==0 || format.indexOf('scale')==0){
+						success = true;
+						return parseFloat(value) + 0.001;
+					}
 				}
 				if(property=='-webkit-filter'){
 					if(format=='grayscale' || format=='sepia' || format=='ínvert' || format=='opacity'){
@@ -296,7 +298,7 @@ Last modification on this file: 15 December 2013
 			browser.safari = true;
 		}
 		if(browser.mozilla) {
-			if( (/Trident\/7\./).test(navigator.userAgent) ){
+			if((/Trident\/7\./).test(navigator.userAgent)){
 				delete browser.mozilla;
 				browser.msie = true;
 			}
@@ -306,7 +308,7 @@ Last modification on this file: 15 December 2013
 	
 	/* CHECKS PROPERTY IS CSS3 */
 	function isCSS3(property){
-		var CSS3 = ['transform','trasition','border-radius','background-size','box-shadow'];
+		var CSS3 = ['transform','trasition','border-radius','background-size','box-shadow','text-shadow'];
 		return (indexOf(CSS3,property)!=-1);
 	}
 	
@@ -505,15 +507,11 @@ Last modification on this file: 15 December 2013
 	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
 	isAlive.prototype.animateCSS3 = function(selector,property,value,duration,easing){
 		var thisObj = this;
-		
 		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing;
 		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
-		
 		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
 			value = breakCSS3(property,value)
-		
 		thisObj.CSS3ValuesArray[selector][property] = value;
-		
 		jQuery(selector).css(property,value);
 	}
 	
@@ -1531,7 +1529,7 @@ Last modification on this file: 15 December 2013
 		}
 		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
-		if(typeof(browserObj.webkit)!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
+		if(browserObj.webkit!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
 			jQuery('.'+thisObj.settings.animateClass).css({
 				'-webkit-backface-visibility':'hidden',
 				'-webkit-perspective':'1000'
@@ -2610,7 +2608,6 @@ Last modification on this file: 15 December 2013
 			jQuery(selector).css(CSSValues);
 		}
 	}
-
 	
 	/*STOPS ANIMATIONS*/	
 	isAlive.prototype.stop = function(){
@@ -2790,7 +2787,7 @@ Last modification on this file: 15 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.10";
+			return "1.5.11";
 		}
 	};
 	
