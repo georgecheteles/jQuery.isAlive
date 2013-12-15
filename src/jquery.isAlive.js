@@ -53,6 +53,13 @@ Last modification on this file: 15 December 2013
 			}
 			if(success)
 				return value;
+			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
+				var fNumber = value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+				if(fNumber!=null){
+					success = true;
+					return value.replace(fNumber,parseFloat(fNumber)+0.01);
+				}
+			}
 			if(format!=null){
 				if(format=='rgb' || format=='rgba'){
 					success = true;
@@ -78,13 +85,6 @@ Last modification on this file: 15 December 2013
 						success = true;
 						return parseFloat(value) + 0.001;
 					}
-				}
-			}
-			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
-				var fNumber = value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
-				if(fNumber!=null){
-					success = true;
-					return value.replace(fNumber,parseFloat(fNumber)+0.01);
 				}
 			}
 			return value;
