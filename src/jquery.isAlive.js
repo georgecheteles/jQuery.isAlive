@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.11)
+jQuery.isAlive(1.5.12)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 16 December 2013
+Last modification on this file: 17 December 2013
 */
 
 (function(jQuery) {
@@ -75,7 +75,7 @@ Last modification on this file: 16 December 2013
 					}
 				}
 				if(property=='-webkit-filter'){
-					if(format=='grayscale' || format=='sepia' || format=='ínvert' || format=='opacity'){
+					if(format=='grayscale' || format=='sepia' || format=='invert' || format=='opacity'){
 						if(value<=0.5)
 							value = parseFloat(value) + 0.001;
 						else
@@ -419,6 +419,7 @@ Last modification on this file: 16 December 2013
 		this.msTouchAction;
 		this.lastElemValue = {};
 		this.dragHorizontal = null;
+		this.scrollBarPosition = 0;
 
 		/* MY CLASS/SET ARRAYS */
 		this.setArray = {};
@@ -969,6 +970,11 @@ Last modification on this file: 16 December 2013
 				} else if(window.navigator.msPointerEnabled){
 					ie10 = true;
 					this.addEventListener('MSPointerDown', onTouchStart, false);
+					/*PREVENT SCROLL FOR IE10*/
+					if(thisObj.settings.preventTouch){
+						thisObj.msTouchAction = jQuery(this).css('-ms-touch-action');			
+						jQuery(this).css('-ms-touch-action','none');			
+					}
 				}
 			});
 		}
@@ -1295,33 +1301,26 @@ Last modification on this file: 16 December 2013
 			thisObj.settings.maxDrag = thisObj.settings.stepsOnDrag;
 		
 		/*CHECK FOR TOUCH*/
-		if(thisObj.settings.enableTouch && (thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
+		if(thisObj.settings.enableTouch && thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1)
 			thisObj.settings.enableTouch = false;
-		
-		/*GET CSS FOR MSIE 10 TOUCH*/
-		if(thisObj.settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && thisObj.settings.preventTouch){
-			thisObj.msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');			
-			jQuery(thisObj.mySelector).css('-ms-touch-action',"none");			
-		}
-		
-		/*SORT TOUCH POINT*/
-		if(thisObj.settings.enableTouch && thisObj.settings.touchType=='wipe')
-			thisObj.settings.wipePoints.sort(function(a,b){return a-b});
-		
+
 		/*CHECK FOR SCROLL*/
 		if(thisObj.settings.enableScroll && thisObj.settings.scrollType=="jump" && thisObj.settings.jumpPoints.length<=1)
 			thisObj.settings.enableScroll = false;
-
-		/*SORT AND GET START SCROLL POINT*/
-		if(thisObj.settings.enableScroll && thisObj.settings.scrollType=='jump')
-			thisObj.settings.jumpPoints.sort(function(a,b){return a-b});
-		
-		/*SORT STOP POINTS*/
-		thisObj.settings.playPoints.sort(function(a,b){return a-b});
-
+			
 		/*CHECK IF SCROLLBARPOINTS EXIST*/
-		if(thisObj.settings.scrollbarType!="scroll" && thisObj.settings.scrollbarPoints.length==0)
+		if(thisObj.settings.scrollbarType=="jump" && thisObj.settings.scrollbarPoints.length<=1)
 			thisObj.settings.scrollbarType = "scroll";
+			
+		/*SORT AND INIT STEP POINTS*/	
+		thisObj.haveStepPoints = (thisObj.settings.stepPointsSelector!=null && thisObj.settings.stepPointsActiveClass!=null && thisObj.settings.stepPoints.length>0);
+			
+		/*SORT POINTS ARRAYS*/
+		thisObj.settings.wipePoints.sort(function(a,b){return a-b});
+		thisObj.settings.jumpPoints.sort(function(a,b){return a-b});
+		thisObj.settings.playPoints.sort(function(a,b){return a-b});
+		thisObj.settings.scrollbarPoints.sort(function(a,b){return a-b});
+		thisObj.settings.stepPoints.sort(function(a,b){return a-b});
 		
 		/*SETS THE DURATION TWEAKS*/
 		if(typeof(thisObj.settings.durationTweaks['scroll'])=="undefined")
@@ -1340,17 +1339,9 @@ Last modification on this file: 16 December 2013
 		thisObj.settings.durationTweaks['wipe'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['wipe']);
 		thisObj.settings.durationTweaks['scrollbar'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['scrollbar']);
 
-		/*IF MIN NOT 0 LOOP CAN NOT WORK*/
-		if(thisObj.settings.min>0)
-			thisObj.settings.loop = false;
-			
 		/*SET TOUCH ACTIONS*/
 		thisObj.settings.touchActions = jQuery.extend({up:1,down:-1,right:0,left:0},thisObj.settings.touchActions);
 			
-		/*SORT AND INIT STEP POINTS*/	
-		thisObj.haveStepPoints = (thisObj.settings.stepPointsSelector!=null && thisObj.settings.stepPointsActiveClass!=null && thisObj.settings.stepPoints.length>0);
-		thisObj.settings.stepPoints.sort(function(a,b){return a-b});
-		
 		/*DELETE ELEMENTS FOR OTHER BROWSERS THEN MINE*/
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['+browsers'])!="undefined"){
@@ -1529,7 +1520,7 @@ Last modification on this file: 16 December 2013
 		}
 		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
-		if(browserObj.webkit!="undefined" && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
+		if(browserObj.webkit && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
 			jQuery('.'+thisObj.settings.animateClass).css({
 				'-webkit-backface-visibility':'hidden',
 				'-webkit-perspective':'1000'
@@ -1680,7 +1671,7 @@ Last modification on this file: 16 December 2013
 					if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
 						return false;
 				
-				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,scrollBarPosition,positionValid;
+				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,positionValid;
 				var valStart = parseInt(thisObj.settings.elements[scrollbarKey]['value-start'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
 				var valEnd = parseInt(thisObj.settings.elements[scrollbarKey]['value-end'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
 				
@@ -1716,7 +1707,10 @@ Last modification on this file: 16 December 2013
 					}
 				}
 				
-				scrollBarPosition = thisObj.getPos(Math.round(thisObj.lastStep));
+				
+				if(!thisObj.animating)
+					thisObj.scrollBarPosition = thisObj.getPos(thisObj.step);
+					
 				var mousemoveFunction = function(e,eType){
 
 					if(eType=='mousemove'){
@@ -1747,23 +1741,23 @@ Last modification on this file: 16 December 2013
 					
 					if(thisObj.settings.scrollbarType=="scroll"){
 						positionTo = thisObj.settings.elements[scrollbarKey]['step-start']+(Math.round((position-thisObj.settings.elements[scrollbarKey]['step-start'])/thisObj.settings.stepsOnScrollbar)*thisObj.settings.stepsOnScrollbar);
-						if(Math.abs(scrollBarPosition-positionTo)>=thisObj.settings.stepsOnScrollbar)
+						if(Math.abs(thisObj.scrollBarPosition-positionTo)>=thisObj.settings.stepsOnScrollbar)
 							positionValid = true;
-						else if(position!=scrollBarPosition && (position==thisObj.settings.elements[scrollbarKey]['step-start'] || position==thisObj.settings.elements[scrollbarKey]['step-end'])){
+						else if(position!=thisObj.scrollBarPosition && (position==thisObj.settings.elements[scrollbarKey]['step-start'] || position==thisObj.settings.elements[scrollbarKey]['step-end'])){
 							positionValid = true;
 							positionTo = position;
 						}
 					}else{
-						if(scrollBarPosition<position){
-							for(var i=position;i>=scrollBarPosition+1;i--){
+						if(thisObj.scrollBarPosition<position){
+							for(var i=position;i>=thisObj.scrollBarPosition+1;i--){
 								if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
 									positionValid = true;
 									positionTo = i;
 									break;
 								}
 							}
-						}else if(scrollBarPosition>position){
-							for(var i=position;i<=scrollBarPosition-1;i++){
+						}else if(thisObj.scrollBarPosition>position){
+							for(var i=position;i<=thisObj.scrollBarPosition-1;i++){
 								if(indexOf(thisObj.settings.scrollbarPoints,i)!=-1){
 									positionValid = true;
 									positionTo = i;
@@ -1774,11 +1768,9 @@ Last modification on this file: 16 December 2013
 					}
 					
 					if(positionValid){
-						scrollBarPosition=positionTo;
-						if(thisObj.getPos(thisObj.lastStep)<positionTo)
-							thisObj.goTo({to:positionTo,orientation:'next',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
-						else if(thisObj.getPos(thisObj.lastStep)>positionTo)
-							thisObj.goTo({to:positionTo,orientation:'prev',animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
+						console.log(positionTo);
+						thisObj.scrollBarPosition=positionTo;
+						thisObj.goTo({to:positionTo,animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
 					}
 				}
 				
@@ -1815,7 +1807,7 @@ Last modification on this file: 16 December 2013
 			
 			if(window.navigator.msPointerEnabled){
 				if(thisObj.settings.enableScrollbarTouch)
-					jQuery(scrollBarObj).css('-ms-touch-action',"none");
+					jQuery(scrollBarObj).css('-ms-touch-action','none');
 				scrollBarObj.addEventListener('MSPointerDown',function(e){
 					mousedownFunction(e,'mousedown',this);
 					e.stopPropagation();					
@@ -2787,7 +2779,7 @@ Last modification on this file: 16 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.11";
+			return "1.5.12";
 		}
 	};
 	
