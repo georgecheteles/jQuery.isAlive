@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.12)
+jQuery.isAlive(1.5.13)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -395,7 +395,7 @@ Last modification on this file: 17 December 2013
 		this.lastStep=0;
 		this.animating = false;
 		this.forceAnimation = false;
-		this.scrollTimer;
+		this.wheellTimer;
 		this.animPositions = [];
 		this.animateDuration;
 		this.touchPosition;
@@ -405,7 +405,6 @@ Last modification on this file: 17 December 2013
 		this.allowTouch = true;
 		this.scrollbarActive = null;
 		this.waitScrollEnd = false;
-		this.waitScrollTimer;
 		this.cssDinamicElements = [];
 		this.params = {};
 		this.onComplete = null;
@@ -900,24 +899,24 @@ Last modification on this file: 17 December 2013
 							if(Math.abs(dx)>=thisObj.settings.wipeXFrom) {
 								if(thisObj.settings.touchActions.left!=0 && dx>0){
 									cancelTouch();
-									thisObj.doWipeTouch(thisObj.settings.touchActions.left);
+									thisObj.doWipe(thisObj.settings.touchActions.left);
 									return;
 								}
 								else if(thisObj.settings.touchActions.right!=0 && dx<0){
 									cancelTouch();
-									thisObj.doWipeTouch(thisObj.settings.touchActions.right);
+									thisObj.doWipe(thisObj.settings.touchActions.right);
 									return;
 								}
 							}
 							if(Math.abs(dy)>=thisObj.settings.wipeYFrom) {
 								if(thisObj.settings.touchActions.up!=0 && dy>0){
 									cancelTouch();
-									thisObj.doWipeTouch(thisObj.settings.touchActions.up);
+									thisObj.doWipe(thisObj.settings.touchActions.up);
 									return;
 								}
 								else if(thisObj.settings.touchActions.down!=0 && dy<0 ){
 									cancelTouch();
-									thisObj.doWipeTouch(thisObj.settings.touchActions.down);
+									thisObj.doWipe(thisObj.settings.touchActions.down);
 									return;
 								}
 							}
@@ -942,22 +941,22 @@ Last modification on this file: 17 December 2013
 							if(Math.abs(dx)>=thisObj.settings.dragXFrom){
 								if(thisObj.settings.touchActions.left!=0 && dx>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
 									thisObj.dragHorizontal = true;
-									thisObj.doDragTouch(thisObj.settings.touchActions.left);
+									thisObj.doDrag(thisObj.settings.touchActions.left);
 									startX = x;
 								} else if(thisObj.settings.touchActions.right!=0 && dx<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
 									thisObj.dragHorizontal = true;
-									thisObj.doDragTouch(thisObj.settings.touchActions.right);
+									thisObj.doDrag(thisObj.settings.touchActions.right);
 									startX = x;
 								}
 							 }
 							 if(Math.abs(dy)>=thisObj.settings.dragYFrom){
 								if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
-									thisObj.doDragTouch(thisObj.settings.touchActions.up);
+									thisObj.doDrag(thisObj.settings.touchActions.up);
 									startY = y;
 								}else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
-									thisObj.doDragTouch(thisObj.settings.touchActions.down);
+									thisObj.doDrag(thisObj.settings.touchActions.down);
 									startY = y;
 								}
 							}
@@ -1741,12 +1740,9 @@ Last modification on this file: 17 December 2013
 					
 					if(thisObj.settings.scrollbarType=="scroll"){
 						positionTo = thisObj.settings.elements[scrollbarKey]['step-start']+(Math.round((position-thisObj.settings.elements[scrollbarKey]['step-start'])/thisObj.settings.stepsOnScrollbar)*thisObj.settings.stepsOnScrollbar);
-						if(Math.abs(thisObj.scrollBarPosition-positionTo)>=thisObj.settings.stepsOnScrollbar)
-							positionValid = true;
-						else if(position!=thisObj.scrollBarPosition && (position==thisObj.settings.elements[scrollbarKey]['step-start'] || position==thisObj.settings.elements[scrollbarKey]['step-end'])){
-							positionValid = true;
-							positionTo = position;
-						}
+						if(positionTo!=thisObj.scrollBarPosition)
+							if(positionTo>=thisObj.settings.elements[scrollbarKey]['step-start'] && positionTo<=thisObj.settings.elements[scrollbarKey]['step-end'])
+								positionValid = true;
 					}else{
 						if(thisObj.scrollBarPosition<position){
 							for(var i=position;i>=thisObj.scrollBarPosition+1;i--){
@@ -1768,7 +1764,6 @@ Last modification on this file: 17 December 2013
 					}
 					
 					if(positionValid){
-						console.log(positionTo);
 						thisObj.scrollBarPosition=positionTo;
 						thisObj.goTo({to:positionTo,animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
 					}
@@ -2160,8 +2155,8 @@ Last modification on this file: 17 December 2013
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 		
 		if(thisObj.settings.scrollDelay!==false){
-			clearTimeout(thisObj.waitScrollTimer);
-			thisObj.waitScrollTimer = setTimeout(function(){
+			clearTimeout(thisObj.wheellTimer);
+			thisObj.wheellTimer = setTimeout(function(){
 				thisObj.waitScrollEnd = false;
 			},thisObj.settings.scrollDelay);
 		}
@@ -2282,14 +2277,14 @@ Last modification on this file: 17 December 2013
 		if(thisObj.settings.debug)
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
-		clearTimeout(thisObj.scrollTimer);
+		clearTimeout(thisObj.wheellTimer);
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='scroll')){
 			thisObj.animationType='scroll';
 			thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
 			thisObj.animateSite();
 		}
 		else{
-			thisObj.scrollTimer = setTimeout(function(){
+			thisObj.wheellTimer = setTimeout(function(){
 				thisObj.animationType='scroll';
 				thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
 				thisObj.animateSite();
@@ -2298,7 +2293,7 @@ Last modification on this file: 17 December 2013
 	}
 	
 	/*DO TOUCH WIPE*/
-	isAlive.prototype.doWipeTouch = function(value){
+	isAlive.prototype.doWipe = function(value){
 		
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
@@ -2375,7 +2370,7 @@ Last modification on this file: 17 December 2013
 	}
 	
 	/*DO TOUCH DRAG*/
-	isAlive.prototype.doDragTouch = function(value){
+	isAlive.prototype.doDrag = function(value){
 
 		var thisObj = this;
 
@@ -2779,7 +2774,7 @@ Last modification on this file: 17 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.12";
+			return "1.5.13";
 		}
 	};
 	
