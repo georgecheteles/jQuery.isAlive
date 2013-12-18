@@ -53,9 +53,6 @@ input[type=submit]{
 
 .drawSurface{
 	position:relative;height:340px;background:#ccc;
-}
-
-#drawSurface2 {
 	margin-bottom:50px;
 }
 
@@ -135,4 +132,39 @@ h3{
 
 .example-wrapper{
 	padding:25px 0px;
+}
+
+.stepPointsWrap{
+	position:relative;
+}
+
+.stepPointsWrap a.sp{
+	position:absolute;
+	top:-40px;
+	left:0px;
+	display:block;
+	width:19px;
+	height:19px;
+	background:#ccc;
+	border:1px solid gray;
+}
+
+.stepPointsWrap a.sp.active{
+	background:brown;
+}
+
+.stepPointsWrap a.sp2{
+	left:30px;
+}
+
+.stepPointsWrap a.sp3{
+	left:60px;
+}
+
+.stepPointsWrap a.sp4{
+	left:90px;
+}
+
+.stepPointsWrap a.sp5{
+	left:120px;
 }

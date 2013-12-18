@@ -412,7 +412,10 @@
 					enableScrollbarTouch:true,
 					debug:true,
 					dragYFrom:40,
-					loop:true
+					loop:true,
+					stepPoints:[0,5,10,15,20],
+					stepPointsSelector:".stepPointsWrap .sp",
+					stepPointsActiveClass:"active"
 				});
 
 				jQuery('#drawSurface2').isAlive('create',{
@@ -473,6 +476,31 @@
 					return false;
 				});
 
+				$('.stepPointsWrap .sp1').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:0,durationType:'step',duration:100});
+					return false;
+				});
+				
+				$('.stepPointsWrap .sp2').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:5,durationType:'step',duration:100});
+					return false;
+				});
+				
+				$('.stepPointsWrap .sp3').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:10,durationType:'step',duration:100});
+					return false;
+				});
+				
+				$('.stepPointsWrap .sp4').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:15,durationType:'step',duration:100});
+					return false;
+				});
+
+				$('.stepPointsWrap .sp5').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:20,durationType:'step',duration:100});
+					return false;
+				});
+
 			});
 			
 			
@@ -496,6 +524,13 @@
 					<a href="#" class="action btn1">Go To Step 0</a>
 					<a href="#" class="action btn2">Go To Step 10</a>
 					<a href="#" class="action btn3">Skip To Step 5</a>
+				</div>
+				<div class="stepPointsWrap">
+					<a href="#" class="sp sp1 active"></a>
+					<a href="#" class="sp sp2"></a>
+					<a href="#" class="sp sp3"></a>
+					<a href="#" class="sp sp4"></a>
+					<a href="#" class="sp sp5"></a>
 				</div>
 				<p>
 					 - The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
