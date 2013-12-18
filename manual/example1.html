@@ -6,7 +6,7 @@
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 		<link type="text/css" rel="stylesheet" href="examples.css?v=1.5.13" media="screen" />
 		<script src="../jquery-1.10.2.min.js"></script>
-		<script src="../src/jquery.isAlive.js?v=1.5.13"></script>
+		<script src="../src/jquery.isAlive.js?v=1.6.0"></script>
 		<script src="../easing.js"></script>
 		<script src="../src/jquery.isAlive.helper.js?v=1.4.11"></script>
 		<script>
@@ -404,7 +404,7 @@
 					elements:animations1,
 					elementsType:"linear",
 					easing:"easeOutQuad",
-					scrollType:"scroll",
+					wheelType:"scroll",
 					useCSS3:false,
 					enableTouch:true,
 					scrollbarType:"scroll",
@@ -423,7 +423,7 @@
 					elements:animations2,
 					elementsType:"tree",
 					easing:"easeOutQuad",
-					scrollType:"jump",
+					wheelType:"jump",
 					useCSS3:true,
 					enableTouch:true,
 					scrollbarType:"jump",
@@ -439,7 +439,7 @@
 							'duration':100,
 							'durationType':'step'
 						},
-						'wipe':{
+						'touch':{
 							'duration':200,
 							'durationType':'step'
 						}

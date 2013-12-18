@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.5.13)
+jQuery.isAlive(1.6.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 17 December 2013
+Last modification on this file: 18 December 2013
 */
 
 (function(jQuery) {
@@ -395,16 +395,16 @@ Last modification on this file: 17 December 2013
 		this.lastStep=0;
 		this.animating = false;
 		this.forceAnimation = false;
-		this.wheellTimer;
+		this.wheelTimer;
 		this.animPositions = [];
 		this.animateDuration;
-		this.touchPosition;
+		this.wipePosition;
 		this.jumpPosition;
 		this.animationType='none';
-		this.allowScroll = true;
+		this.allowWheel = true;
 		this.allowTouch = true;
 		this.scrollbarActive = null;
-		this.waitScrollEnd = false;
+		this.waitWheellEnd = false;
 		this.cssDinamicElements = [];
 		this.params = {};
 		this.onComplete = null;
@@ -428,9 +428,9 @@ Last modification on this file: 17 December 2013
 			elements:{},
 			elementsType:"linear", /*linear|tree*/
 			duration: 1000,
-			durationTweaks:{}, /*obj: {scroll|jump|drag|wipe|scrollBar:duration|durationType|minStepDuration}*/
-			enableScroll:true,
-			scrollType:"scroll", /*scroll|jump*/
+			durationTweaks:{}, /*obj: {wheel|touch|scrollBar:duration|durationType|minStepDuration}*/
+			enableWheel:true,
+			wheelType:"scroll", /*scroll|jump*/
 			jumpPoints:[],
 			max:null,
 			min:0,
@@ -442,7 +442,7 @@ Last modification on this file: 17 December 2013
 			CSS3Easing:null,
 			start:0,
 			loop:false,
-			preventScroll:true,
+			preventWheel:true,
 			stepPoints:[],
 			stepPointsSelector:null,
 			stepPointsActiveClass:null,
@@ -468,7 +468,7 @@ Last modification on this file: 17 December 2013
 			scrollbarPoints:[],
 			scrollbarActiveClass:null,
 			enableScrollbarTouch:false,
-			scrollDelay:250, /*number or false*/
+			wheelDelay:250, /*number or false*/
 			enableGPU:false, /*false|true|webkit|chrome|safari|mobile*/
 			useIdAttribute:false,
 			onStep:null,
@@ -602,21 +602,24 @@ Last modification on this file: 17 December 2013
 			}
 			if(params.indexOf('(')!=-1 && params.substr(0,params.indexOf('('))=='eval')
 				return getBetweenBrackets(params,true);
+				
+			if(typeof(stringPositions[params])!="undefined")	
+				return stringPositions[params];
+
 			if(params.charAt(0)=="#"){
 				var convertValue = hexToRgb(params);
 				if(convertValue!=false)
-					params = convertValue;
+					return convertValue;
 			}
-			else{
-				var convertValue = nameToRgb(params);
-				if(convertValue!=false)
-					params = convertValue;
-			}
+
+			var convertValue = nameToRgb(params);
+			if(convertValue!=false)
+				return convertValue;
+			
 			return params;
 		}
-		params = fixSpaces(params);
-		params = params.replace(/top/g,"0%").replace(/center/g,"50%").replace(/bottom/g,"100%").replace(/left/g,"0%").replace(/right/g,"100%");
-		params = doRecursive(params);
+		var stringPositions = {top:"0%",center:"50%",bottom:"100%",left:"0%",right:"100%"};
+		params = doRecursive(fixSpaces(params));
 		if(typeof(format)!='undefined')
 			params = format.replace('(X)','('+params+')').replace('Xpx',params+'px').replace('X%',params+'%').replace('Xdeg',params+'deg').replace('Xem',params+'em');
 		if(isNumber(params))
@@ -979,18 +982,18 @@ Last modification on this file: 17 December 2013
 		}
 		
 		/* BIND SCROLL EVENTS */
-		if(thisObj.settings.enableScroll){
-			if(thisObj.settings.scrollType=="scroll"){
+		if(thisObj.settings.enableWheel){
+			if(thisObj.settings.wheelType=="scroll"){
 				/*FOR NON FIREFOX*/
 				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
 					(e.originalEvent.detail > 0)?thisObj.doScroll(true):thisObj.doScroll(false);
-					if(thisObj.settings.preventScroll)
+					if(thisObj.settings.preventWheel)
 						return false;
 				});
 				/*FOR FIREFOX*/
 				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
 					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(true):thisObj.doScroll(false);
-					if(thisObj.settings.preventScroll)
+					if(thisObj.settings.preventWheel)
 						return false;
 				});
 			}
@@ -998,13 +1001,13 @@ Last modification on this file: 17 December 2013
 				/*FOR FIREFOX*/
 				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
 					(e.originalEvent.detail > 0)?thisObj.doJump(true):thisObj.doJump(false);
-					if(thisObj.settings.preventScroll)
+					if(thisObj.settings.preventWheel)
 						return false;
 				});
 				/*FOR NON FIREFOX*/
 				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
 					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(true):thisObj.doJump(false);
-					if(thisObj.settings.preventScroll)
+					if(thisObj.settings.preventWheel)
 						return false;
 				});
 			}
@@ -1304,8 +1307,8 @@ Last modification on this file: 17 December 2013
 			thisObj.settings.enableTouch = false;
 
 		/*CHECK FOR SCROLL*/
-		if(thisObj.settings.enableScroll && thisObj.settings.scrollType=="jump" && thisObj.settings.jumpPoints.length<=1)
-			thisObj.settings.enableScroll = false;
+		if(thisObj.settings.enableWheel && thisObj.settings.wheelType=="jump" && thisObj.settings.jumpPoints.length<=1)
+			thisObj.settings.enableWheel = false;
 			
 		/*CHECK IF SCROLLBARPOINTS EXIST*/
 		if(thisObj.settings.scrollbarType=="jump" && thisObj.settings.scrollbarPoints.length<=1)
@@ -1322,20 +1325,14 @@ Last modification on this file: 17 December 2013
 		thisObj.settings.stepPoints.sort(function(a,b){return a-b});
 		
 		/*SETS THE DURATION TWEAKS*/
-		if(typeof(thisObj.settings.durationTweaks['scroll'])=="undefined")
-			thisObj.settings.durationTweaks['scroll'] = {};
-		if(typeof(thisObj.settings.durationTweaks['jump'])=="undefined")
-			thisObj.settings.durationTweaks['jump'] = {};
-		if(typeof(thisObj.settings.durationTweaks['drag'])=="undefined")
-			thisObj.settings.durationTweaks['drag'] = {};
-		if(typeof(thisObj.settings.durationTweaks['wipe'])=="undefined")
-			thisObj.settings.durationTweaks['wipe'] = {};
+		if(typeof(thisObj.settings.durationTweaks['wheel'])=="undefined")
+			thisObj.settings.durationTweaks['wheel'] = {};
+		if(typeof(thisObj.settings.durationTweaks['touch'])=="undefined")
+			thisObj.settings.durationTweaks['touch'] = {};
 		if(typeof(thisObj.settings.durationTweaks['scrollbar'])=="undefined")
 			thisObj.settings.durationTweaks['scrollbar'] = {};
-		thisObj.settings.durationTweaks['scroll'] = jQuery.extend({duration:thisObj.settings.duration},thisObj.settings.durationTweaks['scroll']);
-		thisObj.settings.durationTweaks['jump'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['jump']);
-		thisObj.settings.durationTweaks['drag'] = jQuery.extend({duration:thisObj.settings.duration},thisObj.settings.durationTweaks['drag']);
-		thisObj.settings.durationTweaks['wipe'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['wipe']);
+		thisObj.settings.durationTweaks['wheel'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['wheel']);
+		thisObj.settings.durationTweaks['touch'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['touch']);
 		thisObj.settings.durationTweaks['scrollbar'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['scrollbar']);
 
 		/*SET TOUCH ACTIONS*/
@@ -1528,7 +1525,7 @@ Last modification on this file: 17 December 2013
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
-			if(!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9))
+			if(thisObj.settings.elements[key]['useCSS3'] && (!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9)))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
 					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
@@ -2154,26 +2151,26 @@ Last modification on this file: 17 December 2013
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 		
-		if(thisObj.settings.scrollDelay!==false){
-			clearTimeout(thisObj.wheellTimer);
-			thisObj.wheellTimer = setTimeout(function(){
-				thisObj.waitScrollEnd = false;
-			},thisObj.settings.scrollDelay);
+		if(thisObj.settings.wheelDelay!==false){
+			clearTimeout(thisObj.wheelTimer);
+			thisObj.wheelTimer = setTimeout(function(){
+				thisObj.waitWheellEnd = false;
+			},thisObj.settings.wheelDelay);
 		}
 		
-		if(!thisObj.allowScroll || thisObj.forceAnimation)
+		if(!thisObj.allowWheel || thisObj.forceAnimation)
 			return false;
 			
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
 
-		if(thisObj.settings.scrollDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
+		if(thisObj.settings.wheelDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
 		
-		if(thisObj.settings.scrollDelay!==false && thisObj.waitScrollEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
+		if(thisObj.settings.wheelDelay!==false && thisObj.waitWheellEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
 			return false;
 			
-		if(thisObj.settings.scrollDelay!==false)	
-			thisObj.waitScrollEnd = true;
+		if(thisObj.settings.wheelDelay!==false)	
+			thisObj.waitWheellEnd = true;
 		
 		stepPos = thisObj.getPos(thisObj.lastStep);
 		currentPosition = indexOf(thisObj.settings.jumpPoints,stepPos);
@@ -2233,12 +2230,12 @@ Last modification on this file: 17 December 2013
 			if(nextPosition === notAllowed)
 				return false;
 			thisObj.jumpPosition = nextPosition;
-			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'next',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
+			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'next',animationType:'jump',duration:thisObj.settings.durationTweaks['wheel']['duration'],durationType:thisObj.settings.durationTweaks['wheel']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wheel']['minStepDuration']});
 		}else{
 			if(nextPosition === notAllowed)
 				return false;
 			thisObj.jumpPosition = nextPosition;
-			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'prev',animationType:'jump',duration:thisObj.settings.durationTweaks['jump']['duration'],durationType:thisObj.settings.durationTweaks['jump']['durationType'],minStepDuration:thisObj.settings.durationTweaks['jump']['minStepDuration']});
+			thisObj.goTo({to:thisObj.settings.jumpPoints[thisObj.jumpPosition],orientation:'prev',animationType:'jump',duration:thisObj.settings.durationTweaks['wheel']['duration'],durationType:thisObj.settings.durationTweaks['wheel']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wheel']['minStepDuration']});
 		}		
 	}
 	
@@ -2247,7 +2244,7 @@ Last modification on this file: 17 December 2013
 		
 		var thisObj = this;
 		
-		if(!thisObj.allowScroll || thisObj.forceAnimation)
+		if(!thisObj.allowWheel || thisObj.forceAnimation)
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='scroll'){
@@ -2277,16 +2274,16 @@ Last modification on this file: 17 December 2013
 		if(thisObj.settings.debug)
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
-		clearTimeout(thisObj.wheellTimer);
+		clearTimeout(thisObj.wheelTimer);
 		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='scroll')){
 			thisObj.animationType='scroll';
-			thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
+			thisObj.animateDuration = thisObj.settings.durationTweaks.wheel.duration;
 			thisObj.animateSite();
 		}
 		else{
-			thisObj.wheellTimer = setTimeout(function(){
+			thisObj.wheelTimer = setTimeout(function(){
 				thisObj.animationType='scroll';
-				thisObj.animateDuration = thisObj.settings.durationTweaks.scroll.duration;
+				thisObj.animateDuration = thisObj.settings.durationTweaks.wheel.duration;
 				thisObj.animateSite();
 			},20);
 		}
@@ -2320,7 +2317,7 @@ Last modification on this file: 17 December 2013
 			}
 		}
 		
-		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='touchWipe') || (thisObj.animating && thisObj.animationType=='touchWipe' && ((directionForward && value==-1)||(!directionForward && value==1)))){
+		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='wipe') || (thisObj.animating && thisObj.animationType=='wipe' && ((directionForward && value==-1)||(!directionForward && value==1)))){
 			notAllowed = null;
 			nextPosition = currentPosition;
 		}else{
@@ -2336,7 +2333,7 @@ Last modification on this file: 17 December 2013
 				else
 					notAllowed = thisObj.settings.wipePoints.length-1;
 			}
-			nextPosition = thisObj.touchPosition;
+			nextPosition = thisObj.wipePosition;
 		}
 		
 		if(value==1){
@@ -2359,13 +2356,13 @@ Last modification on this file: 17 December 2013
 		if(value==1){
 			if(nextPosition===notAllowed)
 				return false;
-			thisObj.touchPosition = nextPosition;
-			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'next',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
+			thisObj.wipePosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.wipePosition],orientation:'next',animationType:'wipe',duration:thisObj.settings.durationTweaks['touch']['duration'],durationType:thisObj.settings.durationTweaks['touch']['durationType'],minStepDuration:thisObj.settings.durationTweaks['touch']['minStepDuration']});
 		}else{
 			if(nextPosition===notAllowed)
 				return false;
-			thisObj.touchPosition = nextPosition;
-			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.touchPosition],orientation:'prev',animationType:'touchWipe',duration:thisObj.settings.durationTweaks['wipe']['duration'],durationType:thisObj.settings.durationTweaks['wipe']['durationType'],minStepDuration:thisObj.settings.durationTweaks['wipe']['minStepDuration']});
+			thisObj.wipePosition = nextPosition;
+			thisObj.goTo({to:thisObj.settings.wipePoints[thisObj.wipePosition],orientation:'prev',animationType:'wipe',duration:thisObj.settings.durationTweaks['touch']['duration'],durationType:thisObj.settings.durationTweaks['touch']['durationType'],minStepDuration:thisObj.settings.durationTweaks['touch']['minStepDuration']});
 		}		
 	}
 	
@@ -2377,11 +2374,11 @@ Last modification on this file: 17 December 2013
 		if(thisObj.forceAnimation)
 			return false;
 		
-		if(thisObj.animating && thisObj.animationType!='dragTouch'){
+		if(thisObj.animating && thisObj.animationType!='drag'){
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
 		}
-		else if(thisObj.animating && thisObj.animationType=='dragTouch' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
+		else if(thisObj.animating && thisObj.animationType=='drag' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		if(value==1){
@@ -2403,8 +2400,8 @@ Last modification on this file: 17 December 2013
 		if(thisObj.settings.debug)
 			jQuery('#isalive-'+thisObj.uniqId+'-debuger span:first').html(thisObj.step);
 		
-		thisObj.animationType='dragTouch';
-		thisObj.animateDuration = thisObj.settings.durationTweaks.drag.duration;
+		thisObj.animationType='drag';
+		thisObj.animateDuration = thisObj.settings.durationTweaks.touch.duration;
 		thisObj.animateSite();
 	}
 	
@@ -2731,11 +2728,11 @@ Last modification on this file: 17 December 2013
 			isAliveObjects[selector].rebuildLayout();
 			return thisObj;
 		},
-		enableScroll : function(thisObj,options){
+		enableWheel : function(thisObj,options){
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
-			isAliveObjects[selector].allowScroll = options;
+			isAliveObjects[selector].allowWheel = options;
 			return thisObj;
 		},
 		enableTouch : function(thisObj,options){
@@ -2774,7 +2771,7 @@ Last modification on this file: 17 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.5.13";
+			return "1.6.0";
 		}
 	};
 	

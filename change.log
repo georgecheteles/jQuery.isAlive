@@ -1,5 +1,10 @@
 jQuery isAlive ChangeLog
 
+ver. 1.6.0 (18 December 2013)
+ - bugs fixed
+ - enableScroll/scrollType/preventScroll are now enableWheel/wheelType/preventWheel
+ - durationTweaks now can set durations for wheel(scroll/jump) and touch(drag/wipe) and scrollbar(unchanged)
+
 ver. 1.5.13 (17 December 2013)
  - bugs fixed
 

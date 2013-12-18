@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.5.8+ Manual</h1>
+				<h1>jQuery.isAlive 1.6.0 Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -93,16 +93,16 @@
 						<p class="exp">
 							Type: Object<br/>
 							Default: auto<br/>
-							With this object you can set durations for "scroll","jump","dragm"wipe","scrollbar" animations. Every one of this settings can have a "duration","durationType", and a "minStepDuration" value. If none is provided the default duration will be used.(See example)
+							With this object you can set durations for "wheel","touch","scrollbar" animations. Every one of this settings can have a "duration","durationType", and a "minStepDuration" value. If none is provided the default duration will be used.(See example)
 						</p>
-						enableScroll:
+						enableWheel:
 						<p class="exp">
 							Type: Boolean<br/>
 							Default: true<br/>
 							Values: true | false<br/>
 							Set to false if you do not want mouse scroll events for your animations.
 						</p>
-						scrollType:
+						wheelType:
 						<p class="exp">
 							Type: String<br/>
 							Default: scroll<br/>
@@ -113,7 +113,7 @@
 						<p class="exp">
 							Type: Array<br/>
 							Default: []<br/>
-							If "scrollType" is set to "jump" then here you will enter the points that you want to use for your animations. Minimum 2 are needed.(See example)
+							If "wheelType" is set to "jump" then here you will enter the points that you want to use for your animations. Minimum 2 are needed.(See example)
 						</p>
 						max:
 						<p class="exp">
@@ -180,7 +180,7 @@
 							Values: true | false<br/>
 							Enables loop animations.(See example)
 						</p>
-						preventScroll:
+						preventWheel:
 						<p class="exp">
 							Type: Boolean<br/>
 							Default: True<br/>
@@ -280,7 +280,7 @@
 						<p class="exp">
 							Type: Integer<br/>
 							Default: 1<br/>
-							The number of steps you want when having a scroll event(only when "scrollType" is on "scroll").(See example)
+							The number of steps you want when having a scroll event(only when "wheelType" is on "scroll").(See example)
 						</p>
 						stepsOnDrag:
 						<p class="exp">
@@ -338,12 +338,12 @@
 							Values: true | false<br/>
 							Enables touch events on scrollbar element.
 						</p>
-						scrollDelay:
+						wheelDelay:
 						<p class="exp">
 							Type: Integer<br/>
 							Default: 250<br/>
 							Values: number | false<br/>
-							Set here the number of milliseconds before a new scroll action can be taken(only when "scrollType" is on "scroll"). If set to "false" the animations will have to end before a new animation can start.(See example)
+							Set here the number of milliseconds before a new scroll action can be taken(only when "wheelType" is on "scroll"). If set to "false" the animations will have to end before a new animation can start.(See example)
 						</p>
 						enableGPU:
 						<p class="exp">
@@ -674,13 +674,13 @@ jQuery('#scroll-over-me').isAlive('rebuild');
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">8. enableScroll</p>
+						<p class="imp">8. enableWheel</p>
 							<p class="blue">
 								Enables or disables scroll events.
 							</p>
 						<p class="code">
-jQuery('#scroll-over-me').isAlive('enableScroll',true); //to enable
-jQuery('#scroll-over-me').isAlive('enableScroll',false); //to disable
+jQuery('#scroll-over-me').isAlive('enableWheel',true); //to enable
+jQuery('#scroll-over-me').isAlive('enableWheel',false); //to disable
 						</p>
 					</p>
 					<p class="text">
