@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.6.0)
+jQuery.isAlive(1.6.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 18 December 2013
+Last modification on this file: 20 December 2013
 */
 
 (function(jQuery) {
@@ -2032,13 +2032,21 @@ Last modification on this file: 18 December 2013
 				if(thisObj.rebuildOnStop){
 					thisObj.rebuildLayout();
 					thisObj.rebuildOnStop = false;
+					if(thisObj.onComplete!==null){
+						setTimeout(function(){
+							var onComplete = thisObj.onComplete;
+							thisObj.onComplete = null;
+							onComplete();
+						},25);
+					}
 				}
-				
-				if(thisObj.onComplete!==null && typeof(settings.onComplete)=='function'){
-					thisObj.onComplete();
-					thisObj.onComplete = null;
+				else{
+					if(thisObj.onComplete!==null){
+						var onComplete = thisObj.onComplete;
+						thisObj.onComplete = null;
+						onComplete();
+					}
 				}
-				
 			},
 			step: function(now, fx) {
 			
@@ -2598,7 +2606,7 @@ Last modification on this file: 18 December 2013
 		var thisObj = this;
 		
 		if(!thisObj.animating)
-			return false;
+			return true;
 		
 		jQuery(thisObj.TimeLine).stop();
 		jQuery('.'+thisObj.settings.animateClass).stop();
@@ -2620,7 +2628,8 @@ Last modification on this file: 18 December 2013
 	/*PLAYS ANIMATIONS TO THE NEXT PLAY POINT*/	
 	isAlive.prototype.play = function(options){
 		var thisObj = this;
-		if(thisObj.settings.playPoints.length<=1)
+		
+		if(thisObj.forceAnimation || thisObj.settings.playPoints.length<=1)
 			return false;
 		if(typeof(options) == "undefined")
 			options = {};
@@ -2645,7 +2654,7 @@ Last modification on this file: 18 December 2013
 	/*PLAYS BACK ANIMATIONS TO THE PREV PLAY POINT*/
 	isAlive.prototype.rewind = function(options){
 		var thisObj = this;
-		if(thisObj.settings.playPoints.length<=1)
+		if(thisObj.forceAnimation || thisObj.settings.playPoints.length<=1)
 			return false;
 		if(typeof(options) == "undefined")
 			options = {};
@@ -2664,6 +2673,31 @@ Last modification on this file: 18 December 2013
 		options['orientation'] = 'prev';
 		options['animationType'] = 'rewind';
 		thisObj.goTo(options);
+	}
+	/*AUTOPLAY ANIMATION IN LOOPS*/
+	isAlive.prototype.autoplay = function(options){
+		var thisObj = this;
+		if(thisObj.forceAnimation || !thisObj.settings.loop)
+			return false;
+		var count = false;
+		if(typeof(options['count'])!="undefined"){
+			count = options['count'];
+			delete options['count'];
+		}
+		options['to'] = 0;
+		if(typeof(options['orientation'])=="undefined" || (options['orientation']!="next" && options['orientation']!="prev"))
+			options['orientation'] = "next";
+		options['onComplete'] = function(){
+			doAutoplay();
+		};
+		var doAutoplay = function(){
+			if(count===false || count>0){
+				thisObj.goTo(options);
+				if(count!==false)
+					count--;
+			}
+		};
+		doAutoplay();
 	}
 	
 /*ISALIVE MAIN OBJECT:END*/
@@ -2712,6 +2746,13 @@ Last modification on this file: 18 December 2013
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].rewind(options);
+			return thisObj;
+		},
+		autoplay : function(thisObj,options){
+			var selector = thisObj.selector;
+			if(typeof(isAliveObjects[selector])=="undefined")
+				return false;
+			isAliveObjects[selector].autoplay(options);
 			return thisObj;
 		},
 		stop : function(thisObj,options){
@@ -2771,7 +2812,7 @@ Last modification on this file: 18 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.6.0";
+			return "1.6.1";
 		}
 	};
 	

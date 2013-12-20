@@ -607,7 +607,7 @@ jQuery('#scroll-over-me').isAlive('goTo',{
 	to: > step where you want to go
 	duration: > duration, if nothing is provided the default will be used
 	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
-	orientation: > can be "default" or if your animation has a loop you can enter "next","prev","loop".
+	orientation: > can be "default" or if your animation has a loop you can enter "next","prev","loop"
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
 	onComplete: > this is a function that will be called on the animation end
@@ -652,6 +652,22 @@ jQuery('#scroll-over-me').isAlive('play',{
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
 	onComplete: > this is a function that will be called on the animation end
+}); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">6. autoplay</p>
+							<p class="blue">
+								Plays the animations in loop
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('autoplay',{
+	duration: > duration, if nothing is provided the default will be used
+	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
+	orientation: > can be "next" or "prev"
+	minStepDuration: > the minimum duration per step
+	force: > will force the animation to play until the end
+	count: > how many times will the animation play. Default is set to FALSE for infinite loop
 }); 
 						</p>
 					</p>

@@ -1,5 +1,9 @@
 jQuery isAlive ChangeLog
 
+ver. 1.6.1 (20 December 2013)
+ - adding "autoplay" method
+ - bug fixed
+
 ver. 1.6.0 (18 December 2013)
  - bugs fixed
  - enableScroll/scrollType/preventScroll are now enableWheel/wheelType/preventWheel
