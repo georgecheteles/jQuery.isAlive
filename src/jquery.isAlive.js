@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.6.1)
+jQuery.isAlive(1.6.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 20 December 2013
+Last modification on this file: 21 December 2013
 */
 
 (function(jQuery) {
@@ -415,7 +415,6 @@ Last modification on this file: 20 December 2013
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
-		this.msTouchAction;
 		this.lastElemValue = {};
 		this.dragHorizontal = null;
 		this.scrollBarPosition = 0;
@@ -851,8 +850,6 @@ Last modification on this file: 20 December 2013
 			jQuery(thisObj.mySelector).each(function(){
 				
 				function onTouchStart(e) {
-					if(!thisObj.allowTouch)
-						return;
 					if(!ie10) {
 						if(e.touches.length != 1) 
 							return;
@@ -973,10 +970,8 @@ Last modification on this file: 20 December 2013
 					ie10 = true;
 					this.addEventListener('MSPointerDown', onTouchStart, false);
 					/*PREVENT SCROLL FOR IE10*/
-					if(thisObj.settings.preventTouch){
-						thisObj.msTouchAction = jQuery(this).css('-ms-touch-action');			
+					if(thisObj.settings.preventTouch)
 						jQuery(this).css('-ms-touch-action','none');			
-					}
 				}
 			});
 		}
@@ -2158,6 +2153,9 @@ Last modification on this file: 20 December 2013
 		
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
+
+		if(!thisObj.allowWheel || thisObj.forceAnimation)
+			return false;
 		
 		if(thisObj.settings.wheelDelay!==false){
 			clearTimeout(thisObj.wheelTimer);
@@ -2166,9 +2164,6 @@ Last modification on this file: 20 December 2013
 			},thisObj.settings.wheelDelay);
 		}
 		
-		if(!thisObj.allowWheel || thisObj.forceAnimation)
-			return false;
-			
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
 
 		if(thisObj.settings.wheelDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
@@ -2303,7 +2298,7 @@ Last modification on this file: 20 December 2013
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 		
-		if(thisObj.forceAnimation)
+		if(!thisObj.allowTouch || thisObj.forceAnimation)
 			return false;
 			
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
@@ -2379,7 +2374,7 @@ Last modification on this file: 20 December 2013
 
 		var thisObj = this;
 
-		if(thisObj.forceAnimation)
+		if(!thisObj.allowTouch || thisObj.forceAnimation)
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='drag'){
@@ -2781,12 +2776,6 @@ Last modification on this file: 20 December 2013
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].allowTouch = options;
-			if(options==true && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.preventTouch){
-				isAliveObjects[selector].msTouchAction = jQuery(thisObj.mySelector).css('-ms-touch-action');
-				jQuery(selector).css('-ms-touch-action',"none");				
-			}
-			else if(options==false && isAliveObjects[selector].settings.enableTouch && browserObj.msie && parseInt(browserObj.version)>=10 && isAliveObjects[selector].settings.preventTouch)
-				jQuery(selector).css('-ms-touch-action',isAliveObjects[selector].msTouchAction);
 			return thisObj;
 		},
 		addOnComplete : function(thisObj,options){
@@ -2812,7 +2801,7 @@ Last modification on this file: 20 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.6.1";
+			return "1.6.2";
 		}
 	};
 	

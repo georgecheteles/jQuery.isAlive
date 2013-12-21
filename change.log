@@ -1,5 +1,8 @@
 jQuery isAlive ChangeLog
 
+ver. 1.6.2 (21 December 2013)
+ - small changes in enableTouch method
+
 ver. 1.6.1 (20 December 2013)
  - adding "autoplay" method
  - bug fixed
