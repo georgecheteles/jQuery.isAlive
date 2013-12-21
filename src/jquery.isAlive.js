@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.6.2)
+jQuery.isAlive(1.6.3)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -693,7 +693,8 @@ Last modification on this file: 21 December 2013
 					property = thisObj.cssDinamicElements[key]['property'];
 					value = thisObj.convertParams(thisObj.cssDinamicElements[key]['value'],thisObj.cssDinamicElements[key]['format']);
 					thisObj.setCSS(selector,property,value);
-				} else if(thisObj.cssDinamicElements[key]['method']=="animate"){
+				}
+				else if(thisObj.cssDinamicElements[key]['method']=="animate"){
 					/*REPOSITION ANIMATE*/	
 					selector = thisObj.cssDinamicElements[key]['selector'];
 					property = thisObj.cssDinamicElements[key]['property'];
@@ -713,7 +714,8 @@ Last modification on this file: 21 December 2013
 						changedElements[selector] = [];
 					if(indexOf(changedElements[selector],property)==-1)
 						changedElements[selector].push(property);
-				}else if(thisObj.cssDinamicElements[key]['method']=="set"){
+				}
+				else if(thisObj.cssDinamicElements[key]['method']=="set"){
 					/*REPOSITION SET*/
 					selector = thisObj.cssDinamicElements[key]['selector'];
 					property = thisObj.cssDinamicElements[key]['property'];
@@ -732,7 +734,8 @@ Last modification on this file: 21 December 2013
 						changedElements[selector] = [];
 					if(indexOf(changedElements[selector],property)==-1)
 						changedElements[selector].push(property);
-				}else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
+				}
+				else if(thisObj.cssDinamicElements[key]['method']=="animate-set"){
 					/*REPOSITION ANIMATE-SET*/
 					selector = thisObj.cssDinamicElements[key]['selector'];
 					property = thisObj.cssDinamicElements[key]['property'];
@@ -849,8 +852,8 @@ Last modification on this file: 21 December 2013
 
 			jQuery(thisObj.mySelector).each(function(){
 				
-				function onTouchStart(e) {
-					if(!ie10) {
+				function onTouchStart(e){
+					if(!ie10){
 						if(e.touches.length != 1) 
 							return;
 						startX = e.touches[0].clientX;
@@ -858,7 +861,8 @@ Last modification on this file: 21 December 2013
 						isMoving = true;
 						this.addEventListener('touchmove', onTouchMove, false);
 						this.addEventListener('touchend', cancelTouch, false);
-					} else {
+					}
+					else{
 						if(e.pointerType==e.MSPOINTER_TYPE_MOUSE)
 							return;
 						startX = e.clientX;
@@ -869,11 +873,12 @@ Last modification on this file: 21 December 2013
 					}
 				}
 	
-				function cancelTouch(e) {
-					if(!ie10) {
+				function cancelTouch(e){
+					if(!ie10){
 						this.removeEventListener('touchmove', onTouchMove);
 						this.removeEventListener('touchend', cancelTouch);
-					} else {
+					}
+					else{
 						document.removeEventListener('MSPointerMove', onTouchMove);
 						document.removeEventListener('MSPointerUp', cancelTouch);
 					}
@@ -882,21 +887,22 @@ Last modification on this file: 21 December 2013
 				}	
 				
 				if(thisObj.settings.touchType=='wipe'){
-					var onTouchMove = function(e) {
-						if(!ie10 && thisObj.settings.preventTouch) {
+					var onTouchMove = function(e){
+						if(!ie10 && thisObj.settings.preventTouch){
 							e.preventDefault();
 						}
-						if(isMoving) {
-							if(!ie10) {
+						if(isMoving){
+							if(!ie10){
 								var x = e.touches[0].clientX;
 								var y = e.touches[0].clientY;
-							} else {
+							}
+							else{
 								var x = e.clientX;
 								var y = e.clientY;
 							}
 							var dx = startX - x;
 							var dy = startY - y;
-							if(Math.abs(dx)>=thisObj.settings.wipeXFrom) {
+							if(Math.abs(dx)>=thisObj.settings.wipeXFrom){
 								if(thisObj.settings.touchActions.left!=0 && dx>0){
 									cancelTouch();
 									thisObj.doWipe(thisObj.settings.touchActions.left);
@@ -908,7 +914,7 @@ Last modification on this file: 21 December 2013
 									return;
 								}
 							}
-							if(Math.abs(dy)>=thisObj.settings.wipeYFrom) {
+							if(Math.abs(dy)>=thisObj.settings.wipeYFrom){
 								if(thisObj.settings.touchActions.up!=0 && dy>0){
 									cancelTouch();
 									thisObj.doWipe(thisObj.settings.touchActions.up);
@@ -925,14 +931,15 @@ Last modification on this file: 21 December 2013
 				}
 				else{
 					var onTouchMove = function (e){
-						if(!ie10 && thisObj.settings.preventTouch) {
+						if(!ie10 && thisObj.settings.preventTouch){
 							e.preventDefault();
 						}
-						if(isMoving) {
-							if(!ie10) {
+						if(isMoving){
+							if(!ie10){
 								var x = e.touches[0].clientX;
 								var y = e.touches[0].clientY;
-							} else {
+							}
+							else{
 								var x = e.clientX;
 								var y = e.clientY;
 							}
@@ -943,7 +950,8 @@ Last modification on this file: 21 December 2013
 									thisObj.dragHorizontal = true;
 									thisObj.doDrag(thisObj.settings.touchActions.left);
 									startX = x;
-								} else if(thisObj.settings.touchActions.right!=0 && dx<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
+								}
+								else if(thisObj.settings.touchActions.right!=0 && dx<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
 									thisObj.dragHorizontal = true;
 									thisObj.doDrag(thisObj.settings.touchActions.right);
 									startX = x;
@@ -954,7 +962,8 @@ Last modification on this file: 21 December 2013
 									thisObj.dragHorizontal = false;
 									thisObj.doDrag(thisObj.settings.touchActions.up);
 									startY = y;
-								}else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
+								}
+								else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
 									thisObj.doDrag(thisObj.settings.touchActions.down);
 									startY = y;
@@ -964,9 +973,10 @@ Last modification on this file: 21 December 2013
 					}
 				}
 		    	 
-				if('ontouchstart' in document.documentElement) {
+				if('ontouchstart' in document.documentElement){
 					this.addEventListener('touchstart', onTouchStart, false);
-				} else if(window.navigator.msPointerEnabled){
+				}
+				else if(window.navigator.msPointerEnabled){
 					ie10 = true;
 					this.addEventListener('MSPointerDown', onTouchStart, false);
 					/*PREVENT SCROLL FOR IE10*/
@@ -1793,20 +1803,20 @@ Last modification on this file: 21 December 2013
 			}
 			
 			if(window.navigator.msPointerEnabled){
-				if(thisObj.settings.enableScrollbarTouch)
-					jQuery(scrollBarObj).css('-ms-touch-action','none');
 				scrollBarObj.addEventListener('MSPointerDown',function(e){
 					mousedownFunction(e,'mousedown',this);
 					e.stopPropagation();					
 				}, false);
-					
-			} else if('onmousedown' in document.documentElement){
+				if(thisObj.settings.enableScrollbarTouch)
+					jQuery(scrollBarObj).css('-ms-touch-action','none');
+			}
+			else if('onmousedown' in document.documentElement){
 				jQuery(scrollBarObj).bind('mousedown',function(e){
 					mousedownFunction(e,'mousedown',this);
 					e.stopPropagation();					
 				});
 			}
-			if('ontouchstart' in document.documentElement && thisObj.settings.enableScrollbarTouch){
+			if(thisObj.settings.enableScrollbarTouch && ('ontouchstart' in document.documentElement)){
 				scrollBarObj.addEventListener('touchstart',function(e){
 					mousedownFunction(e,'touchstart',this);
 					e.stopPropagation();					
@@ -2014,6 +2024,7 @@ Last modification on this file: 21 December 2013
 		jQuery(thisObj.TimeLine).animate({"timer":"+=100"},{duration:thisObj.animateDuration,easing:'linear',queue:false,
 			complete : function(){
 				var selector,property;
+				
 				thisObj.animating = false;
 				thisObj.animationType='none';
 				thisObj.forceAnimation = false;
@@ -2109,9 +2120,9 @@ Last modification on this file: 21 December 2013
 						    			duration = Math.floor(animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step))));
 							    	if(!animations[step][selector][property]['useCSS3']){
 										if(animations[step][selector][property]['useJQuery']){
-											var animObj = {};
-											animObj[property] = animations[step][selector][property]['to'];
-											jQuery(selector).animate(animObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
+											var tObj = {};
+											tObj[property] = animations[step][selector][property]['to'];
+											jQuery(selector).animate(tObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
 										}
 										else
 											thisObj.animateJS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
@@ -2674,11 +2685,20 @@ Last modification on this file: 21 December 2013
 		var thisObj = this;
 		if(thisObj.forceAnimation || !thisObj.settings.loop)
 			return false;
+		
 		var count = false;
+		var loop = 0;
 		if(typeof(options['count'])!="undefined"){
 			count = options['count'];
 			delete options['count'];
 		}
+		
+		var onLoop = null;
+		if(typeof(options['onLoop'])!="undefined"){
+			onLoop = options['onLoop'];
+			delete options['onLoop'];
+		}
+		
 		options['to'] = 0;
 		if(typeof(options['orientation'])=="undefined" || (options['orientation']!="next" && options['orientation']!="prev"))
 			options['orientation'] = "next";
@@ -2687,6 +2707,10 @@ Last modification on this file: 21 December 2013
 		};
 		var doAutoplay = function(){
 			if(count===false || count>0){
+				if(onLoop!=null){
+					loop++;
+					onLoop(loop);
+				}
 				thisObj.goTo(options);
 				if(count!==false)
 					count--;
@@ -2801,7 +2825,7 @@ Last modification on this file: 21 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.6.2";
+			return "1.6.3";
 		}
 	};
 	

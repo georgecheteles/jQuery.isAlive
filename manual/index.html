@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.6.1+ Manual</h1>
+				<h1>jQuery.isAlive 1.6.3+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -535,7 +535,7 @@
 					</p>
 
 					<p class="text">
-						<p class="imp">1. onStep</p>
+						<p class="imp">1. onStep(position,loop,animationType)</p>
 							<p class="blue">
 								This event is called on every step of your animation
 							</p>
@@ -551,7 +551,7 @@ jQuery('#scroll-over-me').isAlive('create',{
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">2. onLoadingComplete</p>
+						<p class="imp">2. onLoadingComplete()</p>
 							<p class="blue">
 								This event is called after the initialization procedure is done and the plugin is ready to be used
 							</p>
@@ -565,7 +565,7 @@ jQuery('#scroll-over-me').isAlive('create',{
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">1. onRebuild</p>
+						<p class="imp">1. onRebuild(params,position,loop)</p>
 							<p class="blue">
 								This event is called on a rebuild action (resize of the browser)
 							</p>
@@ -610,7 +610,7 @@ jQuery('#scroll-over-me').isAlive('goTo',{
 	orientation: > can be "default" or if your animation has a loop you can enter "next","prev","loop"
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
-	onComplete: > this is a function that will be called on the animation end
+	onComplete(): > this is a function that will be called on the animation end
 }); 
 						</p>
 					</p>
@@ -636,7 +636,7 @@ jQuery('#scroll-over-me').isAlive('play',{
 	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
-	onComplete: > this is a function that will be called on the animation end
+	onComplete(): > this is a function that will be called on the animation end
 }); 
 						</p>
 					</p>
@@ -651,7 +651,7 @@ jQuery('#scroll-over-me').isAlive('play',{
 	durationType: > can be "default" or "step", where the duration will be the numbers of steps multiply by duration given
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
-	onComplete: > this is a function that will be called on the animation end
+	onComplete(): > this is a function that will be called on the animation end
 }); 
 						</p>
 					</p>
@@ -668,6 +668,7 @@ jQuery('#scroll-over-me').isAlive('autoplay',{
 	minStepDuration: > the minimum duration per step
 	force: > will force the animation to play until the end
 	count: > how many times will the animation play. Default is set to FALSE for infinite loop
+	onLoop(count): > this function will be called on every new loop started. "count" will return the loop count
 }); 
 						</p>
 					</p>
