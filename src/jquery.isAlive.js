@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.6.3)
+jQuery.isAlive(1.7.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	office@we-code-magic.com
-Last modification on this file: 21 December 2013
+Last modification on this file: 24 December 2013 (Merry Christmas)
 */
 
 (function(jQuery) {
@@ -577,7 +577,7 @@ Last modification on this file: 21 December 2013
 		}
 		else	
 			params = params(thisObj.mySelector,thisObj.params).toString();
-			
+		
 		var doRecursive = function(params){
 			if(params.indexOf(' ')!=-1){
 				params = params.split(' ');
@@ -1270,21 +1270,6 @@ Last modification on this file: 21 December 2013
 		if(thisObj.settings.debug)
 			jQuery(thisObj.mySelector).append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
 		
-		/* CONVERT FROM TREE TO LINEAR STRUCTURE */
-		if(thisObj.settings.elementsType=="tree"){
-			var tempObj = {};
-			var i = 0;
-			for(key in thisObj.settings.elements){
-				for(key2 in thisObj.settings.elements[key]){
-					tempObj[i] = {};
-					tempObj[i] = jQuery.extend({"selector":key},thisObj.settings.elements[key][key2]);
-					i++;
-				}
-				delete thisObj.settings.elements[key];
-			}
-			thisObj.settings.elements = jQuery.extend({},tempObj);
-		}
-		
 		/*GET WIDTH AND HEIGHT OF THE PARENT ELEMENT*/
 		thisObj.params.windowWidth = jQuery(window).width();
 		thisObj.params.windowHeight = jQuery(window).height();
@@ -1343,26 +1328,41 @@ Last modification on this file: 21 December 2013
 		/*SET TOUCH ACTIONS*/
 		thisObj.settings.touchActions = jQuery.extend({up:1,down:-1,right:0,left:0},thisObj.settings.touchActions);
 			
-		/*DELETE ELEMENTS FOR OTHER BROWSERS THEN MINE*/
-		for(key in thisObj.settings.elements){
-			if(typeof(thisObj.settings.elements[key]['+browsers'])!="undefined"){
-				if(!validateBrowsers(thisObj.settings.elements[key]['+browsers']))
-					delete thisObj.settings.elements[key];
+		/* CONVERT FROM TREE TO LINEAR STRUCTURE */
+		if(thisObj.settings.elementsType=="tree"){
+			var tempObj = {};
+			var i = 0;
+			for(key in thisObj.settings.elements){
+				for(key2 in thisObj.settings.elements[key]){
+					tempObj[i] = {};
+					tempObj[i] = jQuery.extend({"selector":key},thisObj.settings.elements[key][key2]);
+					i++;
+				}
+				delete thisObj.settings.elements[key];
 			}
-			else if(typeof(thisObj.settings.elements[key]['-browsers'])!="undefined"){
-				if(validateBrowsers(thisObj.settings.elements[key]['-browsers']))
-					delete thisObj.settings.elements[key];
-			}
+			thisObj.settings.elements = jQuery.extend({},tempObj);
 		}
-
-		/*ADDS ID AND DUPLICATES ELEMENTS IF USE_ID_ATTRIBUTE OPTION IS ON*/
+		
 		var new_elements = [];
 		var idIndex = 0;
 		var keyIndex = 0;
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
+			/*DELETE ELEMENTS FOR OTHER BROWSERS THEN MINE*/
+			if(typeof(thisObj.settings.elements[key]['+browsers'])!="undefined"){
+				if(!validateBrowsers(thisObj.settings.elements[key]['+browsers'])){
+					delete thisObj.settings.elements[key];
+					continue;
+				}
+			}
+			if(typeof(thisObj.settings.elements[key]['-browsers'])!="undefined"){
+				if(validateBrowsers(thisObj.settings.elements[key]['-browsers'])){
+					delete thisObj.settings.elements[key];
+					continue;
+				}
+			}
 			/*DELETE INVALID ELEMENTS*/
-			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || typeof(thisObj.settings.elements[key]['method'])=="undefined"){
+			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || (typeof(thisObj.settings.elements[key]['method'])=="undefined" && typeof(thisObj.settings.elements[key]['do'])=="undefined")){
 				delete thisObj.settings.elements[key];
 				continue;
 			}
@@ -1373,6 +1373,49 @@ Last modification on this file: 21 December 2013
 					continue;
 				}
 				tempArray.push(thisObj.settings.elements[key]['selector']);
+			}
+			/*UNPACK SHOT ELEMENTS*/
+			if(typeof(thisObj.settings.elements[key]['do'])!="undefined"){
+				if(thisObj.settings.elements[key]['do'].indexOf('(')!=-1){
+					thisObj.settings.elements[key]['property'] = thisObj.settings.elements[key]['do'].substr(0,thisObj.settings.elements[key]['do'].indexOf('('));
+					var temp = getBetweenBrackets(thisObj.settings.elements[key]['do']);
+					var values = [];
+					var s = 0;
+					var k = 0;
+					for(var i=0;i<=temp.length-1;i++){
+						if(temp.charAt(i) == '(')
+							s++;
+						else if(temp.charAt(i) == ')')
+							s--;
+						if(temp.charAt(i)==',' && s==0)
+							k++;
+						else{
+							if(typeof(values[k])=="undefined")
+								values[k] = "";
+							values[k] = values[k] + temp.charAt(i);
+						}
+					}
+					if(values.length==1)
+						thisObj.settings.elements[key]['value-end'] = values[0];
+					else if(values.length==2){
+						thisObj.settings.elements[key]['value-start'] = values[0];
+						thisObj.settings.elements[key]['value-end'] = values[1];
+					}
+					else{
+						delete thisObj.settings.elements[key];
+						continue;					
+					}
+				}
+				else if(thisObj.settings.elements[key]['do']=="fadeOut"){
+					thisObj.settings.elements[key]['property'] = "opacity";
+					thisObj.settings.elements[key]['value-end'] = 0;
+				}
+				else if(thisObj.settings.elements[key]['do']=="fadeIn"){
+					thisObj.settings.elements[key]['property'] = "opacity";
+					thisObj.settings.elements[key]['value-end'] = 1;
+				}
+				thisObj.settings.elements[key]['method'] = "animate";
+				delete thisObj.settings.elements[key]['do'];
 			}
 			/*ADD IF USEIDATTRIBUTE IS SET TO TRUE*/
 			if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
@@ -1410,7 +1453,6 @@ Last modification on this file: 21 December 2013
 			thisObj.settings.elements["ISALIVE_OBJECT_"+keyIndex] = new_elements[key];
 			keyIndex++;
 		}
-		
 		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
@@ -2825,7 +2867,7 @@ Last modification on this file: 21 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.6.3";
+			return "1.7.0";
 		}
 	};
 	

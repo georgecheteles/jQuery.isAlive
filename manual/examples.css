@@ -135,16 +135,20 @@ h3{
 }
 
 .stepPointsWrap{
-	position:relative;
+	width:100%;
+	height:20px;
+	position:absolute;
+	bottom:-30px;
+	left:0px;
 }
 
 .stepPointsWrap a.sp{
 	position:absolute;
-	top:-40px;
+	top:0px;
 	left:0px;
 	display:block;
-	width:19px;
-	height:19px;
+	width:18px;
+	height:18px;
 	background:#ccc;
 	border:1px solid gray;
 }

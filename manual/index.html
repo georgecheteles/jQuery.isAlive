@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.6.3+ Manual</h1>
+				<h1>jQuery.isAlive 1.7.0 Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -411,8 +411,28 @@
 }
 						</p>
 					</p>
+
+
 					<p class="text">
-						<p class="imp">2. set</p>
+						<p class="imp">2. do (short form for animate)</p>
+							<p class="blue">
+								By using "do" you can write less code.<br/>
+								This does the same thing as the "animation" but replaces "method","property","value-start","value-end" with a single line.<br/>
+								Ex: "do":"left(100)" | "do":"left(0,100)" | "do":"fadeOut" | "do":"fadeIn"
+							</p>
+						<p class="code">
+0: {
+	"selector": > jQuery selector
+	"do": > property(value-start,value-end) or property(value-end) or reserved words like "fadeOut","fadeIn"
+	"step-start": > step where animation will start
+	"step-end": > step where animation will end
+}
+						</p>
+					</p>
+
+					
+					<p class="text">
+						<p class="imp">3. set</p>
 							<p class="blue">
 								Using this method you can change an element CSS value,scroll value or call a function from a step.
 							</p>
@@ -432,7 +452,7 @@
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">3. animate-set</p>
+						<p class="imp">4. animate-set</p>
 							<p class="blue">
 								This method will set a CSS value, scroll value or call a function on every step from "value-start" to "value-end".
 							</p>
@@ -454,7 +474,7 @@
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">4. static</p>
+						<p class="imp">5. static</p>
 							<p class="blue">
 								This is not an dinamic element. Will set an CSS value, scroll or function at start and on every window resize.
 							</p>
@@ -472,7 +492,7 @@
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">5. set@start</p>
+						<p class="imp">6. set@start</p>
 							<p class="blue">
 								Will set a CSS value at the starting point of your animation. This works only if "initCSS" is set to FALSE.
 							</p>
@@ -490,7 +510,7 @@
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">6. add-class</p>
+						<p class="imp">7. add-class</p>
 							<p class="blue">
 								Will add a class to the element at a given step.
 							</p>
@@ -507,7 +527,7 @@
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">7. remove-class</p>
+						<p class="imp">8. remove-class</p>
 							<p class="blue">
 								Will remove a class from the element at a given step.
 							</p>

@@ -1,6 +1,9 @@
 jQuery isAlive ChangeLog
 
 ver. 1.6.3 (21 December 2013)
+ - adding "do" method (short for animation)
+
+ver. 1.6.3 (21 December 2013)
  - adding "onLoop" event for "autoplay"
 
 ver. 1.6.2 (21 December 2013)

@@ -6,7 +6,7 @@
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 		<link type="text/css" rel="stylesheet" href="examples.css?v=1.5.13" media="screen" />
 		<script src="../jquery-1.10.2.min.js"></script>
-		<script src="../src/jquery.isAlive.js?v=1.6.3"></script>
+		<script src="../src/jquery.isAlive.js?v=1.7.0"></script>
 		<script src="../easing.js"></script>
 		<script src="../src/jquery.isAlive.helper.js?v=1.4.11"></script>
 		<script>
@@ -142,19 +142,15 @@
 				},
 				15:{
 					"selector":"#drawSurface1 .myDiv1",
-					"method":"animate",
-					"property":"left",
+					"do":"left(0)",
 					"step-start":10,
-					"step-end":15,
-					"value-end":0
+					"step-end":15
 				},
 				16:{
 					"selector":"#drawSurface1 .myDiv1",
-					"method":"animate",
-					"property":"top",
+					"do":"top(240,0)",
 					"step-start":15,
-					"step-end":20,
-					"value-end":0
+					"step-end":20
 				},
 				17:{
 					"selector":"#drawSurface1 .myDiv2",
@@ -524,13 +520,13 @@
 					<a href="#" class="action btn1">Autoplay</a>
 					<a href="#" class="action btn2">Go To 10</a>
 					<a href="#" class="action btn3">Skip To Step 5</a>
-				</div>
-				<div class="stepPointsWrap">
-					<a href="#" class="sp sp1 active"></a>
-					<a href="#" class="sp sp2"></a>
-					<a href="#" class="sp sp3"></a>
-					<a href="#" class="sp sp4"></a>
-					<a href="#" class="sp sp5"></a>
+					<div class="stepPointsWrap">
+						<a href="#" class="sp sp1 active"></a>
+						<a href="#" class="sp sp2"></a>
+						<a href="#" class="sp sp3"></a>
+						<a href="#" class="sp sp4"></a>
+						<a href="#" class="sp sp5"></a>
+					</div>
 				</div>
 				<p>
 					 - The "scrollType" option is set to default "scroll", this mean that the animations will play on each mouse scroll.<br/>
