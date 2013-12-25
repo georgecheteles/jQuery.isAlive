@@ -2694,11 +2694,9 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 	/*PLAYS ANIMATIONS TO THE NEXT PLAY POINT*/	
 	isAlive.prototype.play = function(options){
 		var thisObj = this;
-		
 		if(thisObj.forceAnimation || thisObj.settings.playPoints.length<=1)
 			return false;
-		if(typeof(options) == "undefined")
-			options = {};
+		options = jQuery.extend({},options);
 		var pos = Math.floor(thisObj.getPos(thisObj.lastStep));
 		var max = thisObj.settings.max-1;
 		var found = null; 
@@ -2722,8 +2720,7 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 		var thisObj = this;
 		if(thisObj.forceAnimation || thisObj.settings.playPoints.length<=1)
 			return false;
-		if(typeof(options) == "undefined")
-			options = {};
+		options = jQuery.extend({},options);
 		var pos = Math.ceil(thisObj.getPos(thisObj.lastStep));
 		var found = null; 
 		for(var i=pos-1;i>=0;i--)
@@ -2745,20 +2742,18 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 		var thisObj = this;
 		if(thisObj.forceAnimation || !thisObj.settings.loop)
 			return false;
-		
+		options = jQuery.extend({},options);
 		var count = false;
 		var loop = 0;
 		if(typeof(options['count'])!="undefined"){
 			count = options['count'];
 			delete options['count'];
 		}
-		
 		var onLoop = null;
 		if(typeof(options['onLoop'])!="undefined"){
 			onLoop = options['onLoop'];
 			delete options['onLoop'];
 		}
-		
 		options['to'] = 0;
 		if(typeof(options['orientation'])=="undefined" || (options['orientation']!="next" && options['orientation']!="prev"))
 			options['orientation'] = "next";
