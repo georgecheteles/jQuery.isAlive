@@ -514,7 +514,7 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 	isAlive.prototype.animateJS = function(startPos,selector,property,value,duration,easing){
 		var thisObj = this;
 		if(typeof(thisObj.JSValuesArray[selector][property])=="undefined")
-			thisObj.JSValuesArray[selector][property] = thisObj.animPositions[thisObj.getPos(startPos)][selector][property].toString();
+			thisObj.JSValuesArray[selector][property] = thisObj.animPositions[Math.round(thisObj.getPos(startPos))][selector][property].toString();
 		var start = thisObj.JSValuesArray[selector][property];
 		var end = value.toString();
 		var tempObj = {};
