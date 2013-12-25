@@ -1,6 +1,10 @@
 jQuery isAlive ChangeLog
 
-ver. 1.6.3 (21 December 2013)
+ver. 1.7.1 (25 December 2013)
+ - adding "getCurrentStep" method
+ - bug fixed
+
+ver. 1.7.0 (24 December 2013)
  - adding "do" method (short for animation)
 
 ver. 1.6.3 (21 December 2013)
