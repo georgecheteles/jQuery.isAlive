@@ -1,5 +1,8 @@
 jQuery isAlive ChangeLog
 
+ver. 1.7.2 (26 December 2013)
+ - bug fixed
+
 ver. 1.7.1 (25 December 2013)
  - adding "getCurrentStep" method
  - bug fixed

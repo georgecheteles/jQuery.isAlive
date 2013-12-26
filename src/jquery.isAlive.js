@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.1)
+jQuery.isAlive(1.7.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 25 December 2013 (Merry Christmas)
+Last modification on this file: 26 December 2013
 */
 
 (function(jQuery) {
@@ -371,7 +371,7 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 			}
 			valStart = parseFloat(valStart);
 			valEnd = parseFloat(valEnd);
-			var value = parseFloat(valStart+((valEnd-valStart)*((pos-stepStart)/(stepEnd-stepStart))));
+			var value = Math.floor(parseFloat(valStart+((valEnd-valStart)*((pos-stepStart)/(stepEnd-stepStart))))*1000)/1000;
 			if(colorFound)
 				return Math.round(Math.min(255,Math.max(0,value)));
 			if(format!==false){
@@ -2886,7 +2886,7 @@ Last modification on this file: 25 December 2013 (Merry Christmas)
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.1";
+			return "1.7.2";
 		}
 	};
 	
