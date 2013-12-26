@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.3)
+jQuery.isAlive(1.7.4)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1415,6 +1415,10 @@ Last modification on this file: 26 December 2013
 					thisObj.settings.elements[key]['property'] = "opacity";
 					thisObj.settings.elements[key]['value-end'] = 1;
 				}
+				else {
+					delete thisObj.settings.elements[key];
+					continue;					
+				}
 				thisObj.settings.elements[key]['method'] = "animate";
 				delete thisObj.settings.elements[key]['do'];
 			}
@@ -1495,7 +1499,7 @@ Last modification on this file: 26 December 2013
 				
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
-					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined"){
+					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
 						/*BUILD JS ARRAY*/						
 						if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
 							thisObj.settings.elements[key]['animType'] = 1;
@@ -1519,51 +1523,26 @@ Last modification on this file: 26 December 2013
 							delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
 					else {
-						if((thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']){
-							/*BUILD CSS3 ARRAYS*/
-							thisObj.settings.elements[key]['animType'] = 3;
-							if(typeof(thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]])=="undefined")
-								thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]] = {};
-							if(typeof(thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]])=="undefined")
-								thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]] = {};
-							/*SET EASING*/
-							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
-								if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
-									thisObj.settings.elements[key]["easing"] = thisObj.settings.CSS3Easing;
-								else
-									thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["CSS3Easing"];
-							}
-							thisObj.settings.elements[key]["easing"] = convertEasing(thisObj.settings.elements[key]["easing"]);
-							if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]["easing"])==-1 && thisObj.settings.elements[key]["easing"].indexOf('cubic-bezier')==-1)
-								thisObj.settings.elements[key]["easing"] = "linear";
-							if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
-								delete thisObj.settings.elements[key]['JSEasing'];
-							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
-								delete thisObj.settings.elements[key]['CSS3Easing'];
+						/*BUILD CSS3 ARRAYS*/
+						thisObj.settings.elements[key]['animType'] = 3;
+						if(typeof(thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]])=="undefined")
+							thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]] = {};
+						if(typeof(thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]])=="undefined")
+							thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]] = {};
+						/*SET EASING*/
+						if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
+							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.CSS3Easing;
+							else
+								thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["CSS3Easing"];
 						}
-						else{
-							/*BUILD JS ARRAY*/						
-							if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
-								thisObj.settings.elements[key]['animType'] = 1;
-							else{
-								thisObj.settings.elements[key]['animType'] = 2;
-								if(typeof(thisObj.JSValuesArray[thisObj.settings.elements[key]["selector"]])=="undefined")
-									thisObj.JSValuesArray[thisObj.settings.elements[key]["selector"]] = {};
-							}
-							/*SET EASING*/
-							if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
-								if(typeof(thisObj.settings.elements[key]["JSEasing"])=="undefined")
-									thisObj.settings.elements[key]["easing"] = thisObj.settings.JSEasing;
-								else
-									thisObj.settings.elements[key]["easing"] = thisObj.settings.elements[key]["JSEasing"];
-							}
-							if(typeof(jQuery.easing[thisObj.settings.elements[key]["easing"]])=='undefined')
-								thisObj.settings.elements[key]["easing"] = "linear";						
-							if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
-								delete thisObj.settings.elements[key]['JSEasing'];
-							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
-								delete thisObj.settings.elements[key]['CSS3Easing'];
-						}
+						thisObj.settings.elements[key]["easing"] = convertEasing(thisObj.settings.elements[key]["easing"]);
+						if(indexOf(['linear','ease','ease-in','ease-out','ease-in-out'],thisObj.settings.elements[key]["easing"])==-1 && thisObj.settings.elements[key]["easing"].indexOf('cubic-bezier')==-1)
+							thisObj.settings.elements[key]["easing"] = "linear";
+						if(typeof(thisObj.settings.elements[key]["JSEasing"])!="undefined")
+							delete thisObj.settings.elements[key]['JSEasing'];
+						if(typeof(thisObj.settings.elements[key]["CSS3Easing"])!="undefined")
+							delete thisObj.settings.elements[key]['CSS3Easing'];
 					}
 					if(typeof(thisObj.settings.elements[key]['useCSS3'])!="undefined")
 						delete thisObj.settings.elements[key]['useCSS3'];
@@ -1968,10 +1947,10 @@ Last modification on this file: 26 December 2013
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'animType':thisObj.settings.elements[key]['animType'],
 						'duration':timing,
 						'end':end,
 						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'animType':thisObj.settings.elements[key]['animType'],
 						'easing':thisObj.settings.elements[key]['easing']
 					};
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
@@ -1995,10 +1974,10 @@ Last modification on this file: 26 December 2013
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'animType':thisObj.settings.elements[key]['animType'],
 						'duration':timing,
 						'end':end,
 						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'animType':thisObj.settings.elements[key]['animType'],
 						'easing':thisObj.settings.elements[key]['easing']
 					};
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
@@ -2032,10 +2011,10 @@ Last modification on this file: 26 December 2013
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'animType':thisObj.settings.elements[key]['animType'],
 						'duration':timing,
 						'end':end,
 						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'animType':thisObj.settings.elements[key]['animType'],
 						'easing':thisObj.settings.elements[key]['easing']
 					};
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
@@ -2060,10 +2039,10 @@ Last modification on this file: 26 December 2013
 					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
 						animations[start][thisObj.settings.elements[key]['selector']] = {};
 					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+						'animType':thisObj.settings.elements[key]['animType'],
 						'duration':timing,
 						'end':end,
 						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'animType':thisObj.settings.elements[key]['animType'],
 						'easing':thisObj.settings.elements[key]['easing']
 					};
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
@@ -2880,11 +2859,17 @@ Last modification on this file: 26 December 2013
 				return false;
 			return (isAliveObjects[selector].settings.max-1);
 		},
+		getAnimationState : function(thisObj){
+			var selector = thisObj.selector;
+			if(typeof(isAliveObjects[selector])=="undefined")
+				return false;
+			return (isAliveObjects[selector].animating);
+		},
 		getBrowser : function(){
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.3";
+			return "1.7.4";
 		}
 	};
 	

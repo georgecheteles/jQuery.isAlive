@@ -1,5 +1,8 @@
 jQuery isAlive ChangeLog
 
+ver. 1.7.4 (26 December 2013)
+ - adding "getAnimationState" method
+
 ver. 1.7.3 (26 December 2013)
  - small changes
 
