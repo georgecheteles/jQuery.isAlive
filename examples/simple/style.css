@@ -39,6 +39,12 @@ a {
 	outline:none;
 }
 
+html,body{
+	/*font-family: Lucida Grande, Verdana, Geneva, Sans-serif;*/
+	color: #333;
+	font-size:15px;
+}
+
 input[type=submit]{
 	outline:none;
 	padding:0;
