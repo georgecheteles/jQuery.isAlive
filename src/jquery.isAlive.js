@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.4)
+jQuery.isAlive(1.7.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 26 December 2013
+Last modification on this file: 28 December 2013
 */
 
 (function(jQuery) {
@@ -27,6 +27,11 @@ Last modification on this file: 26 December 2013
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
+	
+	/*RETURN THE FIRST FLOAT VALUE*/
+	function getFloat(value){
+		return value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+	}
 	
 	/*FIXES CSS3 TRANSITION DURATION BUG*/
 	function breakCSS3(property,value){
@@ -54,7 +59,7 @@ Last modification on this file: 26 December 2013
 			if(success)
 				return value;
 			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
-				var fNumber = value.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+				var fNumber = getFloat(value);
 				if(fNumber!=null){
 					success = true;
 					return value.replace(fNumber,parseFloat(fNumber)+0.01);
@@ -365,9 +370,9 @@ Last modification on this file: 26 December 2013
 			if(isNumber(valStart))
 				var format = false;
 			else{
-				var format = valStart.replace(valStart.match(/[-]?[0-9]*\.?[0-9]+/)[0],'$');
-				valStart = valStart.match(/[-]?[0-9]*\.?[0-9]+/)[0];
-				valEnd = valEnd.match(/[-]?[0-9]*\.?[0-9]+/)[0];
+				var format = valStart.replace(getFloat(valStart),'$');
+				valStart = getFloat(valStart);
+				valEnd = getFloat(valEnd);
 			}
 			valStart = parseFloat(valStart);
 			valEnd = parseFloat(valEnd);
@@ -410,6 +415,8 @@ Last modification on this file: 26 December 2013
 		this.rebuildOnStop = false;
 		this.dragHorizontal = null;
 		this.scrollBarPosition = 0;
+		this.toggleState = 0;
+		
 		this.CSS3DefaultTransitionArray = {};
 		this.CSS3TransitionArray = {};
 		this.CSS3ValuesArray = {};
@@ -530,7 +537,7 @@ Last modification on this file: 26 December 2013
 	/*SET CSS VALUES*/
 	isAlive.prototype.setCSS = function(selector,property,value){
 		var thisObj = this;
-		if(typeof(thisObj.functionsArray[property])!="undefined"){
+		if(property.indexOf('F:')==0){
 			thisObj.JSValuesArray[selector][property] = value;
 			thisObj.functionsArray[property](selector,value);
 			return;
@@ -832,7 +839,7 @@ Last modification on this file: 26 December 2013
 		if(thisObj.settings.elements[index]['property']=="scrollLeft")
 			return jQuery(thisObj.settings.elements[index]['selector']).scrollLeft();
 
-		if(typeof(thisObj.functionsArray[thisObj.settings.elements[index]['property']])!="undefined")
+		if(thisObj.settings.elements[index]['property'].indexOf('F:')==0)
 			return 0;
 
 		return jQuery(thisObj.settings.elements[index]['selector']).css(thisObj.settings.elements[index]['property']);
@@ -1375,7 +1382,7 @@ Last modification on this file: 26 December 2013
 				}
 				tempArray.push(thisObj.settings.elements[key]['selector']);
 			}
-			/*UNPACK SHOT ELEMENTS*/
+			/*UNPACK SHORT ELEMENTS*/
 			if(typeof(thisObj.settings.elements[key]['do'])!="undefined"){
 				if(thisObj.settings.elements[key]['do'].indexOf('(')!=-1){
 					thisObj.settings.elements[key]['property'] = thisObj.settings.elements[key]['do'].substr(0,thisObj.settings.elements[key]['do'].indexOf('('));
@@ -1415,13 +1422,14 @@ Last modification on this file: 26 December 2013
 					thisObj.settings.elements[key]['property'] = "opacity";
 					thisObj.settings.elements[key]['value-end'] = 1;
 				}
-				else {
+				else{
 					delete thisObj.settings.elements[key];
 					continue;					
 				}
 				thisObj.settings.elements[key]['method'] = "animate";
 				delete thisObj.settings.elements[key]['do'];
 			}
+			
 			/*ADD IF USEIDATTRIBUTE IS SET TO TRUE*/
 			if((thisObj.settings.useIdAttribute && (typeof(thisObj.settings.elements[key]['use-id-attribute'])=="undefined" || thisObj.settings.elements[key]['use-id-attribute']==true)) || (!thisObj.settings.useIdAttribute && thisObj.settings.elements[key]['use-id-attribute']==true)){
 				if(typeof(thisObj.settings.elements[key]['use-id-attribute'])!="undefined")
@@ -1465,9 +1473,10 @@ Last modification on this file: 26 December 2013
 			
 				/*BUILD FUNCTIONS ARRAY && TRIMS PROPERTY*/
 				if(typeof(thisObj.settings.elements[key]['property'])=='function'){
-					if(typeof(thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])])=="undefined")
-						thisObj.functionsArray['f:'+toString(thisObj.settings.elements[key]['property'])] = thisObj.settings.elements[key]['property'];
-					thisObj.settings.elements[key]['property'] = 'f:'+toString(thisObj.settings.elements[key]['property']);	
+					var fTemp = 'F:'+toString(thisObj.settings.elements[key]['property']);
+					if(typeof(thisObj.functionsArray[fTemp])=="undefined")
+						thisObj.functionsArray[fTemp] = thisObj.settings.elements[key]['property'];
+					thisObj.settings.elements[key]['property'] = fTemp;
 				}
 				
 				/*ONLY STRING PROPERTIES*/
@@ -1499,7 +1508,7 @@ Last modification on this file: 26 December 2013
 				
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
-					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || typeof(thisObj.functionsArray[thisObj.settings.elements[key]["property"]])!="undefined" || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
+					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || thisObj.settings.elements[key]["property"].indexOf('F:')==0 || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
 						/*BUILD JS ARRAY*/						
 						if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
 							thisObj.settings.elements[key]['animType'] = 1;
@@ -1649,7 +1658,7 @@ Last modification on this file: 26 December 2013
 		for(key in thisObj.settings.elements){
 			if(thisObj.settings.elements[key]['scrollbar'] && thisObj.settings.elements[key]['method']=="animate" && (thisObj.settings.elements[key]['property']=="top" || thisObj.settings.elements[key]['property']=="left")){
 				if(typeof(thisObj.settings.elements[key]['step-start'])=="undefined")
-					thisObj.settings.elements[key]['step-start'] = 0;
+					thisObj.settings.elements[key]['step-start'] = thisObj.settings.min;
 				if(typeof(thisObj.settings.elements[key]['step-end'])=="undefined")
 					thisObj.settings.elements[key]['step-end'] = thisObj.settings.max;
 			}
@@ -1712,8 +1721,8 @@ Last modification on this file: 26 December 2013
 						return false;
 				
 				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,positionValid;
-				var valStart = parseInt(thisObj.settings.elements[scrollbarKey]['value-start'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
-				var valEnd = parseInt(thisObj.settings.elements[scrollbarKey]['value-end'].toString().match(/[-]?[0-9]*\.?[0-9]+/)[0]);
+				var valStart = parseFloat(getFloat(thisObj.settings.elements[scrollbarKey]['value-start'].toString()));
+				var valEnd = parseFloat(getFloat(thisObj.settings.elements[scrollbarKey]['value-end'].toString()));
 				
 				thisObj.scrollbarActive = scrollbarKey; 						
 				
@@ -2731,6 +2740,7 @@ Last modification on this file: 26 December 2013
 			onLoop = options['onLoop'];
 			delete options['onLoop'];
 		}
+		options['animationType'] = 'autoplay';
 		options['to'] = 0;
 		if(typeof(options['orientation'])=="undefined" || (options['orientation']!="next" && options['orientation']!="prev"))
 			options['orientation'] = "next";
@@ -2749,6 +2759,23 @@ Last modification on this file: 26 December 2013
 			}
 		};
 		doAutoplay();
+	}
+	/*TOGGLE ANIMATION*/
+	isAlive.prototype.toggle = function(options){
+		var thisObj = this;
+		if(thisObj.forceAnimation)
+			return false;
+		options = jQuery.extend({},options);
+		options['animationType'] = 'toggle';
+		if((!thisObj.animating || (thisObj.animating && thisObj.animationType!='toggle') || (thisObj.animating && thisObj.animationType=='toggle' && thisObj.toggleState==-1)) && (thisObj.getPos(thisObj.lastStep)<thisObj.settings.max-1)){
+			thisObj.toggleState = 1;
+			options['to'] = thisObj.settings.max-1;
+		}
+		else{
+			thisObj.toggleState = -1;
+			options['to'] = thisObj.settings.min;
+		}
+		thisObj.goTo(options);
 	}
 	
 /*ISALIVE MAIN OBJECT:END*/
@@ -2804,6 +2831,13 @@ Last modification on this file: 26 December 2013
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
 			isAliveObjects[selector].autoplay(options);
+			return thisObj;
+		},
+		toggle : function(thisObj,options){
+			var selector = thisObj.selector;
+			if(typeof(isAliveObjects[selector])=="undefined")
+				return false;
+			isAliveObjects[selector].toggle(options);
 			return thisObj;
 		},
 		stop : function(thisObj,options){
@@ -2869,7 +2903,7 @@ Last modification on this file: 26 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.4";
+			return "1.7.5";
 		}
 	};
 	

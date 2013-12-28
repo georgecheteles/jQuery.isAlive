@@ -1,5 +1,9 @@
 jQuery isAlive ChangeLog
 
+ver. 1.7.5 (27 December 2013)
+ - adding "toggle" method
+ - bug fixed
+
 ver. 1.7.4 (26 December 2013)
  - adding "getAnimationState" method
 
