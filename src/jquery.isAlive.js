@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.5)
+jQuery.isAlive(1.7.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 28 December 2013
+Last modification on this file: 29 December 2013
 */
 
 (function(jQuery) {
@@ -389,7 +389,6 @@ Last modification on this file: 28 December 2013
 /*ISALIVE MAIN OBJECT:BEGIN*/	
 	
 	function isAlive(selector,options){
-		
 		this.mySelector = selector;
 		this.TimeLine;
 		this.step=0;
@@ -416,7 +415,6 @@ Last modification on this file: 28 December 2013
 		this.dragHorizontal = null;
 		this.scrollBarPosition = 0;
 		this.toggleState = 0;
-		
 		this.CSS3DefaultTransitionArray = {};
 		this.CSS3TransitionArray = {};
 		this.CSS3ValuesArray = {};
@@ -508,6 +506,10 @@ Last modification on this file: 28 December 2013
 	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
 	isAlive.prototype.animateCSS3 = function(selector,property,value,duration,easing){
 		var thisObj = this;
+		/*DELETE VALUE IF ELEMENT IS ANIMATED ALSO BY JS*/
+		if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
+			delete thisObj.JSValuesArray[selector][property];
+		/*SET TRANSITION AND BREAK CSS3 BUG IF NEEDED*/
 		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing;
 		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
@@ -528,8 +530,7 @@ Last modification on this file: 28 December 2013
 		jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
 			step: function(step,fx){
 				var pos = step-fx.start;
-				var value = getAtPosValue(pos,start,end,0,100);
-				thisObj.setCSS(selector,property,value);
+				thisObj.setCSS(selector,property,getAtPosValue(pos,start,end,0,100));
 			}
 		});
 	}
@@ -623,7 +624,6 @@ Last modification on this file: 28 December 2013
 			
 			return params;
 		}
-		
 		params = doRecursive(fixSpaces(params));
 		
 		if(typeof(format)!='undefined')
@@ -1534,10 +1534,11 @@ Last modification on this file: 28 December 2013
 					else {
 						/*BUILD CSS3 ARRAYS*/
 						thisObj.settings.elements[key]['animType'] = 3;
-						if(typeof(thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]])=="undefined")
+						if(typeof(thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]])=="undefined"){
 							thisObj.CSS3TransitionArray[thisObj.settings.elements[key]["selector"]] = {};
-						if(typeof(thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]])=="undefined")
 							thisObj.CSS3ValuesArray[thisObj.settings.elements[key]["selector"]] = {};
+						}
+							
 						/*SET EASING*/
 						if(typeof(thisObj.settings.elements[key]["easing"])=="undefined"){
 							if(typeof(thisObj.settings.elements[key]["CSS3Easing"])=="undefined")
@@ -1923,7 +1924,7 @@ Last modification on this file: 28 December 2013
 		var start;
 		var end;
 		var timing;
-		var loop;
+		var loopFix;
 		var directionForward;
 		var loopFound;
 		
@@ -1938,18 +1939,13 @@ Last modification on this file: 28 December 2013
 					continue;
 				
 				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.step)==false){
-					loop = thisObj.l(thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
-						start=thisObj.lastStep;
-					else
-						start=thisObj.settings.elements[key]['step-start']+loop;
-	
-					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
+					loopFix = thisObj.l(thisObj.lastStep);
+					start = Math.max((thisObj.settings.elements[key]['step-start']+loopFix),thisObj.lastStep);
+					if(thisObj.settings.elements[key]['step-end']+loopFix>=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-end'];
-						
-					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loop)-start))*1;
+					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loopFix)-start))*1;
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
@@ -1965,18 +1961,13 @@ Last modification on this file: 28 December 2013
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}	
 				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.step)==false){
-					loop = thisObj.l(thisObj.step);
-					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.lastStep)
-						start=thisObj.lastStep;
-					else
-						start=thisObj.settings.elements[key]['step-start']+loop;
-	
-					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.step)
+					loopFix = thisObj.l(thisObj.step);
+					start = Math.max((thisObj.settings.elements[key]['step-start']+loopFix),thisObj.lastStep);
+					if(thisObj.settings.elements[key]['step-end']+loopFix>=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-end'];
-	
-					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loop)-start))*1;
+					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loopFix)-start))*1;
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
@@ -2001,19 +1992,13 @@ Last modification on this file: 28 December 2013
 					continue;
 				
 				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.lastStep)==false){
-					
-					loop = thisObj.l(thisObj.step);
-					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
-						start=thisObj.lastStep;
-					else
-						start=thisObj.settings.elements[key]['step-end']+loop;
-
-					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
+					loopFix = thisObj.l(thisObj.step);
+					start = Math.min((thisObj.settings.elements[key]['step-end']+loopFix),thisObj.lastStep);
+					if(thisObj.settings.elements[key]['step-start']+loopFix<=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-start'];
-					
-					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loop)))*1;
+					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loopFix)))*1;
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
@@ -2029,19 +2014,13 @@ Last modification on this file: 28 December 2013
 					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
 				}	
 				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.lastStep)==false){
-					
-					loop = thisObj.l(thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-end']+loop>=thisObj.lastStep)
-						start=thisObj.lastStep;
-					else
-						start=thisObj.settings.elements[key]['step-end']+loop;
-
-					if(thisObj.settings.elements[key]['step-start']+loop<=thisObj.step)
+					loopFix = thisObj.l(thisObj.lastStep);
+					start = Math.min((thisObj.settings.elements[key]['step-end']+loopFix),thisObj.lastStep);
+					if(thisObj.settings.elements[key]['step-start']+loopFix<=thisObj.step)
 						end=thisObj.getPos(thisObj.step);
 					else
 						end=thisObj.settings.elements[key]['step-start'];
-					
-					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loop)))*1;
+					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loopFix)))*1;
 					
 					if(typeof(animations[start])=="undefined")
 						animations[start] = {};
@@ -2903,7 +2882,7 @@ Last modification on this file: 28 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.5";
+			return "1.7.6";
 		}
 	};
 	

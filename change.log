@@ -1,8 +1,11 @@
 jQuery isAlive ChangeLog
 
+ver. 1.7.6 (29 December 2013)
+ - bugs fixed
+
 ver. 1.7.5 (27 December 2013)
  - adding "toggle" method
- - bug fixed
+ - bugs fixed
 
 ver. 1.7.4 (26 December 2013)
  - adding "getAnimationState" method
@@ -11,11 +14,11 @@ ver. 1.7.3 (26 December 2013)
  - small changes
 
 ver. 1.7.2 (26 December 2013)
- - bug fixed
+ - bugs fixed
 
 ver. 1.7.1 (25 December 2013)
  - adding "getCurrentStep" method
- - bug fixed
+ - bugs fixed
 
 ver. 1.7.0 (24 December 2013)
  - adding "do" method (short for animation)
@@ -28,7 +31,7 @@ ver. 1.6.2 (21 December 2013)
 
 ver. 1.6.1 (20 December 2013)
  - adding "autoplay" method
- - bug fixed
+ - bugs fixed
 
 ver. 1.6.0 (18 December 2013)
  - bugs fixed
