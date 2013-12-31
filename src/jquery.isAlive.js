@@ -548,7 +548,7 @@ Last modification on this file: 31 December 2013
 		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing+' 0s';
 		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
-			value = breakCSS3(property,value)
+			value = breakCSS3(property,value);
 		thisObj.CSS3ValuesArray[selector][property] = value;
 		jQuery(selector).css(property,value);
 	}
