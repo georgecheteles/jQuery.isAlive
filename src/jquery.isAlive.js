@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.6)
+jQuery.isAlive(1.7.7)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 29 December 2013
+Last modification on this file: 31 December 2013
 */
 
 (function(jQuery) {
@@ -27,6 +27,38 @@ Last modification on this file: 29 December 2013
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
+	
+	var _fixOp;
+	var _fixPx;
+	var _fixEm;
+	
+	/*COMPARES VERSIONS*/
+	function ifVersion(value1,cond,value2){
+		value1 = value1.toString().split('.');
+		value2 = value2.toString().split('.');
+		var maxLength = Math.max(value1.length,value2.length);
+		for(var i=0;i<=maxLength-1;i++){
+			var v1 = (typeof(value1[i])!="undefined") ? parseInt(value1[i]) : 0;
+			var v2 = (typeof(value2[i])!="undefined") ? parseInt(value2[i]) : 0;
+			if(cond=="<" || cond=="<="){
+				if(v1<v2)
+					return true;
+				if(v1>v2)
+					return false;
+			}
+			else if(cond==">" || cond==">="){
+				if(v1>v2)
+					return true;
+				if(v1<v2)
+					return false;
+			}
+			else if(cond=="==" && v1!=v2)
+				return false;
+		}
+		if(cond=="==" || cond=="<=" || cond==">=")
+			return true;
+		return false;
+	}
 	
 	/*RETURN THE FIRST FLOAT VALUE*/
 	function getFloat(value){
@@ -58,11 +90,25 @@ Last modification on this file: 29 December 2013
 			}
 			if(success)
 				return value;
-			if(value.indexOf('px')!=-1 || value.indexOf('%')!=-1 || value.indexOf('em')!=-1 || value.indexOf('deg')!=-1){
+			if(value.indexOf('px')!=-1){
 				var fNumber = getFloat(value);
 				if(fNumber!=null){
 					success = true;
-					return value.replace(fNumber,parseFloat(fNumber)+0.01);
+					return value.replace(fNumber,parseFloat(fNumber) + _fixPx);
+				}
+			}
+			if(value.indexOf('em')!=-1){
+				var fNumber = getFloat(value);
+				if(fNumber!=null){
+					success = true;
+					return value.replace(fNumber,parseFloat(fNumber) + _fixEm);
+				}
+			}
+			if(value.indexOf('%')!=-1 || value.indexOf('deg')!=-1){
+				var fNumber = getFloat(value);
+				if(fNumber!=null){
+					success = true;
+					return value.replace(fNumber,parseFloat(fNumber) + 0.01);
 				}
 			}
 			if(format!=null){
@@ -98,11 +144,11 @@ Last modification on this file: 29 December 2013
 		}
 		if(property=='opacity'){
 			if(value<=0.5)
-				value = parseFloat(value) + 0.001;
+				value = parseFloat(value) + _fixOp;
 			else
-				value = parseFloat(value) - 0.001;
+				value = parseFloat(value) - _fixOp;
 		} else if(isNumber(value))
-			value = parseFloat(value) + 0.01;
+			value = parseFloat(value) + _fixPx;
 		else
 			value = fix(value,null);
 		return value;
@@ -142,17 +188,18 @@ Last modification on this file: 29 December 2013
 		return params;
 	}
 	
-	/*CHECK IF FUNCTION IS COMPATIBLE WITH JQUERY*/
-	function canJQueryAnimate(property){
-		var allowed = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity,scrollLeft,scrollTop').split(',');
+	/*CONVERT IN PROPERTY LIKE STYLE OBJ*/
+	function propertyToStyle(property){
 		if(property.indexOf('-')!=-1){
+			if(property.charAt(0)=='-')
+				property = property.substr(1);
 			property = property.toLowerCase().split('-');
 			for(var key in property)
 				if(key>0)
 					property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
 			property = property.join('');
 		}
-		return (indexOf(allowed,property)!=-1); 
+		return property;
 	}
 	
 	/*GET TEXT BETWEEN BRACKETS*/
@@ -267,44 +314,32 @@ Last modification on this file: 29 December 2013
 		return !isNaN(parseFloat(n)) && isFinite(n);
 	}
 	
-	/* DETECTS BROWSER / ENGINE / VERSION */
+	/* DETECTS BROWSER / ENGINE / VERSION (THANKS TO KENNEBEC)*/
 	function getBrowser(){
-		/* DEPRECATED FUNCTION COPIED FROM "jQuery JavaScript Library v1.8.2"*/ 
-		var matched, browser;
-		var userAgent = (navigator.userAgent||navigator.vendor||window.opera);
-		jQuery.uaMatch = function(ua) {
-			ua = ua.toLowerCase();
-			var match = /(chrome)[ \/]([\w.]+)/.exec( ua ) ||
-				/(webkit)[ \/]([\w.]+)/.exec( ua ) ||
-				/(opera)(?:.*version|)[ \/]([\w.]+)/.exec( ua ) ||
-				/(msie) ([\w.]+)/.exec( ua ) ||
-				ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec( ua ) ||
-				[];
-			return {
-				browser: match[1] || "",
-				version: match[2] || "0"
-			};
-		};
-		matched = jQuery.uaMatch( navigator.userAgent );
-		browser = {};
-		var mobile = (/(android|bb\d+|meego).+mobile|webos|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(userAgent)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(userAgent.substr(0,4)));
+		var browser = {}, temp;
+		var ua = (navigator.userAgent||navigator.vendor||window.opera); 
+		var M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*([\d\.]+)/i) || [];
+		M = M[2] ? [M[1], M[2]]:[navigator.appName, navigator.appVersion, '-?'];
+		temp = ua.match(/version\/([\.\d]+)/i);
+		if(temp!=null)
+			M[1] = temp[1];
+		browser[M[0].toLowerCase()] = true;
+		if(browser.trident){
+			browser['msie'] = true;
+			temp = /\brv[ :]+(\d+(\.\d+)?)/g.exec(ua) || [];
+			browser['version'] = (temp[1] || '');			
+			delete browser.trident;
+		}
+		else{
+			if(browser.chrome || browser.safari)
+				browser['webkit'] = true;
+			if(browser.firefox)
+				browser['mozilla'] = true;
+			browser['version'] = M[1];
+		}
+		var mobile = (/(android|bb\d+|meego).+mobile|webos|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(ua)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(ua.substr(0,4)));
 		if(mobile)
 			browser.mobile = true;
-		if(matched.browser) {
-			browser[ matched.browser ] = true;
-			browser.version = matched.version;
-		}
-		if(browser.chrome) {
-			browser.webkit = true;
-		} else if(browser.webkit) {
-			browser.safari = true;
-		}
-		if(browser.mozilla) {
-			if((/Trident\/7\./).test(navigator.userAgent)){
-				delete browser.mozilla;
-				browser.msie = true;
-			}
-		}
 		return browser;
 	}
 	
@@ -324,8 +359,8 @@ Last modification on this file: 29 December 2013
 	}
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
-	function vP(property){
-		if(indexOf(['transform','trasition','transition-property','transition-duration','transition-timing-function','transition-delay'],property)!=-1){
+	function vP(property,force){
+		if(indexOf(['transform','trasition'],property)!=-1 || force){
 			if(browserObj.webkit)
 				return "-webkit-"+property;
 			if(browserObj.mozilla)
@@ -510,7 +545,7 @@ Last modification on this file: 29 December 2013
 		if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
 			delete thisObj.JSValuesArray[selector][property];
 		/*SET TRANSITION AND BREAK CSS3 BUG IF NEEDED*/
-		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing;
+		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing+' 0s';
 		jQuery(selector).css(vPTransition,thisObj.getTransitionArray(selector));
 		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
 			value = breakCSS3(property,value)
@@ -1244,7 +1279,6 @@ Last modification on this file: 29 December 2013
 		
 		/*GET IE VERSION AND BIND RESIZE*/
 		if(!isReady){
-			
 			isReady = true;
 			browserObj = getBrowser();
 			
@@ -1269,6 +1303,11 @@ Last modification on this file: 29 December 2013
 			
 			/*SET TRASITION WITH PREFIX VENTOR*/ 
 			vPTransition = vP('transition');
+			
+			/*ADDED VALUE FOR CSS BUG FIXED*/
+			_fixOp = (browserObj.opera) ? 0.004 : 0.001;
+			_fixPx = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 1 : 0.01;
+			_fixEm = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 0.1 : 0.01;
 		}
 		
 		/*TIMELINE WRAPPER*/
@@ -1468,6 +1507,7 @@ Last modification on this file: 29 December 2013
 		}
 		/*DELETES UNVALID ELEMENTS AND ADDS ISALIVE CLASS / PREPARES CSS3*/
 		var tempArray = [];
+		var jQueryCanAnimate = ('borderWidth,borderBottomWidth,borderLeftWidth,borderRightWidth,borderTopWidth,borderSpacing,margin,marginBottom,marginLeft,marginRight,marginTop,outlineWidth,padding,paddingBottom,paddingLeft,paddingRight,paddingTop,height,width,maxHeight,maxWidth,minHeight,minWidth,fontSize,bottom,left,right,top,letterSpacing,wordSpacing,lineHeight,textIndent,opacity,scrollLeft,scrollTop').split(',');
 		for(key in thisObj.settings.elements){
 			if(typeof(thisObj.settings.elements[key]['property'])!="undefined"){
 			
@@ -1491,9 +1531,12 @@ Last modification on this file: 29 December 2013
 					continue;
 				}
 				
-				if((thisObj.settings.elements[key]['property'].indexOf('-webkit-')==0 && !browserObj.webkit) || (thisObj.settings.elements[key]['property'].indexOf('-moz-')==0 && !browserObj.mozilla) || (thisObj.settings.elements[key]['property'].indexOf('-ms-')==0 && !browserObj.msie) || (thisObj.settings.elements[key]['property'].indexOf('-o-')==0 && !browserObj.opera)){
-					delete thisObj.settings.elements[key];
-					continue;
+				if(thisObj.settings.elements[key]['property'].indexOf('-webkit-')==0 || thisObj.settings.elements[key]['property'].indexOf('-moz-')==0 || thisObj.settings.elements[key]['property'].indexOf('-ms-')==0  || thisObj.settings.elements[key]['property'].indexOf('-o-')==0){
+					var elementStyle = jQuery(thisObj.settings.elements[key]['selector'])[0].style;
+					if(typeof(elementStyle[propertyToStyle(thisObj.settings.elements[key]['property'])])=="undefined"){
+						delete thisObj.settings.elements[key];
+						continue;
+					}
 				}
 				
 				/* SET@START IS NOT USED WHEN INITCSS IS TRUE*/
@@ -1509,8 +1552,8 @@ Last modification on this file: 29 December 2013
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
 					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || thisObj.settings.elements[key]["property"].indexOf('F:')==0 || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
-						/*BUILD JS ARRAY*/						
-						if(canJQueryAnimate(thisObj.settings.elements[key]["property"]))
+						/*BUILD JS ARRAY*/
+						if(indexOf(jQueryCanAnimate,propertyToStyle(thisObj.settings.elements[key]["property"]))!=-1)
 							thisObj.settings.elements[key]['animType'] = 1;
 						else{
 							thisObj.settings.elements[key]['animType'] = 2;
@@ -1568,27 +1611,26 @@ Last modification on this file: 29 December 2013
 				}
 			}
 		}
-		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
 		if(browserObj.webkit && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
 			jQuery('.'+thisObj.settings.animateClass).css({
 				'-webkit-backface-visibility':'hidden',
 				'-webkit-perspective':'1000'
 			});
-		
+			
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
 			if(thisObj.settings.elements[key]['animType']==3 && (!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9)))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
-					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
-					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration'));
+					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property',true));
+					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration',true));
 					if(typeof(pTemp1)!="undefined" && typeof(pTemp2)!="undefined" && (pTemp1!="all" || pTemp2!="0s")){
 						propTempArray.push(pTemp1);
 						propTempArray.push(pTemp2);
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function')));
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-delay')));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function',true)));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-delay',true)));
 						thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']] = propTempArray;
 					}
 					else
@@ -2882,7 +2924,7 @@ Last modification on this file: 29 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.6";
+			return "1.7.7";
 		}
 	};
 	

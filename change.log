@@ -1,5 +1,9 @@
 jQuery isAlive ChangeLog
 
+ver. 1.7.7 (31 December 2013)
+ - bugs fixed
+ - "getBrowser" now detects Safari version
+
 ver. 1.7.6 (29 December 2013)
  - bugs fixed
 
