@@ -5,32 +5,30 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.7.7)
+jQuery.isAlive(1.8.0)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 31 December 2013
+Last modification on this file: 1 January 2014
 */
 
 (function(jQuery) {
 	
 	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS*/
 	var isAliveObjects = [];
+
 	var isReady = false;
 	var browserObj = null;
 	var vPTransition = null;
 	var indexOf = null;
+	var _fix = {};
 	
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
-	
-	var _fixOp;
-	var _fixPx;
-	var _fixEm;
 	
 	/*COMPARES VERSIONS*/
 	function ifVersion(value1,cond,value2){
@@ -69,6 +67,8 @@ Last modification on this file: 31 December 2013
 	function breakCSS3(property,value){
 		var success = false;
 		var fix = function(value,format){
+			if(success)
+				return value;
 			if(value.indexOf(' ')!=-1){
 				value = value.split(' ');
 				for(var key in value)
@@ -88,27 +88,14 @@ Last modification on this file: 31 December 2013
 					value[key] = fix(value[key],format);
 				return value.join(',');
 			}
-			if(success)
-				return value;
-			if(value.indexOf('px')!=-1){
+			
+			var unitType = value.match('px|%|deg|em');
+			if(unitType!=null){
+				unitType = unitType[0];
 				var fNumber = getFloat(value);
 				if(fNumber!=null){
 					success = true;
-					return value.replace(fNumber,parseFloat(fNumber) + _fixPx);
-				}
-			}
-			if(value.indexOf('em')!=-1){
-				var fNumber = getFloat(value);
-				if(fNumber!=null){
-					success = true;
-					return value.replace(fNumber,parseFloat(fNumber) + _fixEm);
-				}
-			}
-			if(value.indexOf('%')!=-1 || value.indexOf('deg')!=-1){
-				var fNumber = getFloat(value);
-				if(fNumber!=null){
-					success = true;
-					return value.replace(fNumber,parseFloat(fNumber) + 0.01);
+					return value.replace(fNumber,parseFloat(fNumber) + _fix[unitType]);
 				}
 			}
 			if(format!=null){
@@ -144,11 +131,12 @@ Last modification on this file: 31 December 2013
 		}
 		if(property=='opacity'){
 			if(value<=0.5)
-				value = parseFloat(value) + _fixOp;
+				value = parseFloat(value) + _fix['opacity'];
 			else
-				value = parseFloat(value) - _fixOp;
-		} else if(isNumber(value))
-			value = parseFloat(value) + _fixPx;
+				value = parseFloat(value) - _fix['opacity'];
+		}
+		else if(isNumber(value))
+			value = parseFloat(value) + _fix['px'];
 		else
 			value = fix(value,null);
 		return value;
@@ -465,6 +453,7 @@ Last modification on this file: 31 December 2013
 			durationTweaks:{}, /*obj: {wheel|touch|scrollBar:duration|durationType|minStepDuration}*/
 			enableWheel:true,
 			wheelType:"scroll", /*scroll|jump*/
+			wheelActions:{},
 			jumpPoints:[],
 			max:null,
 			min:0,
@@ -482,11 +471,9 @@ Last modification on this file: 31 December 2013
 			stepPointsActiveClass:null,
 			enableTouch:false,
 			touchType:'drag',/*drag|wipe*/
-			touchActions:{up:1,down:-1,right:0,left:0},
-			dragXFrom:10,
-			dragYFrom:10,
-			wipeXFrom:20,
-			wipeYFrom:20,
+			touchActions:{},
+			touchXFrom:null,
+			touchYFrom:null,
 			wipePoints:[],
 			preventTouch:true,
 			animateClass:'isalive-'+this.uniqId,
@@ -681,7 +668,7 @@ Last modification on this file: 31 December 2013
 				for (var key in tempArray){
 					if(tempArray[key].indexOf(')')!=-1){
 						tempArray[key] = tempArray[key].split(')');
-						tempArray[key][0] = tempArray[key][0].replace(/,/g,'*char*');
+						tempArray[key][0] = tempArray[key][0].replace(/,/g,'$');
 						tempArray[key] = tempArray[key].join(')'); 
 					}
 				}
@@ -690,7 +677,7 @@ Last modification on this file: 31 December 2013
 			for(key in tempArray){
 				var temp = tempArray[key].split(' ');
 				var fix = vP(temp[0]);
-				thisObj.CSS3DefaultTransitionArray[selector][fix] = tempArray[key].replace(temp[0],fix).replace(/\*char\*/g,","); 
+				thisObj.CSS3DefaultTransitionArray[selector][fix] = tempArray[key].replace(temp[0],fix).replace(/$/g,","); 
 			}
 		}
 
@@ -945,7 +932,7 @@ Last modification on this file: 31 December 2013
 							}
 							var dx = startX - x;
 							var dy = startY - y;
-							if(Math.abs(dx)>=thisObj.settings.wipeXFrom){
+							if(Math.abs(dx)>=thisObj.settings.touchXFrom){
 								if(thisObj.settings.touchActions.left!=0 && dx>0){
 									cancelTouch();
 									thisObj.doWipe(thisObj.settings.touchActions.left);
@@ -957,7 +944,7 @@ Last modification on this file: 31 December 2013
 									return;
 								}
 							}
-							if(Math.abs(dy)>=thisObj.settings.wipeYFrom){
+							if(Math.abs(dy)>=thisObj.settings.touchYFrom){
 								if(thisObj.settings.touchActions.up!=0 && dy>0){
 									cancelTouch();
 									thisObj.doWipe(thisObj.settings.touchActions.up);
@@ -988,7 +975,7 @@ Last modification on this file: 31 December 2013
 							}
 							var dx = startX - x;
 							var dy = startY - y;
-							if(Math.abs(dx)>=thisObj.settings.dragXFrom){
+							if(Math.abs(dx)>=thisObj.settings.touchXFrom){
 								if(thisObj.settings.touchActions.left!=0 && dx>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
 									thisObj.dragHorizontal = true;
 									thisObj.doDrag(thisObj.settings.touchActions.left);
@@ -1000,7 +987,7 @@ Last modification on this file: 31 December 2013
 									startX = x;
 								}
 							 }
-							 if(Math.abs(dy)>=thisObj.settings.dragYFrom){
+							 if(Math.abs(dy)>=thisObj.settings.touchYFrom){
 								if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
 									thisObj.dragHorizontal = false;
 									thisObj.doDrag(thisObj.settings.touchActions.up);
@@ -1034,13 +1021,13 @@ Last modification on this file: 31 December 2013
 			if(thisObj.settings.wheelType=="scroll"){
 				/*FOR NON FIREFOX*/
 				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
-					(e.originalEvent.detail > 0)?thisObj.doScroll(true):thisObj.doScroll(false);
+					(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
 				/*FOR FIREFOX*/
 				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(true):thisObj.doScroll(false);
+					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
@@ -1048,13 +1035,13 @@ Last modification on this file: 31 December 2013
 			else{
 				/*FOR FIREFOX*/
 				jQuery(thisObj.mySelector).bind('DOMMouseScroll', function(e){
-					(e.originalEvent.detail > 0)?thisObj.doJump(true):thisObj.doJump(false);
+					(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
 				/*FOR NON FIREFOX*/
 				jQuery(thisObj.mySelector).bind('mousewheel', function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(true):thisObj.doJump(false);
+					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
@@ -1305,9 +1292,11 @@ Last modification on this file: 31 December 2013
 			vPTransition = vP('transition');
 			
 			/*ADDED VALUE FOR CSS BUG FIXED*/
-			_fixOp = (browserObj.opera) ? 0.004 : 0.001;
-			_fixPx = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 1 : 0.01;
-			_fixEm = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 0.1 : 0.01;
+			_fix['opacity'] = (browserObj.opera) ? 0.004 : 0.001;
+			_fix['px'] = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 1 : 0.01;
+			_fix['%'] = 0.01;
+			_fix['deg'] = 0.01;
+			_fix['em'] = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 0.1 : 0.01;
 		}
 		
 		/*TIMELINE WRAPPER*/
@@ -1372,7 +1361,12 @@ Last modification on this file: 31 December 2013
 		thisObj.settings.durationTweaks['touch'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['touch']);
 		thisObj.settings.durationTweaks['scrollbar'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['scrollbar']);
 
-		/*SET TOUCH ACTIONS*/
+		/*SET SCROLL & TOUCH ACTIONS*/
+		thisObj.settings.wheelActions = jQuery.extend({up:-1,down:1},thisObj.settings.wheelActions);
+		if(thisObj.settings.touchXFrom==null)
+			(thisObj.settings.touchType=="drag") ? thisObj.settings.touchXFrom = 10 : thisObj.settings.touchXFrom = 20;
+		if(thisObj.settings.touchYFrom==null)
+			(thisObj.settings.touchType=="drag") ? thisObj.settings.touchYFrom = 10 : thisObj.settings.touchYFrom = 20;
 		thisObj.settings.touchActions = jQuery.extend({up:1,down:-1,right:0,left:0},thisObj.settings.touchActions);
 			
 		/* CONVERT FROM TREE TO LINEAR STRUCTURE */
@@ -1660,7 +1654,7 @@ Last modification on this file: 31 December 2013
 					for (var keyA in aTemp){
 						if(aTemp[keyA].indexOf(')')!=-1){
 							aTemp[keyA] = aTemp[keyA].split(')');
-							aTemp[keyA][0] = aTemp[keyA][0].replace(/,/g,'*char*');
+							aTemp[keyA][0] = aTemp[keyA][0].replace(/,/g,'$');
 							aTemp[keyA] = aTemp[keyA].join(')'); 
 						}
 					}
@@ -1674,7 +1668,7 @@ Last modification on this file: 31 December 2013
 				transVal.push(jQuery.trim(tempArray[1][key2]));
 				transVal.push(jQuery.trim(tempArray[2][key2]));
 				transVal.push(jQuery.trim(tempArray[3][key2]));
-				thisObj.CSS3DefaultTransitionArray[key][jQuery.trim(tempArray[0][key2])] = transVal.join(" ").replace(/\*char\*/g,',');
+				thisObj.CSS3DefaultTransitionArray[key][jQuery.trim(tempArray[0][key2])] = transVal.join(" ").replace(/$/g,',');
 			}
 		}
 		
@@ -2227,12 +2221,12 @@ Last modification on this file: 31 December 2013
 	}
 	
 	/* FUNCTION FOR JUMP */
-	isAlive.prototype.doJump = function(pos){
+	isAlive.prototype.doJump = function(value){
 		
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 
-		if(!thisObj.allowWheel || thisObj.forceAnimation)
+		if(!thisObj.allowWheel || thisObj.forceAnimation || !value)
 			return false;
 		
 		if(thisObj.settings.wheelDelay!==false){
@@ -2244,10 +2238,10 @@ Last modification on this file: 31 December 2013
 		
 		(thisObj.animating)?((thisObj.lastStep<thisObj.step)?directionForward=true:directionForward=false):directionForward=null;
 
-		if(thisObj.settings.wheelDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
+		if(thisObj.settings.wheelDelay===false && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && value==1)||(!directionForward && value==-1)))
 			return false;
 		
-		if(thisObj.settings.wheelDelay!==false && thisObj.waitWheellEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && pos)||(!directionForward && !pos)))
+		if(thisObj.settings.wheelDelay!==false && thisObj.waitWheellEnd && thisObj.animating && thisObj.animationType=='jump' && ((directionForward && value==1)||(!directionForward && value==-1)))
 			return false;
 			
 		if(thisObj.settings.wheelDelay!==false)	
@@ -2271,11 +2265,11 @@ Last modification on this file: 31 December 2013
 			}
 		}
 		
-		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && !pos)||(!directionForward && pos)))){
+		if(!thisObj.animating || (thisObj.animating && thisObj.animationType!='jump') || (thisObj.animating && thisObj.animationType=='jump' && ((directionForward && value==-1)||(!directionForward && value==1)))){
 			notAllowed = null;
 			nextPosition = currentPosition;
 		}else{
-			if(pos){
+			if(value==1){
 				if(currentPosition<thisObj.settings.jumpPoints.length-1)
 					notAllowed = Math.ceil(currentPosition);
 				else
@@ -2290,7 +2284,7 @@ Last modification on this file: 31 December 2013
 			nextPosition = thisObj.jumpPosition;
 		}
 		
-		if(pos){
+		if(value==1){
 			if(nextPosition<(thisObj.settings.jumpPoints.length-1))
 				nextPosition = Math.floor(nextPosition+1);
 			else if(thisObj.settings.loop)
@@ -2307,7 +2301,7 @@ Last modification on this file: 31 December 2013
 				return;
 		}
 		
-		if(pos){
+		if(value==1){
 			if(nextPosition === notAllowed)
 				return false;
 			thisObj.jumpPosition = nextPosition;
@@ -2321,22 +2315,22 @@ Last modification on this file: 31 December 2013
 	}
 	
 	/* FUNCTION FOR SCROLL */
-	isAlive.prototype.doScroll = function(pos){
+	isAlive.prototype.doScroll = function(value){
 		
 		var thisObj = this;
 		
-		if(!thisObj.allowWheel || thisObj.forceAnimation)
+		if(!thisObj.allowWheel || thisObj.forceAnimation || !value)
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='scroll'){
 			thisObj.step=Math.round(thisObj.lastStep);
 			thisObj.onComplete=null;
 		}
-		else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && !pos)||(thisObj.lastStep>thisObj.step && pos)))
+		else if(thisObj.animating && thisObj.animationType=='scroll' && ((thisObj.lastStep<thisObj.step && value==-1)||(thisObj.lastStep>thisObj.step && value==1)))
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		
-		if(pos){
+		if(value==1){
 			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && Math.floor((thisObj.step+thisObj.settings.stepsOnScroll)/thisObj.settings.max)-Math.floor(thisObj.lastStep/thisObj.settings.max)<=1 && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnScroll;
 			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnScroll>thisObj.settings.max-1 && !thisObj.settings.loop && (thisObj.settings.max-1)-thisObj.lastStep<=thisObj.settings.maxScroll){
@@ -2924,7 +2918,7 @@ Last modification on this file: 31 December 2013
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.7.7";
+			return "1.8.0";
 		}
 	};
 	

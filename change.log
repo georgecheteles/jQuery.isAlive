@@ -1,5 +1,10 @@
 jQuery isAlive ChangeLog
 
+ver. 1.8.0 (1 January 2014)
+ - bugs fixed
+ - adding "wheelActions"
+ - "dragFromX"/"dragFromY"/"wipeFromX"/"wipeFromY" is now "touchFromX" and "touchFromY"
+
 ver. 1.7.7 (31 December 2013)
  - bugs fixed
  - "getBrowser" now detects Safari version

@@ -187,6 +187,12 @@
 							Values: true | false<br/>
 							Prevents default action when scrolling of the site.
 						</p>
+						wheelActions:
+						<p class="exp">
+							Type: Object<br/>
+							Default: {up:-1,down:1}<br/>
+							You can define the action for each wheel move. +1 means forward and -1 means backward. 0 means no action.(See example)
+						</p>
 						stepPoints:
 						<p class="exp">
 							Type: Array<br/>
@@ -219,32 +225,20 @@
 						touchActions:
 						<p class="exp">
 							Type: Object<br/>
-							Default: {left:0,down:1,right:0,up:-1}<br/>
+							Default: {up:1,down:-1,right:0,left:0}<br/>
 							You can define the action for each touch. +1 means forward and -1 means backward. 0 means no action.(See example)
 						</p>
-						dragXFrom:
+						touchXFrom:
 						<p class="exp">
 							Type: Integer<br/>
-							Default: 10<br/>
-							Number of pixels for horizontal drag to start.
+							Default: 10 for "drag" / 20 for "wipe"<br/>
+							Number of pixels for horizontal drag/wipe to start.
 						</p>
-						dragYFrom:
+						touchYFrom:
 						<p class="exp">
 							Type: Integer<br/>
-							Default: 10<br/>
-							Number of pixels for vertical drag to start.
-						</p>
-						wipeXFrom:
-						<p class="exp">
-							Type: Integer<br/>
-							Default: 20<br/>
-							Number of pixels for horizontal wipe to start.
-						</p>
-						wipeYFrom:
-						<p class="exp">
-							Type: Integer<br/>
-							Default: 20<br/>
-							Number of pixels for vertical wipe to start.
+							Default: 10 for "drag" / 20 for "wipe"<br/>
+							Number of pixels for vertical drag/wipe to start.
 						</p>
 						wipePoints:,<br/>
 						<p class="exp">
