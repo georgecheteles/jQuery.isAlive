@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.0)
+jQuery.isAlive(1.8.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 1 January 2014
+Last modification on this file: 2 January 2014
 */
 
 (function(jQuery) {
@@ -511,18 +511,18 @@ Last modification on this file: 1 January 2014
 		if(this.settings.debug)
 			jQuery('#isalive-'+this.uniqId+'-debuger').append('<br/>'+value);
 	}
-
-	/* GETS LOOP INCREMENTING POSITION */
-	isAlive.prototype.l = function(val){
-		return Math.floor(val/this.settings.max)*this.settings.max;
-	}
 	
+	/*GET LOOP VALUE*/
+	isAlive.prototype.getLoop = function(value){
+		return Math.floor(value/this.settings.max);
+	}
+
 	/* CONVERTS REAL POSITION TO RANGE POSITION */ 
-	isAlive.prototype.getPos = function(val){
-		if(val%this.settings.max<0)
-			return this.settings.max+(val%this.settings.max);
+	isAlive.prototype.getPos = function(value){
+		if(value%this.settings.max<0)
+			return this.settings.max+(value%this.settings.max);
 		else
-			return val%this.settings.max;
+			return value%this.settings.max;
 	}
 
 	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
@@ -1402,11 +1402,6 @@ Last modification on this file: 1 January 2014
 					continue;
 				}
 			}
-			/*DELETE INVALID ELEMENTS*/
-			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined" || (typeof(thisObj.settings.elements[key]['method'])=="undefined" && typeof(thisObj.settings.elements[key]['do'])=="undefined")){
-				delete thisObj.settings.elements[key];
-				continue;
-			}
 			/*DELETE NON EXISTING DOM ELEMENTS*/
 			if(indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 				if(jQuery(thisObj.settings.elements[key]['selector']).length==0){
@@ -1511,12 +1506,6 @@ Last modification on this file: 1 January 2014
 					if(typeof(thisObj.functionsArray[fTemp])=="undefined")
 						thisObj.functionsArray[fTemp] = thisObj.settings.elements[key]['property'];
 					thisObj.settings.elements[key]['property'] = fTemp;
-				}
-				
-				/*ONLY STRING PROPERTIES*/
-				if(typeof(thisObj.settings.elements[key]['property'])!='string'){
-					delete thisObj.settings.elements[key];
-					continue;
 				}
 				
 				/*CSS3 DOES NOT WORK ON IE7&IE8*/
@@ -1962,114 +1951,62 @@ Last modification on this file: 1 January 2014
 		var timing;
 		var loopFix;
 		var directionForward;
-		var loopFound;
+		var loop,loopStart,loopEnd;
 		
-		loopFound = (thisObj.l(thisObj.lastStep)!=thisObj.l(thisObj.step));
-		
+		loopStart = thisObj.getLoop(thisObj.lastStep);
+		loopEnd = thisObj.getLoop(thisObj.step);
 		if(thisObj.step>thisObj.lastStep){
 			/*SCROLL DOWN*/
 			directionForward = true;
-			for(key in thisObj.settings.elements){
-				
-				if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
-					continue;
-				
-				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.step)==false){
-					loopFix = thisObj.l(thisObj.lastStep);
-					start = Math.max((thisObj.settings.elements[key]['step-start']+loopFix),thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-end']+loopFix>=thisObj.step)
-						end=thisObj.getPos(thisObj.step);
-					else
-						end=thisObj.settings.elements[key]['step-end'];
-					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loopFix)-start))*1;
-					
-					if(typeof(animations[start])=="undefined")
-						animations[start] = {};
-					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
-						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
-						'animType':thisObj.settings.elements[key]['animType'],
-						'duration':timing,
-						'end':end,
-						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'easing':thisObj.settings.elements[key]['easing']
-					};
-					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
-				}	
-				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.lastStep || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.step)==false){
-					loopFix = thisObj.l(thisObj.step);
-					start = Math.max((thisObj.settings.elements[key]['step-start']+loopFix),thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-end']+loopFix>=thisObj.step)
-						end=thisObj.getPos(thisObj.step);
-					else
-						end=thisObj.settings.elements[key]['step-end'];
-					timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loopFix)-start))*1;
-					
-					if(typeof(animations[start])=="undefined")
-						animations[start] = {};
-					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
-						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
-						'animType':thisObj.settings.elements[key]['animType'],
-						'duration':timing,
-						'end':end,
-						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'easing':thisObj.settings.elements[key]['easing']
-					};
-					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
-				}
+			for(loop=loopStart;loop<=loopEnd;loop++){
+				loopFix = loop * thisObj.settings.max;
+				for(key in thisObj.settings.elements){
+					if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
+						continue;
+					if(thisObj.settings.elements[key]['step-start']+loopFix<thisObj.step && thisObj.settings.elements[key]['step-end']+loopFix>thisObj.lastStep){
+						start = Math.max((thisObj.settings.elements[key]['step-start']+loopFix),thisObj.lastStep);
+						(thisObj.settings.elements[key]['step-end']+loopFix>=thisObj.step) ? end = thisObj.getPos(thisObj.step) : end = thisObj.settings.elements[key]['step-end'];
+						timing = Math.floor((thisObj.animateDuration/(thisObj.step-thisObj.lastStep))*((end+loopFix)-start));
+						if(typeof(animations[start])=="undefined")
+							animations[start] = {};
+						if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']] = {};
+						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+							'animType':thisObj.settings.elements[key]['animType'],
+							'duration':timing,
+							'end':end,
+							'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+							'easing':thisObj.settings.elements[key]['easing']
+						};
+						//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
+					}
+				}				
 			}
 		}else{
 			/*SCROLL UP*/
 			directionForward = false;
-			for(key in thisObj.settings.elements){
-				
-				if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
-					continue;
-				
-				if((thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.step)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.step)>=thisObj.lastStep)==false){
-					loopFix = thisObj.l(thisObj.step);
-					start = Math.min((thisObj.settings.elements[key]['step-end']+loopFix),thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-start']+loopFix<=thisObj.step)
-						end=thisObj.getPos(thisObj.step);
-					else
-						end=thisObj.settings.elements[key]['step-start'];
-					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loopFix)))*1;
-					
-					if(typeof(animations[start])=="undefined")
-						animations[start] = {};
-					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
-						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
-						'animType':thisObj.settings.elements[key]['animType'],
-						'duration':timing,
-						'end':end,
-						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'easing':thisObj.settings.elements[key]['easing']
-					};
-					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
-				}	
-				if(loopFound && (thisObj.settings.elements[key]['step-end']+thisObj.l(thisObj.lastStep)<=thisObj.step || thisObj.settings.elements[key]['step-start']+thisObj.l(thisObj.lastStep)>=thisObj.lastStep)==false){
-					loopFix = thisObj.l(thisObj.lastStep);
-					start = Math.min((thisObj.settings.elements[key]['step-end']+loopFix),thisObj.lastStep);
-					if(thisObj.settings.elements[key]['step-start']+loopFix<=thisObj.step)
-						end=thisObj.getPos(thisObj.step);
-					else
-						end=thisObj.settings.elements[key]['step-start'];
-					timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loopFix)))*1;
-					
-					if(typeof(animations[start])=="undefined")
-						animations[start] = {};
-					if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
-						animations[start][thisObj.settings.elements[key]['selector']] = {};
-					animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
-						'animType':thisObj.settings.elements[key]['animType'],
-						'duration':timing,
-						'end':end,
-						'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
-						'easing':thisObj.settings.elements[key]['easing']
-					};
-					//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
+			for(loop=loopStart;loop>=loopEnd;loop--){
+				loopFix = loop * thisObj.settings.max;
+				for(key in thisObj.settings.elements){
+					if(thisObj.animationType=='scrollbar' && key==thisObj.scrollbarActive)
+						continue;
+					if(thisObj.settings.elements[key]['step-start']+loopFix<thisObj.lastStep && thisObj.settings.elements[key]['step-end']+loopFix>thisObj.step){
+						start = Math.min((thisObj.settings.elements[key]['step-end']+loopFix),thisObj.lastStep);
+						(thisObj.settings.elements[key]['step-start']+loopFix<=thisObj.step) ? end = thisObj.getPos(thisObj.step) : end = thisObj.settings.elements[key]['step-start'];
+						timing = Math.floor((thisObj.animateDuration/(thisObj.lastStep-thisObj.step))*(start-(end+loopFix)));
+						if(typeof(animations[start])=="undefined")
+							animations[start] = {};
+						if(typeof(animations[start][thisObj.settings.elements[key]['selector']])=="undefined")
+							animations[start][thisObj.settings.elements[key]['selector']] = {};
+						animations[start][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']] = {
+							'animType':thisObj.settings.elements[key]['animType'],
+							'duration':timing,
+							'end':end,
+							'to':thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']],
+							'easing':thisObj.settings.elements[key]['easing']
+						};
+						//console.log('Id:'+thisObj.settings.elements[key]['selector']+'|Lastscroll:'+thisObj.lastStep+'|Scroll:'+thisObj.step+'|Css:'+thisObj.settings.elements[key]['property']+'|Start:'+start+'|End:'+end+'|Duration:'+timing+'|Css Value:'+thisObj.animPositions[end][thisObj.settings.elements[key]['selector']][thisObj.settings.elements[key]['property']]+'|Css Real:'+jQuery(thisObj.settings.elements[key]['selector']).css(thisObj.settings.elements[key]['property']));
+					}	
 				}
 			}
 		}
@@ -2085,7 +2022,7 @@ Last modification on this file: 1 January 2014
 				var selector,property;
 				
 				thisObj.animating = false;
-				thisObj.animationType='none';
+				thisObj.animationType = 'none';
 				thisObj.forceAnimation = false;
 				
 				for(selector in thisObj.CSS3TransitionArray){
@@ -2204,7 +2141,7 @@ Last modification on this file: 1 January 2014
 								}
 							}
 							if(thisObj.settings.onStep!=null)
-								thisObj.settings.onStep(thisObj.getPos(step),Math.floor(step/thisObj.settings.max),thisObj.animationType);
+								thisObj.settings.onStep(thisObj.getPos(step),thisObj.getLoop(step),thisObj.animationType);
 						}
 						
 						if(directionForward){
@@ -2226,7 +2163,7 @@ Last modification on this file: 1 January 2014
 		var thisObj = this;
 		var directionForward,stepPos,currentPosition,nextPosition,notAllowed;
 
-		if(!thisObj.allowWheel || thisObj.forceAnimation || !value)
+		if(!value || !thisObj.allowWheel || thisObj.forceAnimation)
 			return false;
 		
 		if(thisObj.settings.wheelDelay!==false){
@@ -2319,7 +2256,7 @@ Last modification on this file: 1 January 2014
 		
 		var thisObj = this;
 		
-		if(!thisObj.allowWheel || thisObj.forceAnimation || !value)
+		if(!value || !thisObj.allowWheel || thisObj.forceAnimation)
 			return false;
 		
 		if(thisObj.animating && thisObj.animationType!='scroll'){
@@ -2331,14 +2268,14 @@ Last modification on this file: 1 January 2014
 		
 		
 		if(value==1){
-			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && Math.floor((thisObj.step+thisObj.settings.stepsOnScroll)/thisObj.settings.max)-Math.floor(thisObj.lastStep/thisObj.settings.max)<=1 && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<=thisObj.settings.maxScroll)
+			if((thisObj.step+thisObj.settings.stepsOnScroll<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnScroll)-thisObj.lastStep<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnScroll;
 			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnScroll>thisObj.settings.max-1 && !thisObj.settings.loop && (thisObj.settings.max-1)-thisObj.lastStep<=thisObj.settings.maxScroll){
 					thisObj.step = thisObj.settings.max-1;
 			}else
 				return;
 		}else{
-			if((thisObj.step-thisObj.settings.stepsOnScroll>=thisObj.settings.min || thisObj.settings.loop) && Math.floor(thisObj.lastStep/thisObj.settings.max)-Math.floor((thisObj.step-thisObj.settings.stepsOnScroll)/thisObj.settings.max)<=1 && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnScroll)<=thisObj.settings.maxScroll)
+			if((thisObj.step-thisObj.settings.stepsOnScroll>=thisObj.settings.min || thisObj.settings.loop) && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnScroll)<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.step-thisObj.settings.stepsOnScroll;
 			else if(thisObj.step>thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnScroll<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep-thisObj.settings.min<=thisObj.settings.maxScroll)
 				thisObj.step = thisObj.settings.min;
@@ -2457,14 +2394,14 @@ Last modification on this file: 1 January 2014
 			thisObj.step=Math.round(thisObj.lastStep);
 		
 		if(value==1){
-			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && Math.floor((thisObj.step+thisObj.settings.stepsOnDrag)/thisObj.settings.max)-Math.floor(thisObj.lastStep/thisObj.settings.max)<=1 && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<=thisObj.settings.maxDrag)
+			if((thisObj.step+thisObj.settings.stepsOnDrag<=thisObj.settings.max-1 || thisObj.settings.loop) && (thisObj.step+thisObj.settings.stepsOnDrag)-thisObj.lastStep<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.step+thisObj.settings.stepsOnDrag;
 			else if(thisObj.step<thisObj.settings.max-1 && thisObj.step+thisObj.settings.stepsOnDrag>thisObj.settings.max-1 && !thisObj.settings.loop && (thisObj.settings.max-1)-thisObj.lastStep<=thisObj.settings.maxDrag)
 					thisObj.step = thisObj.settings.max-1;
 			else
 				return;
 		}else{
-			if((thisObj.step-thisObj.settings.stepsOnDrag>=thisObj.settings.min || thisObj.settings.loop) && Math.floor(thisObj.lastStep/thisObj.settings.max)-Math.floor((thisObj.step-thisObj.settings.stepsOnDrag)/thisObj.settings.max)<=1 && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnDrag)<=thisObj.settings.maxDrag)
+			if((thisObj.step-thisObj.settings.stepsOnDrag>=thisObj.settings.min || thisObj.settings.loop) && thisObj.lastStep-(thisObj.step-thisObj.settings.stepsOnDrag)<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.step-thisObj.settings.stepsOnDrag;
 			else if(thisObj.step>thisObj.settings.min && thisObj.step-thisObj.settings.stepsOnDrag<thisObj.settings.min && !thisObj.settings.loop && thisObj.lastStep-thisObj.settings.min<=thisObj.settings.maxDrag)
 				thisObj.step = thisObj.settings.min;
@@ -2499,19 +2436,19 @@ Last modification on this file: 1 January 2014
 		if(thisObj.forceAnimation)
 			return false;
 			
-		pos = settings.to+(Math.floor(thisObj.lastStep/thisObj.settings.max)*thisObj.settings.max);
+		pos = settings.to + (thisObj.getLoop(thisObj.lastStep)*thisObj.settings.max);
 		
 		if(thisObj.settings.loop){
 			if(settings.orientation=='loop'){
 				if(thisObj.lastStep<=pos)
 					posNext = pos;
 				else
-					posNext = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)+1)*thisObj.settings.max);
+					posNext = settings.to + ((thisObj.getLoop(thisObj.lastStep)+1)*thisObj.settings.max);
 		
 				if(thisObj.lastStep>=pos)
 					posPrev = pos;
 				else
-					posPrev = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
+					posPrev = settings.to + ((thisObj.getLoop(thisObj.lastStep)-1)*thisObj.settings.max);
 				
 				if(Math.abs(thisObj.lastStep-posNext)>Math.abs(thisObj.lastStep-posPrev))
 					pos = posPrev;
@@ -2520,11 +2457,11 @@ Last modification on this file: 1 January 2014
 			}
 			else if(settings.orientation == 'next'){
 				if(thisObj.lastStep>=pos)
-					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)+1)*thisObj.settings.max);
+					pos = settings.to + ((thisObj.getLoop(thisObj.lastStep)+1)*thisObj.settings.max);
 			}
 			else if(settings.orientation == 'prev'){
 				if(thisObj.lastStep<=pos)
-					pos = settings.to+((Math.floor(thisObj.lastStep/thisObj.settings.max)-1)*thisObj.settings.max);
+					pos = settings.to + ((thisObj.getLoop(thisObj.lastStep)-1)*thisObj.settings.max);
 			}
 		}
 		
@@ -2615,7 +2552,7 @@ Last modification on this file: 1 January 2014
 						pointFoundSelector = pointFound;
 				}
 				if(thisObj.settings.onStep!=null)
-					thisObj.settings.onStep(pos,Math.floor(pos/thisObj.settings.max),'skip');
+					thisObj.settings.onStep(pos,thisObj.getLoop(pos),'skip');
 				
 				(thisObj.getPos(thisObj.step)<step)?pos = pos + 1:pos = pos - 1;
 			}
@@ -2638,7 +2575,7 @@ Last modification on this file: 1 January 2014
 				jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
 			}
 			
-			step = step+thisObj.l(thisObj.lastStep);
+			step = step + (thisObj.getLoop(thisObj.lastStep)*thisObj.settings.max);
 			
 			thisObj.step = step;
 			thisObj.lastStep = step;
@@ -2918,7 +2855,7 @@ Last modification on this file: 1 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.8.0";
+			return "1.8.1";
 		}
 	};
 	
