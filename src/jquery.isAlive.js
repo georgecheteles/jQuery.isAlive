@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.1)
+jQuery.isAlive(1.8.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 2 January 2014
+Last modification on this file: 3 January 2014
 */
 
 (function(jQuery) {
@@ -23,6 +23,7 @@ Last modification on this file: 2 January 2014
 	var isReady = false;
 	var browserObj = null;
 	var vPTransition = null;
+	var vPTransform = null;
 	var indexOf = null;
 	var _fix = {};
 	
@@ -106,7 +107,7 @@ Last modification on this file: 2 January 2014
 					else
 						return parseInt(value) - 1;
 				}
-				if(property==vP('transform')){
+				if(property==vPTransform){
 					if(format.indexOf('matrix')==0 || format.indexOf('scale')==0){
 						success = true;
 						return parseFloat(value) + 0.001;
@@ -177,14 +178,27 @@ Last modification on this file: 2 January 2014
 	}
 	
 	/*CONVERT IN PROPERTY LIKE STYLE OBJ*/
-	function propertyToStyle(property){
+	function propFirstLowCase(property){
 		if(property.indexOf('-')!=-1){
 			if(property.charAt(0)=='-')
 				property = property.substr(1);
-			property = property.toLowerCase().split('-');
+			property = property.split('-');
 			for(var key in property)
 				if(key>0)
 					property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
+			property = property.join('');
+		}
+		return property;
+	}
+
+	/*CONVERT IN PROPERTY LIKE STYLE OBJ*/
+	function propFirstUpCase(property){
+		if(property.indexOf('-')!=-1){
+			if(property.charAt(0)=='-')
+				property = property.substr(1);
+			property = property.split('-');
+			for(var key in property)
+				property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
 			property = property.join('');
 		}
 		return property;
@@ -331,12 +345,6 @@ Last modification on this file: 2 January 2014
 		return browser;
 	}
 	
-	/* CHECKS PROPERTY IS CSS3 */
-	function isCSS3(property){
-		var CSS3 = ['transform','trasition','border-radius','background-size','box-shadow','text-shadow'];
-		return (indexOf(CSS3,property)!=-1);
-	}
-	
 	/* CHECKS IF PARAMS ARE DETECTED */
 	function isDinamic(params){
 		if(typeof(params) == "function")
@@ -347,16 +355,38 @@ Last modification on this file: 2 January 2014
 	}
 
 	/*MAKES THE CSS CHANGES FOR EACH BROWSER*/
-	function vP(property,force){
-		if(indexOf(['transform','trasition'],property)!=-1 || force){
-			if(browserObj.webkit)
+	function vP(property){
+		if(indexOf(['opacity','scrollTop','scrollLeft'],property)!=-1 || property.indexOf('F:')==0)
+			return property;
+		var el = document.createElement('foo');
+		var p = propFirstLowCase(property);
+		if(typeof(el.style[p])!="undefined")
+			return property;
+		if(property.indexOf('-webkit-')==0 || property.indexOf('-moz-')==0 || property.indexOf('-ms-')==0 || property.indexOf('-o-')==0)
+			return false;
+		if(browserObj.webkit){
+			var v = propFirstLowCase("-webkit-"+property);
+			if(typeof(el.style[v])!="undefined")
 				return "-webkit-"+property;
-			if(browserObj.mozilla)
+			return false;
+		}
+		if(browserObj.mozilla){
+			var v = propFirstUpCase("-moz-"+property);
+			if(typeof(el.style[v])!="undefined")
 				return "-moz-"+property;
-			if(browserObj.msie && parseInt(browserObj.version)>=9)
+			return false;
+		}
+		if(browserObj.msie){
+			var v = propFirstLowCase("-ms-"+property);
+			if(typeof(el.style[v])!="undefined")
 				return "-ms-"+property;
-			if(browserObj.opera)
+			return false;
+		}
+		if(browserObj.opera){
+			var v = propFirstUpCase("-o-"+property);
+			if(typeof(el.style[v])!="undefined")
 				return "-o-"+property;
+			return false;
 		}
 		return property;
 	}
@@ -1290,6 +1320,7 @@ Last modification on this file: 2 January 2014
 			
 			/*SET TRASITION WITH PREFIX VENTOR*/ 
 			vPTransition = vP('transition');
+			vPTransform = vP('transform');
 			
 			/*ADDED VALUE FOR CSS BUG FIXED*/
 			_fix['opacity'] = (browserObj.opera) ? 0.004 : 0.001;
@@ -1300,7 +1331,7 @@ Last modification on this file: 2 January 2014
 		}
 		
 		/*TIMELINE WRAPPER*/
-		thisObj.TimeLine = document.createElement('wrapper');
+		thisObj.TimeLine = document.createElement('foo');
 		
 		/*SHOW SCROLL POSITION*/
 		if(thisObj.settings.debug)
@@ -1507,16 +1538,10 @@ Last modification on this file: 2 January 2014
 						thisObj.functionsArray[fTemp] = thisObj.settings.elements[key]['property'];
 					thisObj.settings.elements[key]['property'] = fTemp;
 				}
-				
-				/*CSS3 DOES NOT WORK ON IE7&IE8*/
-				if(isCSS3(thisObj.settings.elements[key]['property']) && browserObj.msie && parseInt(browserObj.version)<9){
-					delete thisObj.settings.elements[key];
-					continue;
-				}
-				
-				if(thisObj.settings.elements[key]['property'].indexOf('-webkit-')==0 || thisObj.settings.elements[key]['property'].indexOf('-moz-')==0 || thisObj.settings.elements[key]['property'].indexOf('-ms-')==0  || thisObj.settings.elements[key]['property'].indexOf('-o-')==0){
-					var elementStyle = jQuery(thisObj.settings.elements[key]['selector'])[0].style;
-					if(typeof(elementStyle[propertyToStyle(thisObj.settings.elements[key]['property'])])=="undefined"){
+				else{
+					/*PUTS PREFIX FOR CSS3*/
+					thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
+					if(thisObj.settings.elements[key]['property']==false){
 						delete thisObj.settings.elements[key];
 						continue;
 					}
@@ -1536,7 +1561,7 @@ Last modification on this file: 2 January 2014
 				if(thisObj.settings.elements[key]["method"]=="animate"){
 					if((browserObj.msie && parseInt(browserObj.version)<10) || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || thisObj.settings.elements[key]["property"].indexOf('F:')==0 || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
 						/*BUILD JS ARRAY*/
-						if(indexOf(jQueryCanAnimate,propertyToStyle(thisObj.settings.elements[key]["property"]))!=-1)
+						if(indexOf(jQueryCanAnimate,propFirstLowCase(thisObj.settings.elements[key]["property"]))!=-1)
 							thisObj.settings.elements[key]['animType'] = 1;
 						else{
 							thisObj.settings.elements[key]['animType'] = 2;
@@ -1584,9 +1609,6 @@ Last modification on this file: 2 January 2014
 						delete thisObj.settings.elements[key]['useCSS3'];
 				}
 
-				/*PUTS PREFIX FOR CSS3*/
-				thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
-				
 				/*PUT ANIMATE CLASS FOR ANIMATIONS*/
 				if(thisObj.settings.elements[key]['method']=="animate" && indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 					jQuery(thisObj.settings.elements[key]['selector']).addClass(thisObj.settings.animateClass);
@@ -1607,13 +1629,13 @@ Last modification on this file: 2 January 2014
 			if(thisObj.settings.elements[key]['animType']==3 && (!browserObj.msie || (browserObj.msie && parseInt(browserObj.version)>9)))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
-					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property',true));
-					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration',true));
+					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
+					var pTemp2 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-duration'));
 					if(typeof(pTemp1)!="undefined" && typeof(pTemp2)!="undefined" && (pTemp1!="all" || pTemp2!="0s")){
 						propTempArray.push(pTemp1);
 						propTempArray.push(pTemp2);
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function',true)));
-						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-delay',true)));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-timing-function')));
+						propTempArray.push(jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-delay')));
 						thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']] = propTempArray;
 					}
 					else
@@ -2855,7 +2877,7 @@ Last modification on this file: 2 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.8.1";
+			return "1.8.2";
 		}
 	};
 	
