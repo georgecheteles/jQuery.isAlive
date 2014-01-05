@@ -7,7 +7,7 @@
                                                               /____/          
 jQuery.isAlive.helper(0.0.3) is a list of functions for jQuery.isAlive plugin.
 Written by George Cheteles (george@we-code-magic.com).
-Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
+Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 

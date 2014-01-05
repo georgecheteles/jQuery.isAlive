@@ -5,9 +5,9 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.3)
+jQuery.isAlive(1.8.4)
 Written by George Cheteles (george@we-code-magic.com).
-Licensed under the MIT (https://github.com/jquery/jquery/blob/master/MIT-LICENSE.txt) license. 
+Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
@@ -36,7 +36,7 @@ Last modification on this file: 5 January 2014
 		var el = document.createElement('foo');
 		var prevColor = el.style.color;
 		try {
-			el.style.color = 'rgba(1,5,13,0.44)';
+			el.style.color = 'rgba(0,0,0,0)';
 		} catch(e) {}
 		return el.style.color != prevColor;
 	}
@@ -188,32 +188,19 @@ Last modification on this file: 5 January 2014
 	}
 	
 	/*CONVERT IN PROPERTY LIKE STYLE OBJ*/
-	function propFirstLowCase(property){
+	function propertyToStyle(property,firstUp){
 		if(property.indexOf('-')!=-1){
 			if(property.charAt(0)=='-')
 				property = property.substr(1);
 			property = property.split('-');
 			for(var key in property)
-				if(key>0)
+				if(key>0 || firstUp)
 					property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
 			property = property.join('');
 		}
 		return property;
 	}
 
-	/*CONVERT IN PROPERTY LIKE STYLE OBJ*/
-	function propFirstUpCase(property){
-		if(property.indexOf('-')!=-1){
-			if(property.charAt(0)=='-')
-				property = property.substr(1);
-			property = property.split('-');
-			for(var key in property)
-				property[key] = property[key].charAt(0).toUpperCase()+property[key].substr(1);
-			property = property.join('');
-		}
-		return property;
-	}
-	
 	/*GET TEXT BETWEEN BRACKETS*/
 	function getBetweenBrackets(text,doEval){
 		var lastBracket;
@@ -369,31 +356,31 @@ Last modification on this file: 5 January 2014
 		if(typeof(vPArray[property])=="undefined"){
 			vPArray[property] = false;
 			var el = document.createElement('foo');
-			var p = propFirstLowCase(property);
+			var p = propertyToStyle(property);
 			if(typeof(el.style[p])!="undefined")
 				vPArray[property] = property;
-			else if(browserObj.webkit){
-				var v = propFirstLowCase("-webkit-"+property);
-				if(typeof(el.style[v])!="undefined")
-					vPArray[property] = "-webkit-"+property;
+			else if(property.indexOf('-webkit-')!=0 && property.indexOf('-moz-')!=0 && property.indexOf('-ms-')!=0 && property.indexOf('-o-')!=0){
+				if(browserObj.webkit){
+					var v = propertyToStyle("-webkit-"+property);
+					if(typeof(el.style[v])!="undefined")
+						vPArray[property] = "-webkit-"+property;
+				}
+				else if(browserObj.mozilla){
+					var v = propertyToStyle("-moz-"+property,true);
+					if(typeof(el.style[v])!="undefined")
+						vPArray[property] = "-moz-"+property;
+				}
+				else if(browserObj.msie){
+					var v = propertyToStyle("-ms-"+property);
+					if(typeof(el.style[v])!="undefined")
+						vPArray[property] = "-ms-"+property;
+				}
+				else if(browserObj.opera){
+					var v = propertyToStyle("-o-"+property,true);
+					if(typeof(el.style[v])!="undefined")
+						vPArray[property] = "-o-"+property;
+				}
 			}
-			else if(browserObj.mozilla){
-				var v = propFirstUpCase("-moz-"+property);
-				if(typeof(el.style[v])!="undefined")
-					vPArray[property] = "-moz-"+property;
-			}
-			else if(browserObj.msie){
-				var v = propFirstLowCase("-ms-"+property);
-				if(typeof(el.style[v])!="undefined")
-					vPArray[property] = "-ms-"+property;
-			}
-			else if(browserObj.opera){
-				var v = propFirstUpCase("-o-"+property);
-				if(typeof(el.style[v])!="undefined")
-					vPArray[property] = "-o-"+property;
-			}
-			else 
-				vPArray[property] = property;
 		}
 		return vPArray[property];
 	}
@@ -585,11 +572,10 @@ Last modification on this file: 5 January 2014
 		var start = thisObj.JSValuesArray[selector][property];
 		var end = value.toString();
 		var tempObj = {};
-		tempObj[property.replace(/-/g,"")+'Timer']="+=100";
+		tempObj[property+'Timer']="+=100";
 		jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
 			step: function(step,fx){
-				var pos = step-fx.start;
-				thisObj.setCSS(selector,property,getAtPosValue(pos,start,end,0,100));
+				thisObj.setCSS(selector,property,getAtPosValue(step-fx.start,start,end,0,100));
 			}
 		});
 	}
@@ -714,7 +700,7 @@ Last modification on this file: 5 January 2014
 			for(key in tempArray){
 				var temp = tempArray[key].split(' ');
 				var property = vP(temp[0]);
-				if(property!=false)
+				if(property)
 					thisObj.CSS3DefaultTransitionArray[selector][property] = tempArray[key].replace(temp[0],property).replace(/\*CHAR\*/g,","); 
 			}
 		}
@@ -1049,7 +1035,7 @@ Last modification on this file: 5 January 2014
 					this.addEventListener('MSPointerDown', onTouchStart, false);
 					/*PREVENT SCROLL FOR IE10*/
 					if(thisObj.settings.preventTouch)
-						jQuery(this).css('-ms-touch-action','none');			
+						jQuery(this).css(vP('touch-action'),'none');			
 				}
 			});
 		}
@@ -1573,9 +1559,9 @@ Last modification on this file: 5 January 2014
 				
 				/*SET CSS3 VARS*/
 				if(thisObj.settings.elements[key]["method"]=="animate"){
-					if(vP('transition')==false || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || thisObj.settings.elements[key]["property"].indexOf('F:')==0 || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
+					if(!vP('transition') || thisObj.settings.elements[key]['property']=='scrollTop' || thisObj.settings.elements[key]['property']=='scrollLeft' || thisObj.settings.elements[key]["property"].indexOf('F:')==0 || (!thisObj.settings.useCSS3 && typeof(thisObj.settings.elements[key]['useCSS3'])=="undefined") || thisObj.settings.elements[key]['useCSS3']==false){
 						/*BUILD JS ARRAY*/
-						if(indexOf(jQueryCanAnimate,propFirstLowCase(thisObj.settings.elements[key]["property"]))!=-1)
+						if(indexOf(jQueryCanAnimate,propertyToStyle(thisObj.settings.elements[key]["property"]))!=-1)
 							thisObj.settings.elements[key]['animType'] = 1;
 						else{
 							thisObj.settings.elements[key]['animType'] = 2;
@@ -1632,16 +1618,13 @@ Last modification on this file: 5 January 2014
 		}
 		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
-		if(browserObj.webkit && (thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))))
-			jQuery('.'+thisObj.settings.animateClass).css({
-				'-webkit-backface-visibility':'hidden',
-				'-webkit-perspective':'1000'
-			});
+		if((thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU))) && vP('backface-visibility') && vP('perspective'))
+			jQuery('.'+thisObj.settings.animateClass).css(vP('backface-visibility'),'hidden').css(vP('perspective'),1000);
 			
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
 			/* CREATES ARRAY WITH TRANSITIONS CSS VALUES*/
-			if(thisObj.settings.elements[key]['animType']==3 && vP('transition')!=false)
+			if(thisObj.settings.elements[key]['animType']==3 && vP('transition'))
 				if(typeof(thisObj.CSS3DefaultTransitionArray[thisObj.settings.elements[key]['selector']])=="undefined"){
 					var propTempArray = [];
 					var pTemp1 = jQuery(thisObj.settings.elements[key]['selector']).css(vP('transition-property'));
@@ -1819,7 +1802,6 @@ Last modification on this file: 5 January 2014
 					}
 				}
 				
-				
 				if(!thisObj.animating)
 					thisObj.scrollBarPosition = thisObj.getPos(thisObj.step);
 					
@@ -1919,7 +1901,7 @@ Last modification on this file: 5 January 2014
 					e.stopPropagation();					
 				}, false);
 				if(thisObj.settings.enableScrollbarTouch)
-					jQuery(scrollBarObj).css('-ms-touch-action','none');
+					jQuery(scrollBarObj).css(vP('touch-action'),'none');
 			}
 			else if('onmousedown' in document.documentElement){
 				jQuery(scrollBarObj).bind('mousedown',function(e){
@@ -2892,7 +2874,7 @@ Last modification on this file: 5 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.8.3";
+			return "1.8.4";
 		}
 	};
 	

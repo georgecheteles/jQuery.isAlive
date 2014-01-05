@@ -1,5 +1,10 @@
 jQuery isAlive ChangeLog
 
+ver. 1.8.4 (5 January 2014)
+ - bugs fixed
+ - enableGPU now acts on all browsers
+ - speed improvements
+
 ver. 1.8.3 (5 January 2014)
  - bugs fixed
  - more browser compatibility added
