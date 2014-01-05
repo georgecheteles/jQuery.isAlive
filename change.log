@@ -1,6 +1,10 @@
 jQuery isAlive ChangeLog
 
-ver. 1.8.2 (2 January 2014)
+ver. 1.8.3 (5 January 2014)
+ - bugs fixed
+ - more browser compatibility added
+
+ ver. 1.8.2 (3 January 2014)
  - more CSS3 compatibility added
 
 ver. 1.8.1 (2 January 2014)
