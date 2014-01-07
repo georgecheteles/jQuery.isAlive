@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.4)
+jQuery.isAlive(1.8.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 5 January 2014
+Last modification on this file: 8 January 2014
 */
 
 (function(jQuery) {
@@ -1541,7 +1541,7 @@ Last modification on this file: 5 January 2014
 				else if(thisObj.settings.elements[key]['property']!='scrollTop' && thisObj.settings.elements[key]['property']!='scrollLeft'){
 					/*PUTS PREFIX FOR CSS3*/
 					thisObj.settings.elements[key]['property'] = vP(thisObj.settings.elements[key]['property']);
-					if(thisObj.settings.elements[key]['property']==false){
+					if(!thisObj.settings.elements[key]['property']){
 						delete thisObj.settings.elements[key];
 						continue;
 					}
@@ -2571,7 +2571,7 @@ Last modification on this file: 5 January 2014
 						pointFoundSelector = pointFound;
 				}
 				if(thisObj.settings.onStep!=null)
-					thisObj.settings.onStep(pos,thisObj.getLoop(pos),'skip');
+					thisObj.settings.onStep(pos,thisObj.getLoop(thisObj.step),'skip');
 				
 				(thisObj.getPos(thisObj.step)<step)?pos = pos + 1:pos = pos - 1;
 			}
@@ -2594,7 +2594,7 @@ Last modification on this file: 5 January 2014
 				jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
 			}
 			
-			step = step + (thisObj.getLoop(thisObj.lastStep)*thisObj.settings.max);
+			step = step + (thisObj.getLoop(thisObj.step)*thisObj.settings.max);
 			
 			thisObj.step = step;
 			thisObj.lastStep = step;
@@ -2874,7 +2874,7 @@ Last modification on this file: 5 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.8.4";
+			return "1.8.5";
 		}
 	};
 	
