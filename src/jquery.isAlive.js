@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.5)
+jQuery.isAlive(1.8.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1227,7 +1227,7 @@ Last modification on this file: 8 January 2014
 			}
 		}
 		
-		for(pos=thisObj.settings.start+1;pos<=thisObj.settings.max;pos++){
+		for(pos=thisObj.settings.start+1;pos<=thisObj.settings.max-1;pos++){
 			if(typeof(thisObj.setArray['backward'][pos])!="undefined"){
 				for(selector in thisObj.setArray['backward'][pos]){
 					if(typeof(CSSArray[selector])=="undefined")
@@ -1279,7 +1279,7 @@ Last modification on this file: 8 January 2014
 
 		for(pos=0;pos<=thisObj.settings.start;pos++)
 			if(thisObj.settings.onStep!=null)
-				thisObj.settings.onStep(pos,Math.floor(pos/(thisObj.settings.max+1)),'init');
+				thisObj.settings.onStep(pos,0,'init');
 	};
 	
 	/*THIS FUNCTION MAKES ALL THE INITIALIZATIONS FOR ANIMATIONS*/
@@ -1695,6 +1695,8 @@ Last modification on this file: 8 January 2014
 				}
 			}
 		}
+		/*INCREMENT MAX*/
+		thisObj.settings.max++;
 		
 		/*INIT STARTING POINT*/
 		thisObj.step=thisObj.settings.start;
@@ -1706,7 +1708,7 @@ Last modification on this file: 8 January 2014
 				if(typeof(thisObj.settings.elements[key]['step-start'])=="undefined")
 					thisObj.settings.elements[key]['step-start'] = thisObj.settings.min;
 				if(typeof(thisObj.settings.elements[key]['step-end'])=="undefined")
-					thisObj.settings.elements[key]['step-end'] = thisObj.settings.max;
+					thisObj.settings.elements[key]['step-end'] = thisObj.settings.max-1;
 			}
 			if((thisObj.settings.elements[key]['method']=='animate' || thisObj.settings.elements[key]['method']=='animate-set') && typeof(thisObj.settings.elements[key]['value-start'])=="undefined")
 				thisObj.settings.elements[key]['value-start'] = thisObj.getStartCssValue(key);
@@ -1944,9 +1946,6 @@ Last modification on this file: 8 January 2014
 		/*THIS WILL SET THE CSS VALUES ON LOAD*/
 		if(thisObj.settings.initCSS)
 			thisObj.initCSS();
-
-		/*INCREMENT MAX*/
-		thisObj.settings.max++;
 	}
 	
 	/*ANIMATING MAIN FUNCTION!!!*/
@@ -2874,7 +2873,7 @@ Last modification on this file: 8 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.8.5";
+			return "1.8.6";
 		}
 	};
 	
