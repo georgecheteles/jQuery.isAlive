@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.8.6)
+jQuery.isAlive(1.8.7)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -917,7 +917,7 @@ Last modification on this file: 8 January 2014
 						this.addEventListener('touchend', cancelTouch, false);
 					}
 					else{
-						if(e.pointerType==e.MSPOINTER_TYPE_MOUSE)
+						if(e.pointerType == (e.MSPOINTER_TYPE_MOUSE || 'mouse'))
 							return;
 						startX = e.clientX;
 						startY = e.clientY;
@@ -1765,7 +1765,7 @@ Last modification on this file: 8 January 2014
 					return false;
 					
 				if(window.navigator.msPointerEnabled && !thisObj.settings.enableScrollbarTouch)
-					if(e.pointerType!=e.MSPOINTER_TYPE_MOUSE)
+					if(e.pointerType != (e.MSPOINTER_TYPE_MOUSE || 'mouse'))
 						return false;
 				
 				var htmlUnselectableAttr,cssUserSelect,parentTopLeft,clickPos,position,positionTo,positionValid;
