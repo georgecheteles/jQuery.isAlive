@@ -1,5 +1,8 @@
 jQuery isAlive ChangeLog
 
+ver. 1.9.1 (11 January 2014)
+ - bugs fixed
+ 
 ver. 1.9.0 (11 January 2014)
  - adds "destroy" and "destroyAll" methods
  - bugs fixed

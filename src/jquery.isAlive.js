@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.0)
+jQuery.isAlive(1.9.1)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -20,7 +20,7 @@ Last modification on this file: 11 January 2014
 	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS*/
 	var isAliveObjects = [];
 
-	var iIndex = 0;
+	var incIndex = 0;
 	var browserObj = null;
 	var indexOf = null;
 	var vPArray = {opacity:"opacity",left:"left",right:"right",top:"top",bottom:"bottom",width:"width",height:"height"};
@@ -483,7 +483,7 @@ Last modification on this file: 11 January 2014
 		this.cssDinamicElements = [];
 		this.params = {};
 		this.onComplete = null;
-		this.uniqId = iIndex;
+		this.uniqId = incIndex;
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
@@ -529,7 +529,7 @@ Last modification on this file: 11 January 2014
 			touchYFrom:null,
 			wipePoints:[],
 			preventTouch:true,
-			animateClass:'isalive-'+iIndex,
+			animateClass:'isalive-'+incIndex,
 			rebuildOnResize:true,
 			playPoints:[],
 			stepsOnScroll:1,
@@ -1307,8 +1307,7 @@ Last modification on this file: 11 January 2014
 		var pos,key,key2;
 		
 		/*GET IE VERSION AND BROWSER VARS*/
-		if(!iIndex){
-			iIndex++;
+		if(!incIndex){
 			browserObj = getBrowser();
 			/* ARRAY SEARCH FOR IE7&IE8 FIX*/
 			if(!Array.prototype.indexOf){
@@ -1346,6 +1345,9 @@ Last modification on this file: 11 January 2014
 			if(vP('touch-action'))
 				jQuery('head').append('<style class="isalive-style"> .isalive-notouchaction{'+vP('touch-action')+':none;} </style>');
 		}
+		
+		/*INCREMENT INDEX*/
+		incIndex++;
 		
 		/*TIMELINE WRAPPER*/
 		thisObj.TimeLine = document.createElement('foo');
@@ -2960,7 +2962,7 @@ Last modification on this file: 11 January 2014
 			return getBrowser();
 		},
 		getVersion : function(thisObj){
-			return "1.9.0";
+			return "1.9.1";
 		}
 	};
 	
@@ -2970,7 +2972,7 @@ Last modification on this file: 11 January 2014
 			return mFunc(this,options);
 		}
 		else
-			return (typeof(method)=='undefined')?((iIndex)?true:false):false;
+			return (typeof(method)=='undefined')?((incIndex)?true:false):false;
 	};
 	   
 /*JQUERY PLUGIN PART:END*/
