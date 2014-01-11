@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.1)
+jQuery.isAlive(1.9.2)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -26,39 +26,12 @@ Last modification on this file: 11 January 2014
 	var vPArray = {opacity:"opacity",left:"left",right:"right",top:"top",bottom:"bottom",width:"width",height:"height"};
 	var _fix = {};
 	var canRGBA = false;
+	var MSPointerEnabled,MSPointerDown,MSPointerMove,MSPointerUp;
 
 	var resizeOn = false;
 	var resizeTimer;
 	var windowWidth;
 	var windowHeight;
-	
-	/*GET OBJ LENGTH*/
-	function lengthObj(o){
-		var l = 0;
-		for(var key in o)
-			l++;
-		return l;
-	}
-	
-	/*CHECK IF POINTER EVENTS EXIST*/
-	function MSPointerEnabled(){
-		return (window.navigator.msPointerEnabled || window.navigator.pointerEnabled) ? true : false;
-	}
-	
-	/*GET MSIE POINTER DOWN EVENT*/
-	function MSPointerDown(){
-		return (window.navigator.pointerEnabled) ? "pointerdown" : "MSPointerDown";
-	}
-
-	/*GET MSIE POINTER DOWN EVENT*/
-	function MSPointerMove(){
-		return (window.navigator.pointerEnabled) ? "pointermove" : "MSPointerMove";
-	}
-
-	/*GET MSIE POINTER UP EVENT*/
-	function MSPointerUp(){
-		return (window.navigator.pointerEnabled) ? "pointerup" : "MSPointerUp";
-	}
 	
 	/*CHECK IF BROWSER SUPPORTS RGBA*/
 	function supportsRGBA(){
@@ -497,7 +470,6 @@ Last modification on this file: 11 January 2014
 		/* MY CLASS/SET ARRAYS */
 		this.setArray = {};
 		this.onOffClassArray = {};
-		this.MSTouchAction = {};
 		
 		this.settings = jQuery.extend(true, {}, {
 			elements:{},
@@ -933,7 +905,7 @@ Last modification on this file: 11 January 2014
 			var isMoving = false;
 
 			function onTouchStart(e){
-				if(!MSPointerEnabled()){
+				if(!MSPointerEnabled){
 					if(e.originalEvent.touches.length != 1) 
 						return;
 					startX = e.originalEvent.touches[0].clientX;
@@ -948,19 +920,19 @@ Last modification on this file: 11 January 2014
 					startX = e.originalEvent.clientX;
 					startY = e.originalEvent.clientY;
 					isMoving = true;
-					document.addEventListener(MSPointerMove(), onTouchMove, false);
-					document.addEventListener(MSPointerUp(), cancelTouch, false);
+					document.addEventListener(MSPointerMove, onTouchMove, false);
+					document.addEventListener(MSPointerUp, cancelTouch, false);
 				}
 			}
 
 			function cancelTouch(e){
-				if(!MSPointerEnabled()){
+				if(!MSPointerEnabled){
 					this.removeEventListener('touchmove', onTouchMove);
 					this.removeEventListener('touchend', cancelTouch);
 				}
 				else{
-					document.removeEventListener(MSPointerMove(), onTouchMove);
-					document.removeEventListener(MSPointerUp(), cancelTouch);
+					document.removeEventListener(MSPointerMove, onTouchMove);
+					document.removeEventListener(MSPointerUp, cancelTouch);
 				}
 				isMoving = false;
 				thisObj.dragHorizontal = null;
@@ -968,11 +940,10 @@ Last modification on this file: 11 January 2014
 			
 			if(thisObj.settings.touchType=='wipe'){
 				var onTouchMove = function(e){
-					if(!MSPointerEnabled() && thisObj.settings.preventTouch){
+					if(!MSPointerEnabled && thisObj.settings.preventTouch)
 						e.preventDefault();
-					}
 					if(isMoving){
-						if(!MSPointerEnabled()){
+						if(!MSPointerEnabled){
 							var x = e.touches[0].clientX;
 							var y = e.touches[0].clientY;
 						}
@@ -1011,11 +982,11 @@ Last modification on this file: 11 January 2014
 			}
 			else{
 				var onTouchMove = function (e){
-					if(!MSPointerEnabled() && thisObj.settings.preventTouch){
+					if(!MSPointerEnabled && thisObj.settings.preventTouch){
 						e.preventDefault();
 					}
 					if(isMoving){
-						if(!MSPointerEnabled()){
+						if(!MSPointerEnabled){
 							var x = e.touches[0].clientX;
 							var y = e.touches[0].clientY;
 						}
@@ -1053,8 +1024,8 @@ Last modification on this file: 11 January 2014
 				}
 			}
 			
-			if(MSPointerEnabled()){
-				jQuery(thisObj.mySelector).bind(MSPointerDown()+'.touch',onTouchStart);
+			if(MSPointerEnabled){
+				jQuery(thisObj.mySelector).bind(MSPointerDown+'.touch',onTouchStart);
 				/*PREVENT TOUCH EVENTS*/
 				if(thisObj.settings.preventTouch)
 					jQuery(thisObj.mySelector).addClass('isalive-notouchaction');
@@ -1330,6 +1301,12 @@ Last modification on this file: 11 January 2014
 			_fix['em'] = (browserObj.opera || (browserObj.safari && !browserObj.mobile && ifVersion(browserObj.version,'<','6.0.0'))) ? 0.1 : 0.01;
 			/*CHECK IF RGBA IS SUPPORTED*/
 			canRGBA = supportsRGBA();
+			
+			/*GET MS POINTER EVENTS*/
+			MSPointerEnabled = Boolean(window.navigator.msPointerEnabled || window.navigator.pointerEnabled);
+			MSPointerDown = (window.navigator.msPointerEnabled || window.navigator.pointerEnabled) ? ((window.navigator.pointerEnabled) ? "pointerdown" : "MSPointerDown") : false;
+			MSPointerMove = (window.navigator.msPointerEnabled || window.navigator.pointerEnabled) ? ((window.navigator.pointerEnabled) ? "pointermove" : "MSPointerMove") : false;
+			MSPointerUp = (window.navigator.msPointerEnabled || window.navigator.pointerEnabled) ? ((window.navigator.pointerEnabled) ? "pointerup" : "MSPointerUp") : false;
 		}
 		
 		/*BINDS RESIZE EVENT*/
@@ -1788,7 +1765,7 @@ Last modification on this file: 11 January 2014
 				if(thisObj.animating && thisObj.animationType!="scrollbar")
 					return false;
 				
-				if(eType==MSPointerDown() && e.originalEvent.pointerType!=(e.originalEvent.MSPOINTER_TYPE_MOUSE || 'mouse') && !thisObj.settings.enableScrollbarTouch)
+				if(eType==MSPointerDown && e.originalEvent.pointerType!=(e.originalEvent.MSPOINTER_TYPE_MOUSE || 'mouse') && !thisObj.settings.enableScrollbarTouch)
 					return false;
 						
 				var parentTopLeft,clickPos,position,positionTo,positionValid;
@@ -1797,7 +1774,7 @@ Last modification on this file: 11 January 2014
 				
 				thisObj.scrollbarActive = scrollbarKey; 						
 				
-				if(eType=="mousedown" || eType==MSPointerDown()){
+				if(eType=="mousedown" || eType==MSPointerDown){
 					jQuery('body').bind("selectstart.myEventSelectStart",function(e){
 						e.preventDefault();
 					});
@@ -1815,7 +1792,7 @@ Last modification on this file: 11 January 2014
 						clickPos = e.pageX - jQuery(myObj).offset().left;
 					}
 				}
-				else if(eType==MSPointerDown()){
+				else if(eType==MSPointerDown){
 					if(thisObj.settings.elements[scrollbarKey]['property']=="top"){
 						parentTopLeft = jQuery(myObj).parent().offset().top;
 						clickPos = e.originalEvent.pageY - jQuery(myObj).offset().top;
@@ -1847,7 +1824,7 @@ Last modification on this file: 11 January 2014
 						else
 							var mouseNow = (e.pageX - parentTopLeft)-clickPos;
 					}
-					else if(eType==MSPointerMove()){
+					else if(eType==MSPointerMove){
 						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
 							var mouseNow = (e.originalEvent.pageY - parentTopLeft)-clickPos;
 						else
@@ -1916,11 +1893,11 @@ Last modification on this file: 11 January 2014
 							jQuery(myObj).removeClass(thisObj.settings.scrollbarActiveClass);
 					});
 				}
-				else if(eType==MSPointerDown()){
-					jQuery(document).bind(MSPointerMove()+'.myEventPointerMove',mousemoveFunction);
-					jQuery(document).bind(MSPointerUp()+'.myEventPointerUp',function(){
-						jQuery(document).unbind(MSPointerMove()+'.myEventPointerMove');
-						jQuery(document).unbind(MSPointerUp()+'.myEventPointerUp');
+				else if(eType==MSPointerDown){
+					jQuery(document).bind(MSPointerMove+'.myEventPointerMove',mousemoveFunction);
+					jQuery(document).bind(MSPointerUp+'.myEventPointerUp',function(){
+						jQuery(document).unbind(MSPointerMove+'.myEventPointerMove');
+						jQuery(document).unbind(MSPointerUp+'.myEventPointerUp');
 						jQuery('body').unbind("selectstart.myEventSelectStart");
 						if(thisObj.settings.scrollbarActiveClass!=null)
 							jQuery(myObj).removeClass(thisObj.settings.scrollbarActiveClass);
@@ -1941,8 +1918,8 @@ Last modification on this file: 11 January 2014
 			jQuery(selector).addClass('isalive-nouserselect');
 			jQuery(selector).attr('unselectable', 'on');
 			
-			if(MSPointerEnabled()){
-				jQuery(selector).bind(MSPointerDown()+'.scrollbar',mousedownFunction);
+			if(MSPointerEnabled){
+				jQuery(selector).bind(MSPointerDown+'.scrollbar',mousedownFunction);
 				/*PREVENT TOUCH EVENTS*/
 				if(thisObj.settings.enableScrollbarTouch)
 					jQuery(selector).addClass('isalive-notouchaction');
@@ -2799,10 +2776,10 @@ Last modification on this file: 11 January 2014
 		jQuery(thisObj.mySelector).unbind('mousewheel.wheel');
 		jQuery(thisObj.mySelector).unbind('DOMMouseScroll.wheel');
 		jQuery(thisObj.mySelector).unbind('touchstart.touch');
-		jQuery(thisObj.mySelector).unbind(MSPointerDown()+'.touch');
+		jQuery(thisObj.mySelector).unbind(MSPointerDown+'.touch');
 		for(var key in thisObj.settings.elements){
 			if(thisObj.settings.elements[key]['scrollbar']){
-				jQuery(thisObj.settings.elements[key]['selector']).unbind(MSPointerDown()+'.scrollbar');
+				jQuery(thisObj.settings.elements[key]['selector']).unbind(MSPointerDown+'.scrollbar');
 				jQuery(thisObj.settings.elements[key]['selector']).unbind('mousedown.scrollbar');
 				jQuery(thisObj.settings.elements[key]['selector']).unbind('touchstart.scrollbar');
 				jQuery(thisObj.settings.elements[key]['selector']).removeAttr('unselectable');
@@ -2962,7 +2939,7 @@ Last modification on this file: 11 January 2014
 			return getBrowser();
 		},
 		getVersion : function(thisObj){
-			return "1.9.1";
+			return "1.9.2";
 		}
 	};
 	
