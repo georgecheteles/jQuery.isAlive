@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.8.4+ Manual</h1>
+				<h1>jQuery.isAlive 1.9.0+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -785,7 +785,25 @@ jQuery('#scroll-over-me').isAlive('getAnimationState');
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">17. getBrowser</p>
+						<p class="imp">17. destroy</p>
+							<p class="blue">
+								Destroys an instance
+							</p>
+						<p class="code">
+jQuery('#scroll-over-me').isAlive('destroy'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">18. destroyAll</p>
+							<p class="blue">
+								Destroys all instances and removes all general events(resize) and styles
+							</p>
+						<p class="code">
+jQuery().isAlive('destroyAll'); 
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">19. getBrowser</p>
 							<p class="blue">
 								Returns your browser informations, like engine, version, and if mobile or not
 							</p>
@@ -794,7 +812,7 @@ jQuery().isAlive('getBrowser');
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">18. getVersion</p>
+						<p class="imp">20. getVersion</p>
 							<p class="blue">
 								Returns your jQuery.isAlive current version
 							</p>

@@ -1,7 +1,9 @@
 jQuery isAlive ChangeLog
 
-ver. 1.8.7 (9 January 2014)
- - IE11 bug fixed
+ver. 1.9.0 (11 January 2014)
+ - adds "destroy" and "destroyAll" methods
+ - bugs fixed
+ - speed improvements
 
 ver. 1.8.6 (8 January 2014)
  - small changes
