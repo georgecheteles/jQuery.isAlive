@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.9.0+ Manual</h1>
+				<h1>jQuery.isAlive 1.9.4+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -22,10 +22,11 @@
 						<li>5. <a href="#section-5">Building animations</a></li>
 						<li>6. <a href="#section-6">Events</a></li>
 						<li>7. <a href="#section-7">Methods</a></li>
-						<li>8. <a href="#section-8">Known problems</a></li>
-						<li>9. <a href="#section-9">Examples</a></li>
-						<li>10. <a href="#section-10">Sites that use jQuery.isAlive</a></li>
-						<li>11. <a href="#section-11">Download links</a></li>
+						<li>8. <a href="#section-8">CSS classes</a></li>
+						<li>9. <a href="#section-9">Known problems</a></li>
+						<li>10. <a href="#section-10">Examples</a></li>
+						<li>11. <a href="#section-11">Sites that use jQuery.isAlive</a></li>
+						<li>12. <a href="#section-12">Download links</a></li>
 					</ul>
 				</div>
 				<div id="section-1" class="section">
@@ -547,7 +548,6 @@
 					<p class="text">
 						jQuery.isAlive has 3 events that you can use.
 					</p>
-
 					<p class="text">
 						<p class="imp">1. onStep(position,loop,animationType)</p>
 							<p class="blue">
@@ -805,7 +805,7 @@ jQuery().isAlive('destroyAll');
 					<p class="text">
 						<p class="imp">19. getBrowser</p>
 							<p class="blue">
-								Returns your browser informations, like engine, version, and if mobile or not
+								Returns your browser informations, like engine, version, if touch was found and if mobile or not
 							</p>
 						<p class="code">
 jQuery().isAlive('getBrowser'); 
@@ -822,7 +822,43 @@ jQuery().isAlive('getVersion');
 					</p>
 				</div>
 				<div id="section-8" class="section">
-					<h3>8. Known problems</h3>
+					<h3>8. CSS classes</h3>
+					<p class="text">
+						jQuery.isAlive adds to HEAD element some CSS classes that can be used by the user.
+					</p>
+					<p class="text">
+						<p class="imp">1. isalive-nouserselect</p>
+							<p class="blue">
+								Disables select on modern browsers. Add this to your master element if you want to prevent text selection on touch devices.
+							</p>
+						<p class="code">
+HTML: &lt;div class=&quot;isalive-nouserselect&quot;&gt;&lt;/div&gt;
+jQuery: jQuery('#scroll-over-me').addClass('isalive-nouserselect');
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">2. isalive-notouchaction</p>
+							<p class="blue">
+								Disables touch actions(like drag) on MSIE 10+.
+							</p>
+						<p class="code">
+HTML: &lt;div class=&quot;isalive-notouchaction&quot;&gt;&lt;/div&gt;
+jQuery: jQuery('#scroll-over-me').addClass('isalive-notouchaction');
+						</p>
+					</p>
+					<p class="text">
+						<p class="imp">3. isalive-enablegpu</p>
+							<p class="blue">
+								Adds style properties that enables the use of GPU accelerated animations.
+							</p>
+						<p class="code">
+HTML: &lt;div class=&quot;isalive-enablegpu&quot;&gt;&lt;/div&gt;
+jQuery: jQuery('#scroll-over-me').addClass('isalive-enablegpu');
+						</p>
+					</p>
+				</div>
+				<div id="section-9" class="section">
+					<h3>9. Known problems</h3>
 					<p class="text">
 						<p class="imp">1. On mobile devices the layout will break when the keyboard is open.</p>
 							<p class="blue">
@@ -832,6 +868,7 @@ jQuery().isAlive('getVersion');
 &lt;meta name=&quot;viewport&quot; content=&quot;user-scalable=no&quot;/&gt;
 						</p>
 					</p>
+					<p class="text">
 						<p class="imp">2. On Internet Explorer the mouse scroll event does not work.</p>
 							<p class="blue">
 								Fix: This happens when the wrapper used for mouse scroll events does not have a background property set. Add this code in your CSS.
@@ -843,8 +880,8 @@ jQuery().isAlive('getVersion');
 						</p>
 					</p>
 				</div>
-				<div id="section-9" class="section">
-					<h3>9. Examples</h3>
+				<div id="section-10" class="section">
+					<h3>10. Examples</h3>
 					<p class="text">
 						<a class="links" href="../examples/simple" target="_blank">Simple animation example</a>
 						Demo for basic uses of "animate","animate-set","set","add-class","remove-class".
@@ -862,15 +899,15 @@ jQuery().isAlive('getVersion');
 						 A 360 degree panorama controled by a scrollbar.
 					</p>
 				</div>
-				<div id="section-10" class="section">
-					<h3>10. Sites that use jQuery.isAlive</h3>
+				<div id="section-11" class="section">
+					<h3>11. Sites that use jQuery.isAlive</h3>
 					<p class="text">
 						<a class="links" href="http://www.reea.net" target="_blank">http://www.reea.net</a>
 						<a class="links" href="http://www.reea.net/reeanimation" target="_blank">http://www.reea.net/reeanimation</a>
 					</p>
 				</div>
-				<div id="section-11" class="section">
-					<h3>11. Download links</h3>
+				<div id="section-12" class="section">
+					<h3>12. Download links</h3>
 					<p class="text">
 						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.js" target="_blank">jQuery.isAlive.js (latest)</a>
 						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.min.js" target="_blank">jQuery.isAlive.min.js (latest/minified)</a>

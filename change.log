@@ -1,5 +1,9 @@
 jQuery.isAlive Change Log
 
+ver. 1.9.4 (13 January 2014)
+ - "enablegpu" class added
+ - "getBrowser" now shows if touch or not was found
+
 ver. 1.9.3 (12 January 2014)
  - small changes
 
