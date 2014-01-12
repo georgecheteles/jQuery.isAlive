@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.2)
+jQuery.isAlive(1.9.3)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -899,7 +899,7 @@ Last modification on this file: 11 January 2014
 		
 		/* BIND TOUCH EVENTS */
 		if(thisObj.settings.enableTouch){
-
+			
 			var startX;
 			var startY;
 			var isMoving = false;
@@ -1774,7 +1774,7 @@ Last modification on this file: 11 January 2014
 				
 				thisObj.scrollbarActive = scrollbarKey; 						
 				
-				if(eType=="mousedown" || eType==MSPointerDown){
+				if('onselectstart' in document.documentElement){
 					jQuery('body').bind("selectstart.myEventSelectStart",function(e){
 						e.preventDefault();
 					});
@@ -1908,6 +1908,7 @@ Last modification on this file: 11 January 2014
 					jQuery(myObj).bind('touchend.myEventTouchEnd',function(e){
 						jQuery(myObj).unbind('touchmove.myEventTouchMove');
 						jQuery(myObj).unbind('touchend.myEventTouchEnd');
+						jQuery('body').unbind("selectstart.myEventSelectStart");
 						if(thisObj.settings.scrollbarActiveClass!=null)
 							jQuery(myObj).removeClass(thisObj.settings.scrollbarActiveClass);
 					});
@@ -2814,6 +2815,7 @@ Last modification on this file: 11 January 2014
 			var selector = thisObj.selector;
 			if(typeof(isAliveObjects[selector])=="undefined")
 				return false;
+			
 			isAliveObjects[selector].destroy();
 			delete isAliveObjects[selector];
 			return thisObj;
@@ -2939,7 +2941,7 @@ Last modification on this file: 11 January 2014
 			return getBrowser();
 		},
 		getVersion : function(thisObj){
-			return "1.9.2";
+			return "1.9.3";
 		}
 	};
 	
