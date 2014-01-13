@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.4)
+jQuery.isAlive(1.9.5)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -1324,8 +1324,8 @@ Last modification on this file: 13 January 2014
 				jQuery('head').append('<style class="isalive-style"> .isalive-nouserselect{'+vP('user-select')+':none;} </style>');
 			if(vP('touch-action'))
 				jQuery('head').append('<style class="isalive-style"> .isalive-notouchaction{'+vP('touch-action')+':none;} </style>');
-			if (vP('transform') && vP('backface-visibility') && vP('perspective'))
-				jQuery('head').append('<style class="isalive-style"> .isalive-enablegpu{'+vP('transform')+':translateZ(0);'+vP('backface-visibility')+':hidden;'+vP('perspective')+':1000px;} </style>');
+			if (vP('backface-visibility') && vP('perspective'))
+				jQuery('head').append('<style class="isalive-style"> .isalive-enablegpu{'+vP('backface-visibility')+':hidden;'+vP('perspective')+':1000px;} </style>');
 		}
 		
 		/*INCREMENT INDEX*/
@@ -1625,7 +1625,7 @@ Last modification on this file: 13 January 2014
 		
 		/*CHECKS IF ENABLE GPU IS VALID AND ADD SPECIAL CSS*/
 		if(thisObj.settings.enableGPU==true || (thisObj.settings.enableGPU!=false && validateBrowsers(thisObj.settings.enableGPU)))
-			if(vP('transform') && vP('backface-visibility') && vP('perspective'))
+			if(vP('backface-visibility') && vP('perspective'))
 				jQuery('.'+thisObj.settings.animateClass).addClass('isalive-enablegpu');
 			
 		var tempArray = [];
@@ -2949,7 +2949,7 @@ Last modification on this file: 13 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.4";
+			return "1.9.5";
 		}
 	};
 	
