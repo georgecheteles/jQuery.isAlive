@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.5)
+jQuery.isAlive(1.9.6)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 13 January 2014
+Last modification on this file: 14 January 2014
 */
 
 (function(jQuery) {
@@ -472,7 +472,7 @@ Last modification on this file: 13 January 2014
 		this.setArray = {};
 		this.onOffClassArray = {};
 		
-		this.settings = jQuery.extend(true, {}, {
+		this.settings = jQuery.extend(true,{},{
 			elements:{},
 			elementsType:"linear", /*linear|tree*/
 			duration: 1000,
@@ -709,9 +709,9 @@ Last modification on this file: 13 January 2014
 
 		var tempObj = {};
 		if(typeof(thisObj.CSS3DefaultTransitionArray[selector])!="undefined")
-			tempObj = jQuery.extend(tempObj, thisObj.CSS3DefaultTransitionArray[selector]);
+			tempObj = jQuery.extend({},tempObj,thisObj.CSS3DefaultTransitionArray[selector]);
 		if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined")
-			tempObj = jQuery.extend(tempObj, thisObj.CSS3TransitionArray[selector]);
+			tempObj = jQuery.extend({},tempObj,thisObj.CSS3TransitionArray[selector]);
 			
 		var rt = "";
 		for(var key in tempObj){
@@ -1067,7 +1067,6 @@ Last modification on this file: 13 January 2014
 	/*THIS FUNCTION CREATES ANIMATION, SET AND CLASS ARRAYS*/
 	isAlive.prototype.createElementsArray = function(){
 		var thisObj = this;
-		var myElements = jQuery.extend({},thisObj.settings.elements);
 		var pos,key,selector,property,className,valStart,valEnd,stepStart,stepEnd,value;
 		var oldValue = {};
 		
@@ -1079,19 +1078,15 @@ Last modification on this file: 13 January 2014
 		
 		/*CREATES ARRAYS FOR ADDCLASS, REMOVECLASS, SET, ANIMATION PROPERTY*/
 		for(pos=0;pos<=thisObj.settings.max;pos++){
-			for(key in myElements){
-				if((myElements[key]['method']=='animate' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='animate-set' && pos>myElements[key]['step-end']) || (myElements[key]['method']=='set' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='add-class' && pos>myElements[key]['step-from']) || (myElements[key]['method']=='remove-class' && pos>myElements[key]['step-from'])){
-					delete myElements[key];
-					continue;
-				}
-				if(myElements[key]['method']=='animate'){
-					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end']){
-						selector = myElements[key]['selector'];
-						property = myElements[key]['property'];
-						valStart = myElements[key]['value-start']; 
-						valEnd = myElements[key]['value-end'];
-						stepStart = myElements[key]['step-start']; 
-						stepEnd = myElements[key]['step-end'];
+			for(key in thisObj.settings.elements){
+				if(thisObj.settings.elements[key]['method']=='animate'){
+					if(pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end']){
+						selector = thisObj.settings.elements[key]['selector'];
+						property = thisObj.settings.elements[key]['property'];
+						valStart = thisObj.settings.elements[key]['value-start']; 
+						valEnd = thisObj.settings.elements[key]['value-end'];
+						stepStart = thisObj.settings.elements[key]['step-start']; 
+						stepEnd = thisObj.settings.elements[key]['step-end'];
 						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
 						if(typeof(thisObj.animPositions[pos])=="undefined")
 							thisObj.animPositions[pos]=[];
@@ -1100,14 +1095,14 @@ Last modification on this file: 13 January 2014
 						thisObj.animPositions[pos][selector][property]=value;
 					}
 				}
-				else if(myElements[key]['method']=="animate-set"){
-					if(pos>=myElements[key]['step-start'] && pos<=myElements[key]['step-end'] && (pos-myElements[key]['step-start'])%myElements[key]['move-on']==0){
-						selector = myElements[key]['selector']; 
-						property = myElements[key]['property']; 
-						valStart = myElements[key]['value-start']; 
-						valEnd = myElements[key]['value-end'];
-						stepStart = myElements[key]['step-start']; 
-						stepEnd = myElements[key]['step-end'];
+				else if(thisObj.settings.elements[key]['method']=="animate-set"){
+					if(pos>=thisObj.settings.elements[key]['step-start'] && pos<=thisObj.settings.elements[key]['step-end'] && (pos-thisObj.settings.elements[key]['step-start'])%thisObj.settings.elements[key]['move-on']==0){
+						selector = thisObj.settings.elements[key]['selector']; 
+						property = thisObj.settings.elements[key]['property']; 
+						valStart = thisObj.settings.elements[key]['value-start']; 
+						valEnd = thisObj.settings.elements[key]['value-end'];
+						stepStart = thisObj.settings.elements[key]['step-start']; 
+						stepEnd = thisObj.settings.elements[key]['step-end'];
 						value = getAtPosValue(pos,valStart,valEnd,stepStart,stepEnd);
 						if(pos>stepStart){
 							if(typeof(thisObj.setArray['forward'][pos])=="undefined")
@@ -1124,25 +1119,25 @@ Last modification on this file: 13 January 2014
 						oldValue[selector+'-'+property] = value;
 					}
 				}
-				else if(myElements[key]['method']=="set"){
-					if(pos==myElements[key]['step-from']){
-						selector = myElements[key]['selector']; 
-						property = myElements[key]['property']; 
+				else if(thisObj.settings.elements[key]['method']=="set"){
+					if(pos==thisObj.settings.elements[key]['step-from']){
+						selector = thisObj.settings.elements[key]['selector']; 
+						property = thisObj.settings.elements[key]['property']; 
 						if(typeof(thisObj.setArray['forward'][pos])=="undefined")
 							thisObj.setArray['forward'][pos] = {};
 						if(typeof(thisObj.setArray['forward'][pos][selector])=="undefined")
 							thisObj.setArray['forward'][pos][selector] = {};
-						thisObj.setArray['forward'][pos][selector][property] = myElements[key]['value-above'];
+						thisObj.setArray['forward'][pos][selector][property] = thisObj.settings.elements[key]['value-above'];
 						if(typeof(thisObj.setArray['backward'][pos])=="undefined")
 							thisObj.setArray['backward'][pos] = {};
 						if(typeof(thisObj.setArray['backward'][pos][selector])=="undefined")
 							thisObj.setArray['backward'][pos][selector] = {};
-						thisObj.setArray['backward'][pos][selector][property] = myElements[key]['value-under'];
+						thisObj.setArray['backward'][pos][selector][property] = thisObj.settings.elements[key]['value-under'];
 					}
-				}else if(myElements[key]['method']=="add-class"){
-					if(pos==myElements[key]['step-from']){
-						selector = myElements[key]['selector']; 
-						className = myElements[key]['class-name']; 
+				}else if(thisObj.settings.elements[key]['method']=="add-class"){
+					if(pos==thisObj.settings.elements[key]['step-from']){
+						selector = thisObj.settings.elements[key]['selector']; 
+						className = thisObj.settings.elements[key]['class-name']; 
 						if(typeof(thisObj.onOffClassArray['forward'][pos])=="undefined")
 							thisObj.onOffClassArray['forward'][pos] = {};
 						if(typeof(thisObj.onOffClassArray['forward'][pos][selector])=="undefined")
@@ -1154,10 +1149,10 @@ Last modification on this file: 13 January 2014
 							thisObj.onOffClassArray['backward'][pos][selector] = {};
 						thisObj.onOffClassArray['backward'][pos][selector][className] = false;
 					}
-				}else if(myElements[key]['method']=="remove-class"){
-					if(pos==myElements[key]['step-from']){
-						selector = myElements[key]['selector']; 
-						className = myElements[key]['class-name']; 
+				}else if(thisObj.settings.elements[key]['method']=="remove-class"){
+					if(pos==thisObj.settings.elements[key]['step-from']){
+						selector = thisObj.settings.elements[key]['selector']; 
+						className = thisObj.settings.elements[key]['class-name']; 
 						if(typeof(thisObj.onOffClassArray['forward'][pos])=="undefined")
 							thisObj.onOffClassArray['forward'][pos] = {};
 						if(typeof(thisObj.onOffClassArray['forward'][pos][selector])=="undefined")
@@ -1519,7 +1514,7 @@ Last modification on this file: 13 January 2014
 						}
 						else
 							var id = jQuery(child).attr('id');
-						var newElement = jQuery.extend({}, thisObj.settings.elements[key]);
+						var newElement = jQuery.extend({},thisObj.settings.elements[key]);
 						newElement['selector'] = "#"+id;
 						new_elements.push(newElement);
 					});
@@ -1727,7 +1722,7 @@ Last modification on this file: 13 January 2014
 		for(key in thisObj.settings.elements){
 			if(thisObj.settings.elements[key]["method"]=="animate" || thisObj.settings.elements[key]["method"]=="animate-set"){
 				if(isDinamic(thisObj.settings.elements[key]['value-start']) || isDinamic(thisObj.settings.elements[key]['value-end'])){
-					var tempObj = (thisObj.settings.elements[key]['scrollbar']) ? jQuery.extend({key:parseInt(key)}, thisObj.settings.elements[key]) : jQuery.extend({}, thisObj.settings.elements[key]);
+					var tempObj = (thisObj.settings.elements[key]['scrollbar']) ? jQuery.extend({key:parseInt(key)},thisObj.settings.elements[key]) : jQuery.extend({},thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
 				thisObj.settings.elements[key]['value-start'] = thisObj.convertParams(thisObj.settings.elements[key]['value-start'],thisObj.settings.elements[key]['format']);
@@ -1735,7 +1730,7 @@ Last modification on this file: 13 January 2014
 			}
 			else if(thisObj.settings.elements[key]["method"]=="set"){
 				if(isDinamic(thisObj.settings.elements[key]['value-under']) || isDinamic(thisObj.settings.elements[key]['value-above'])){
-					var tempObj = jQuery.extend({}, thisObj.settings.elements[key]);
+					var tempObj = jQuery.extend({},thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
 				thisObj.settings.elements[key]['value-under'] = thisObj.convertParams(thisObj.settings.elements[key]['value-under'],thisObj.settings.elements[key]['format']);
@@ -1743,7 +1738,7 @@ Last modification on this file: 13 January 2014
 			}
 			else if(thisObj.settings.elements[key]["method"]=="static"){
 				if(isDinamic(thisObj.settings.elements[key]['value'])){
-					var tempObj = jQuery.extend({}, thisObj.settings.elements[key]);
+					var tempObj = jQuery.extend({},thisObj.settings.elements[key]);
 					thisObj.cssDinamicElements.push(tempObj);
 				}
 				convertValue = thisObj.convertParams(thisObj.settings.elements[key]['value'],thisObj.settings.elements[key]['format']);
@@ -2949,7 +2944,7 @@ Last modification on this file: 13 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.5";
+			return "1.9.6";
 		}
 	};
 	
