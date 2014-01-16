@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.6)
+jQuery.isAlive(1.9.7)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 14 January 2014
+Last modification on this file: 16 January 2014
 */
 
 (function(jQuery) {
@@ -318,7 +318,7 @@ Last modification on this file: 14 January 2014
 	function getBrowser(){
 		var browser = {}, temp;
 		var ua = (navigator.userAgent||navigator.vendor||window.opera); 
-		var M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*([\d\.]+)/i) || [];
+		var M = ua.match(/(konqueror|opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*([\d\.]+)/i) || [];
 		M = M[2] ? [M[1], M[2]]:[navigator.appName, navigator.appVersion, '-?'];
 		temp = ua.match(/version\/([\.\d]+)/i);
 		if(temp!=null)
@@ -358,10 +358,11 @@ Last modification on this file: 14 January 2014
 		if(typeof(vPArray[property])=="undefined"){
 			vPArray[property] = false;
 			var el = document.createElement('foo');
-			var p = propertyToStyle(property);
-			if(typeof(el.style[p])!="undefined")
+			var pLower = propertyToStyle(property);
+			var pUpper = propertyToStyle(property,true);
+			if(typeof(el.style[pLower])!="undefined" || typeof(el.style[pUpper])!="undefined")
 				vPArray[property] = property;
-			else if(property.indexOf('-webkit-')!=0 && property.indexOf('-moz-')!=0 && property.indexOf('-ms-')!=0 && property.indexOf('-o-')!=0){
+			else if(property.indexOf('-webkit-')!=0 && property.indexOf('-moz-')!=0 && property.indexOf('-ms-')!=0 && property.indexOf('-o-')!=0 && property.indexOf('-khtml-')!=0){
 				if(browserObj.webkit){
 					var v = propertyToStyle("-webkit-"+property);
 					if(typeof(el.style[v])!="undefined")
@@ -381,6 +382,11 @@ Last modification on this file: 14 January 2014
 					var v = propertyToStyle("-o-"+property,true);
 					if(typeof(el.style[v])!="undefined")
 						vPArray[property] = "-o-"+property;
+				}
+				else if(browserObj.konqueror){
+					var v = propertyToStyle("-khtml-"+property,true);
+					if(typeof(el.style[v])!="undefined")
+						vPArray[property] = "-khtml-"+property;
 				}
 			}
 		}
@@ -550,36 +556,52 @@ Last modification on this file: 14 January 2014
 		else
 			return value%this.settings.max;
 	}
-	
-	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
-	isAlive.prototype.animateCSS3 = function(selector,property,value,duration,easing){
+
+	/*ANIMATE FUNCTION*/
+	isAlive.prototype.animate = function(animType,selector,property,value,duration,easing,step){
 		var thisObj = this;
-		/*DELETE VALUE IF ELEMENT IS ANIMATED ALSO BY JS*/
-		if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
-			delete thisObj.JSValuesArray[selector][property];
-		/*SET TRANSITION AND BREAK CSS3 BUG IF NEEDED*/
-		thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing+' 0s';
-		jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
-		if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
-			value = breakCSS3(property,value);
-		thisObj.CSS3ValuesArray[selector][property] = value;
-		jQuery(selector).css(property,value);
-	}
-	
-	/*ANIMATE FUNCTION THAT WORKS FOR NON JQUERY ANIMATED PROPERTIES*/
-	isAlive.prototype.animateJS = function(startPos,selector,property,value,duration,easing){
-		var thisObj = this;
-		if(typeof(thisObj.JSValuesArray[selector][property])=="undefined")
-			thisObj.JSValuesArray[selector][property] = thisObj.animPositions[Math.round(thisObj.getPos(startPos))][selector][property].toString();
-		var start = thisObj.JSValuesArray[selector][property];
-		var end = value.toString();
-		var tempObj = {};
-		tempObj[property+'Timer']="+=100";
-		jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
-			step: function(step,fx){
-				thisObj.setCSS(selector,property,getAtPosValue(step-fx.start,start,end,0,100));
-			}
-		});
+		switch(animType){
+			case 1:
+				/*DELETE CSS3 VALUES*/
+				if(typeof(thisObj.CSS3TransitionArray[selector])!="undefined" && typeof(thisObj.CSS3TransitionArray[selector][property])!="undefined"){
+					delete thisObj.CSS3TransitionArray[selector][property];
+					delete thisObj.CSS3ValuesArray[selector][property];
+					jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
+				}
+				/*DO ANIMATION*/
+				var animateObj = {};
+				animateObj[property] = value;
+				jQuery(selector).animate(animateObj,{duration:duration,easing:easing,queue:false});										
+				break;
+			case 2:
+				/*DELETE JS VALUES IF EXIST*/
+				if(typeof(thisObj.JSValuesArray[selector][property])=="undefined")
+					thisObj.JSValuesArray[selector][property] = thisObj.animPositions[Math.round(thisObj.getPos(step))][selector][property].toString();
+				/*DO ANIMATION*/
+				var start = thisObj.JSValuesArray[selector][property];
+				var end = value.toString();
+				var tempObj = {};
+				tempObj[property+'Timer']="+=100";
+				jQuery(selector).animate(tempObj,{duration:duration,easing:easing,queue:false,
+					step: function(step,fx){
+						thisObj.setCSS(selector,property,getAtPosValue(step-fx.start,start,end,0,100));
+					}
+				});
+				break;
+			case 3:
+				/*DELETE VALUE IF ELEMENT IS ANIMATED ALSO BY JS*/
+				if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
+					delete thisObj.JSValuesArray[selector][property];
+				/*SET TRANSITION AND BREAK CSS3 BUG IF NEEDED*/
+				thisObj.CSS3TransitionArray[selector][property] = property+' '+duration+'ms '+easing+' 0s';
+				jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
+				if(typeof(thisObj.CSS3ValuesArray[selector][property])!="undefined" && thisObj.CSS3ValuesArray[selector][property]==value)
+					value = breakCSS3(property,value);
+				thisObj.CSS3ValuesArray[selector][property] = value;
+				/*DO ANIMATION*/
+				jQuery(selector).css(property,value);
+				break;
+		}
 	}
 
 	/*SET CSS VALUES*/
@@ -607,9 +629,8 @@ Last modification on this file: 14 January 2014
 			delete thisObj.CSS3ValuesArray[selector][property];
 			jQuery(selector).css(vP('transition'),thisObj.getTransitionArray(selector));
 		}
-		else if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
+		if(typeof(thisObj.JSValuesArray[selector])!="undefined" && typeof(thisObj.JSValuesArray[selector][property])!="undefined")
 			thisObj.JSValuesArray[selector][property] = value;
-
 		jQuery(selector).css(property,value);
 	}
 	
@@ -2155,19 +2176,7 @@ Last modification on this file: 14 January 2014
 						    		duration = 0;
 						    		if ((directionForward && (animations[step][selector][property]['end']-thisObj.getPos(value))>0) || (!directionForward && (thisObj.getPos(value)-animations[step][selector][property]['end'])>0))
 						    			duration = Math.floor(animations[step][selector][property]['duration']*(Math.abs(animations[step][selector][property]['end']-thisObj.getPos(value))/Math.abs(animations[step][selector][property]['end']-thisObj.getPos(step))));
-									switch(animations[step][selector][property]['animType']){
-										case 1:
-											var tObj = {};
-											tObj[property] = animations[step][selector][property]['to'];
-											jQuery(selector).animate(tObj,{duration:duration,easing:animations[step][selector][property]['easing'],queue:false});										
-											break;
-										case 2:
-											thisObj.animateJS(step,selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
-											break;
-										case 3:
-											thisObj.animateCSS3(selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing']);
-											break;
-									}
+						    		thisObj.animate(animations[step][selector][property]['animType'],selector,property,animations[step][selector][property]['to'],duration,animations[step][selector][property]['easing'],step);
 						    	}
 					    	}
 		    			}
@@ -2944,7 +2953,7 @@ Last modification on this file: 14 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.6";
+			return "1.9.7";
 		}
 	};
 	
