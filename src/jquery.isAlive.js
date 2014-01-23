@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.7)
+jQuery.isAlive(1.9.8)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 16 January 2014
+Last modification on this file: 23 January 2014
 */
 
 (function(jQuery) {
@@ -467,7 +467,6 @@ Last modification on this file: 16 January 2014
 		this.functionsArray = {};
 		this.haveStepPoints;
 		this.rebuildOnStop = false;
-		this.dragHorizontal = null;
 		this.scrollBarPosition = 0;
 		this.toggleState = 0;
 		this.CSS3DefaultTransitionArray = {};
@@ -919,12 +918,52 @@ Last modification on this file: 16 January 2014
 		
 		var thisObj = this;
 		
+		/* BIND SCROLL EVENTS */
+		if(thisObj.settings.enableWheel){
+			if(thisObj.settings.wheelType=="scroll"){
+				if(!browserObj.mozilla){
+					jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
+						(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+						if(thisObj.settings.preventWheel)
+							return false;
+					});
+				}
+				else{
+					// DOMMouseScroll | MozMousePixelScroll
+					jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
+						(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+						if(thisObj.settings.preventWheel)
+							return false;
+					});
+				}
+			}
+			else{
+				if(!browserObj.mozilla){
+					jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
+						(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+						if(thisObj.settings.preventWheel)
+							return false;
+					});
+				}
+				else{
+					// DOMMouseScroll | MozMousePixelScroll
+					jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
+						(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+						if(thisObj.settings.preventWheel)
+							return false;
+					});
+				}
+			}
+		}
+		
 		/* BIND TOUCH EVENTS */
 		if(thisObj.settings.enableTouch){
 			
 			var startX;
 			var startY;
 			var isMoving = false;
+			var dragHorizontal = null;
+			var pointerType = null;
 
 			function onTouchStart(e){
 				if(!MSPointerEnabled){
@@ -937,8 +976,9 @@ Last modification on this file: 16 January 2014
 					this.addEventListener('touchend', cancelTouch, false);
 				}
 				else{
-					if(e.originalEvent.pointerType == (e.originalEvent.MSPOINTER_TYPE_MOUSE || 'mouse'))
+					if(e.originalEvent.pointerType != (e.originalEvent.MSPOINTER_TYPE_TOUCH || 'touch'))
 						return;
+					pointerType = e.originalEvent.pointerType;
 					startX = e.originalEvent.clientX;
 					startY = e.originalEvent.clientY;
 					isMoving = true;
@@ -953,15 +993,20 @@ Last modification on this file: 16 January 2014
 					this.removeEventListener('touchend', cancelTouch);
 				}
 				else{
+					if(typeof(e)!="undefined" && e.pointerType != pointerType)
+						return;
+					pointerType = null;
 					document.removeEventListener(MSPointerMove, onTouchMove);
 					document.removeEventListener(MSPointerUp, cancelTouch);
 				}
 				isMoving = false;
-				thisObj.dragHorizontal = null;
+				dragHorizontal = null;
 			}	
 			
 			if(thisObj.settings.touchType=='wipe'){
 				var onTouchMove = function(e){
+					if(MSPointerEnabled && e.pointerType != pointerType)
+						return;
 					if(!MSPointerEnabled && thisObj.settings.preventTouch)
 						e.preventDefault();
 					if(isMoving){
@@ -1004,9 +1049,10 @@ Last modification on this file: 16 January 2014
 			}
 			else{
 				var onTouchMove = function (e){
-					if(!MSPointerEnabled && thisObj.settings.preventTouch){
+					if(MSPointerEnabled && e.pointerType != pointerType)
+						return;
+					if(!MSPointerEnabled && thisObj.settings.preventTouch)
 						e.preventDefault();
-					}
 					if(isMoving){
 						if(!MSPointerEnabled){
 							var x = e.touches[0].clientX;
@@ -1019,25 +1065,25 @@ Last modification on this file: 16 January 2014
 						var dx = startX - x;
 						var dy = startY - y;
 						if(Math.abs(dx)>=thisObj.settings.touchXFrom){
-							if(thisObj.settings.touchActions.left!=0 && dx>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
-								thisObj.dragHorizontal = true;
+							if(thisObj.settings.touchActions.left!=0 && dx>0 && (dragHorizontal==null || dragHorizontal==true)){
+								dragHorizontal = true;
 								thisObj.doDrag(thisObj.settings.touchActions.left);
 								startX = x;
 							}
-							else if(thisObj.settings.touchActions.right!=0 && dx<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==true)){
-								thisObj.dragHorizontal = true;
+							else if(thisObj.settings.touchActions.right!=0 && dx<0 && (dragHorizontal==null || dragHorizontal==true)){
+								dragHorizontal = true;
 								thisObj.doDrag(thisObj.settings.touchActions.right);
 								startX = x;
 							}
 						 }
 						 if(Math.abs(dy)>=thisObj.settings.touchYFrom){
-							if(thisObj.settings.touchActions.up!=0 && dy>0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
-								thisObj.dragHorizontal = false;
+							if(thisObj.settings.touchActions.up!=0 && dy>0 && (dragHorizontal==null || dragHorizontal==false)){
+								dragHorizontal = false;
 								thisObj.doDrag(thisObj.settings.touchActions.up);
 								startY = y;
 							}
-							else if(thisObj.settings.touchActions.down!=0 && dy<0 && (thisObj.dragHorizontal==null || thisObj.dragHorizontal==false)){
-								thisObj.dragHorizontal = false;
+							else if(thisObj.settings.touchActions.down!=0 && dy<0 && (dragHorizontal==null || dragHorizontal==false)){
+								dragHorizontal = false;
 								thisObj.doDrag(thisObj.settings.touchActions.down);
 								startY = y;
 							}
@@ -1056,33 +1102,6 @@ Last modification on this file: 16 January 2014
 				jQuery(thisObj.mySelector).bind('touchstart.touch',onTouchStart);
 		}
 		
-		/* BIND SCROLL EVENTS */
-		if(thisObj.settings.enableWheel){
-			if(thisObj.settings.wheelType=="scroll"){
-				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
-					if(thisObj.settings.preventWheel)
-						return false;
-				});
-				jQuery(thisObj.mySelector).bind('DOMMouseScroll.wheel',function(e){
-					(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
-					if(thisObj.settings.preventWheel)
-						return false;
-				});
-			}
-			else{
-				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
-					if(thisObj.settings.preventWheel)
-						return false;
-				});
-				jQuery(thisObj.mySelector).bind('DOMMouseScroll.wheel',function(e){
-					(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
-					if(thisObj.settings.preventWheel)
-						return false;
-				});
-			}
-		}
 	}
 	
 	/*THIS FUNCTION CREATES ANIMATION, SET AND CLASS ARRAYS*/
@@ -1786,9 +1805,12 @@ Last modification on this file: 16 January 2014
 				
 				if(thisObj.animating && thisObj.animationType!="scrollbar")
 					return false;
-				
-				if(eType==MSPointerDown && e.originalEvent.pointerType!=(e.originalEvent.MSPOINTER_TYPE_MOUSE || 'mouse') && !thisObj.settings.enableScrollbarTouch)
-					return false;
+					
+				if(eType==MSPointerDown){
+					if(e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_PEN || 'pen') || (e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_TOUCH || 'touch') && !thisObj.settings.enableScrollbarTouch))
+						return false;
+					var pointerType = e.originalEvent.pointerType;
+				}
 						
 				var parentTopLeft,clickPos,position,positionTo,positionValid;
 				var valStart = parseFloat(getFloat(thisObj.settings.elements[scrollbarKey]['value-start'].toString()));
@@ -1839,7 +1861,7 @@ Last modification on this file: 16 January 2014
 				var mousemoveFunction = function(e){
 				
 					var eType = e.originalEvent.type;
-				
+					
 					if(eType=="mousemove"){
 						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
 							var mouseNow = (e.pageY - parentTopLeft)-clickPos;
@@ -1847,6 +1869,8 @@ Last modification on this file: 16 January 2014
 							var mouseNow = (e.pageX - parentTopLeft)-clickPos;
 					}
 					else if(eType==MSPointerMove){
+						if(e.originalEvent.pointerType!=pointerType)
+							return false;						
 						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
 							var mouseNow = (e.originalEvent.pageY - parentTopLeft)-clickPos;
 						else
@@ -1907,7 +1931,7 @@ Last modification on this file: 16 January 2014
 				
 				if(eType=="mousedown"){
 					jQuery(document).bind('mousemove.myEventMouseMove',mousemoveFunction);
-					jQuery(document).bind('mouseup.myEventMouseUp',function(){
+					jQuery(document).bind('mouseup.myEventMouseUp',function(e){
 						jQuery(document).unbind('mousemove.myEventMouseMove');
 						jQuery(document).unbind('mouseup.myEventMouseUp');
 						jQuery('body').unbind("selectstart.myEventSelectStart");
@@ -1917,7 +1941,9 @@ Last modification on this file: 16 January 2014
 				}
 				else if(eType==MSPointerDown){
 					jQuery(document).bind(MSPointerMove+'.myEventPointerMove',mousemoveFunction);
-					jQuery(document).bind(MSPointerUp+'.myEventPointerUp',function(){
+					jQuery(document).bind(MSPointerUp+'.myEventPointerUp',function(e){
+						if(e.originalEvent.pointerType!=pointerType)
+							return false;						
 						jQuery(document).unbind(MSPointerMove+'.myEventPointerMove');
 						jQuery(document).unbind(MSPointerUp+'.myEventPointerUp');
 						jQuery('body').unbind("selectstart.myEventSelectStart");
@@ -2785,7 +2811,7 @@ Last modification on this file: 16 January 2014
 		var thisObj = this;
 		/*UNBIND EVENTS*/
 		jQuery(thisObj.mySelector).unbind('mousewheel.wheel');
-		jQuery(thisObj.mySelector).unbind('DOMMouseScroll.wheel');
+		jQuery(thisObj.mySelector).unbind('MozMousePixelScroll.wheel');
 		jQuery(thisObj.mySelector).unbind('touchstart.touch');
 		jQuery(thisObj.mySelector).unbind(MSPointerDown+'.touch');
 		for(var key in thisObj.settings.elements){
@@ -2953,7 +2979,7 @@ Last modification on this file: 16 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.7";
+			return "1.9.8";
 		}
 	};
 	

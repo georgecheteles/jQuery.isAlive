@@ -1,5 +1,9 @@
 jQuery.isAlive Change Log
 
+ver. 1.9.8 (23 January 2014)
+ - bugs fixed on IE 10 && 11
+ - bugs fixed on Firefox for OS X
+
 ver. 1.9.7 (16 January 2014)
  - bugs fixed
  - adding support for Konqueror browser
