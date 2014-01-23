@@ -5,7 +5,7 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.8)
+jQuery.isAlive(1.9.9)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
@@ -921,38 +921,30 @@ Last modification on this file: 23 January 2014
 		/* BIND SCROLL EVENTS */
 		if(thisObj.settings.enableWheel){
 			if(thisObj.settings.wheelType=="scroll"){
-				if(!browserObj.mozilla){
-					jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-						(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
-						if(thisObj.settings.preventWheel)
-							return false;
-					});
-				}
-				else{
-					// DOMMouseScroll | MozMousePixelScroll
-					jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
-						(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
-						if(thisObj.settings.preventWheel)
-							return false;
-					});
-				}
+				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
+					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+					if(thisObj.settings.preventWheel)
+						return false;
+				});
+				// DOMMouseScroll | MozMousePixelScroll
+				jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
+					(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+					if(thisObj.settings.preventWheel)
+						return false;
+				});
 			}
 			else{
-				if(!browserObj.mozilla){
-					jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-						(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
-						if(thisObj.settings.preventWheel)
-							return false;
-					});
-				}
-				else{
-					// DOMMouseScroll | MozMousePixelScroll
-					jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
-						(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
-						if(thisObj.settings.preventWheel)
-							return false;
-					});
-				}
+				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
+					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+					if(thisObj.settings.preventWheel)
+						return false;
+				});
+				// DOMMouseScroll | MozMousePixelScroll
+				jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
+					(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+					if(thisObj.settings.preventWheel)
+						return false;
+				});
 			}
 		}
 		
@@ -1804,11 +1796,11 @@ Last modification on this file: 23 January 2014
 				var eType = e.originalEvent.type;
 				
 				if(thisObj.animating && thisObj.animationType!="scrollbar")
-					return false;
+					return;
 					
 				if(eType==MSPointerDown){
 					if(e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_PEN || 'pen') || (e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_TOUCH || 'touch') && !thisObj.settings.enableScrollbarTouch))
-						return false;
+						return;
 					var pointerType = e.originalEvent.pointerType;
 				}
 						
@@ -1870,7 +1862,7 @@ Last modification on this file: 23 January 2014
 					}
 					else if(eType==MSPointerMove){
 						if(e.originalEvent.pointerType!=pointerType)
-							return false;						
+							return;						
 						if(thisObj.settings.elements[scrollbarKey]['property']=="top")
 							var mouseNow = (e.originalEvent.pageY - parentTopLeft)-clickPos;
 						else
@@ -1927,6 +1919,7 @@ Last modification on this file: 23 January 2014
 						thisObj.goTo({to:positionTo,animationType:'scrollbar',duration:thisObj.settings.durationTweaks['scrollbar']['duration'],durationType:thisObj.settings.durationTweaks['scrollbar']['durationType'],minStepDuration:thisObj.settings.durationTweaks['scrollbar']['minStepDuration']});
 					}
 					e.preventDefault();
+					e.stopPropagation();
 				}
 				
 				if(eType=="mousedown"){
@@ -1943,7 +1936,7 @@ Last modification on this file: 23 January 2014
 					jQuery(document).bind(MSPointerMove+'.myEventPointerMove',mousemoveFunction);
 					jQuery(document).bind(MSPointerUp+'.myEventPointerUp',function(e){
 						if(e.originalEvent.pointerType!=pointerType)
-							return false;						
+							return;						
 						jQuery(document).unbind(MSPointerMove+'.myEventPointerMove');
 						jQuery(document).unbind(MSPointerUp+'.myEventPointerUp');
 						jQuery('body').unbind("selectstart.myEventSelectStart");
@@ -1961,6 +1954,7 @@ Last modification on this file: 23 January 2014
 							jQuery(myObj).removeClass(thisObj.settings.scrollbarActiveClass);
 					});
 				}
+				e.preventDefault();
 				e.stopPropagation();
 			}
 			
@@ -2979,7 +2973,7 @@ Last modification on this file: 23 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.8";
+			return "1.9.9";
 		}
 	};
 	
