@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.9)
+jQuery.isAlive(1.9.10)
 Written by George Cheteles (george@we-code-magic.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	http://www.we-code-magic.com 
 	george@we-code-magic.com
-Last modification on this file: 23 January 2014
+Last modification on this file: 24 January 2014
 */
 
 (function(jQuery) {
@@ -920,28 +920,27 @@ Last modification on this file: 23 January 2014
 		
 		/* BIND SCROLL EVENTS */
 		if(thisObj.settings.enableWheel){
+			var wheelEvent = (browserObj.mozilla) ? "MozMousePixelScroll.wheel" : "DOMMouseScroll.wheel";
 			if(thisObj.settings.wheelType=="scroll"){
 				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+					(e.originalEvent.wheelDelta < 0) ? thisObj.doScroll(thisObj.settings.wheelActions.down) : thisObj.doScroll(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
-				// DOMMouseScroll | MozMousePixelScroll
-				jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
-					(e.originalEvent.detail > 0)?thisObj.doScroll(thisObj.settings.wheelActions.down):thisObj.doScroll(thisObj.settings.wheelActions.up);
+				jQuery(thisObj.mySelector).bind(wheelEvent,function(e){
+					(e.originalEvent.detail > 0) ? thisObj.doScroll(thisObj.settings.wheelActions.down) : thisObj.doScroll(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
 			}
 			else{
 				jQuery(thisObj.mySelector).bind('mousewheel.wheel',function(e){
-					(e.originalEvent.wheelDelta < 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+					(e.originalEvent.wheelDelta < 0) ? thisObj.doJump(thisObj.settings.wheelActions.down) : thisObj.doJump(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
-				// DOMMouseScroll | MozMousePixelScroll
-				jQuery(thisObj.mySelector).bind('MozMousePixelScroll.wheel',function(e){
-					(e.originalEvent.detail > 0)?thisObj.doJump(thisObj.settings.wheelActions.down):thisObj.doJump(thisObj.settings.wheelActions.up);
+				jQuery(thisObj.mySelector).bind(wheelEvent,function(e){
+					(e.originalEvent.detail > 0) ? thisObj.doJump(thisObj.settings.wheelActions.down) : thisObj.doJump(thisObj.settings.wheelActions.up);
 					if(thisObj.settings.preventWheel)
 						return false;
 				});
@@ -1794,6 +1793,7 @@ Last modification on this file: 23 January 2014
 			
 				var myObj = this;
 				var eType = e.originalEvent.type;
+				var pointerType = null;
 				
 				if(thisObj.animating && thisObj.animationType!="scrollbar")
 					return;
@@ -1801,8 +1801,11 @@ Last modification on this file: 23 January 2014
 				if(eType==MSPointerDown){
 					if(e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_PEN || 'pen') || (e.originalEvent.pointerType==(e.originalEvent.MSPOINTER_TYPE_TOUCH || 'touch') && !thisObj.settings.enableScrollbarTouch))
 						return;
-					var pointerType = e.originalEvent.pointerType;
+					 pointerType = e.originalEvent.pointerType;
 				}
+				else if(eType=='touchstart')
+					if(e.originalEvent.touches.length!=1) 
+						return;
 						
 				var parentTopLeft,clickPos,position,positionTo,positionValid;
 				var valStart = parseFloat(getFloat(thisObj.settings.elements[scrollbarKey]['value-start'].toString()));
@@ -2806,6 +2809,7 @@ Last modification on this file: 23 January 2014
 		/*UNBIND EVENTS*/
 		jQuery(thisObj.mySelector).unbind('mousewheel.wheel');
 		jQuery(thisObj.mySelector).unbind('MozMousePixelScroll.wheel');
+		jQuery(thisObj.mySelector).unbind('DOMMouseScroll.wheel');
 		jQuery(thisObj.mySelector).unbind('touchstart.touch');
 		jQuery(thisObj.mySelector).unbind(MSPointerDown+'.touch');
 		for(var key in thisObj.settings.elements){
@@ -2973,7 +2977,7 @@ Last modification on this file: 23 January 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.9";
+			return "1.9.10";
 		}
 	};
 	
