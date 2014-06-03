@@ -440,31 +440,6 @@
 					jQuery('#drawSurface1').isAlive('autoplay',{orientation:"next",duration:200,durationType:"step",count:5});
 					return false;
 				});
-				
-				$('#drawSurface1 a.btn2').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:10,duration:2000});
-					return false;
-				});
-
-				$('#drawSurface1 a.btn3').click(function(){
-					jQuery('#drawSurface1').isAlive('skip',{to:5});
-					return false;
-				});
-
-				$('#drawSurface2 a.btn1').click(function(){
-					jQuery('#drawSurface2').isAlive('play',{duration:1000,force:true});
-					return false;
-				});
-
-				$('#drawSurface2 a.btn2').click(function(){
-					jQuery('#drawSurface2').isAlive('rewind',{duration:1000,force:true});
-					return false;
-				});
-
-				$('#drawSurface2 a.btn3').click(function(){
-					jQuery('#drawSurface2').isAlive('stop');
-					return false;
-				});
 
 				$('.stepPointsWrap .sp1').click(function(){
 					jQuery('#drawSurface1').isAlive('goTo',{to:0,durationType:'step',duration:100});
@@ -488,6 +463,31 @@
 
 				$('.stepPointsWrap .sp5').click(function(){
 					jQuery('#drawSurface1').isAlive('goTo',{to:20,durationType:'step',duration:100});
+					return false;
+				});
+				
+				$('#drawSurface1 a.btn2').click(function(){
+					jQuery('#drawSurface1').isAlive('goTo',{to:10,duration:2000});
+					return false;
+				});
+
+				$('#drawSurface1 a.btn3').click(function(){
+					jQuery('#drawSurface1').isAlive('skip',{to:5});
+					return false;
+				});
+
+				$('#drawSurface2 a.btn1').click(function(){
+					jQuery('#drawSurface2').isAlive('play',{duration:1000,force:true});
+					return false;
+				});
+
+				$('#drawSurface2 a.btn2').click(function(){
+					jQuery('#drawSurface2').isAlive('rewind',{duration:1000,force:true});
+					return false;
+				});
+
+				$('#drawSurface2 a.btn3').click(function(){
+					jQuery('#drawSurface2').isAlive('stop');
 					return false;
 				});
 

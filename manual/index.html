@@ -61,7 +61,7 @@
 &lt;script type=&quot;text/javascript&quot;&gt;
 	var elements = {};/*THIS IS THE ANIMATIONS OBJECT | YOU WILL LEAN HOW TO BUILD THIS OBJECT IN THE NEXT CHAPTER*/					
 	$(document).ready(function(){
-		jQuery('#scroll-over-me').isAlive('create',{
+		jQuery('#scroll-over-me').isAlive('create',{ /*USE A JQUERY SELECTOR OR ANY ALIAS YOU WANT*/
 			elements:animations /*HERE IS WHERE YOU WILL ADD ALL THE PLUGIN OPTIONS*/
 		});
 	});
@@ -95,6 +95,12 @@
 							Type: Object<br/>
 							Default: auto<br/>
 							With this object you can set durations for "wheel","touch","scrollbar" animations. Every one of this settings can have a "duration","durationType", and a "minStepDuration" value. If none is provided the default duration will be used.(See example)
+						</p>
+						elementTweaks:
+						<p class="exp">
+							Type: Object<br/>
+							Default: {left:0,top:0,width:0,height:0}<br/>
+							When you use an "alias" instead of a jQuery selector you can specify the "left"/"top"/"width"/"height" values of your animation wrapper.
 						</p>
 						enableWheel:
 						<p class="exp">
@@ -887,15 +893,15 @@ jQuery: jQuery('#scroll-over-me').addClass('isalive-enablegpu');
 						Demo for basic uses of "animate","animate-set","set","add-class","remove-class".
 					</p>
 					<p class="text">
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/examples/movie" target="_blank">Movie effect</a>
+						<a class="links" href="../examples/movie" target="_blank">Movie effect</a>
 						Get a movie like effect by scrolling a div.
 					</p>
 					<p class="text">
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/examples/butterfly" target="_blank">Butterfly effect</a>
+						<a class="links" href="../examples/butterfly" target="_blank">Butterfly effect</a>
 						 A script randomly cuts a image into pieces and animate them.
 					</p>
 					<p class="text">
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/examples/360View" target="_blank">360 degree panorama</a>
+						<a class="links" href="../examples/360View" target="_blank">360 degree panorama</a>
 						 A 360 degree panorama controled by a scrollbar.
 					</p>
 				</div>
@@ -909,9 +915,9 @@ jQuery: jQuery('#scroll-over-me').addClass('isalive-enablegpu');
 				<div id="section-12" class="section">
 					<h3>12. Download links</h3>
 					<p class="text">
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.js" target="_blank">jQuery.isAlive.js (latest)</a>
+						<!--<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.js" target="_blank">jQuery.isAlive.js (latest)</a>
 						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.min.js" target="_blank">jQuery.isAlive.min.js (latest/minified)</a>
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.helper.js" target="_blank">jQuery.isAlive.helper.js (latest)</a>
+						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.helper.js" target="_blank">jQuery.isAlive.helper.js (latest)</a>-->
 						<a class="links" href="https://github.com/georgecheteles/jQuery.isAlive" target="_blank">Github.com</a>
 						<a class="links" href="http://plugins.jquery.com/jQueryIsAlive/" target="_blank">jQuery.com</a>
 					</p>

@@ -1,0 +1,113 @@
+<html>
+	<head>
+		<title>jQuery isAlive Plugin Demonstration</title>
+		<script type="text/javascript" src="../../jquery-1.10.2.min.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="../../easing.js" charset="UTF-8"></script>
+		<script type="text/javascript" src="../../src/jquery.isAlive.js?v=1.8.5" charset="UTF-8"></script>
+	
+		<script type="text/javascript">
+		var animations = {
+			1:{
+				"selector": "#scroll-bar",
+				"method":"static",
+				"property":"width",
+				"value":"eval(elementWidth-20)"
+			},
+			2: {
+				"selector": "#myDiv",
+				"method":"animate",
+				"property":"background-position",
+				"step-start":0,
+				"step-end":100,
+				"value-start":"0px center",
+				"value-end":function(s,e){
+					var t = -9122+e.elementWidth;
+					return t.toString()+"px center";
+				}
+			},
+			3: {
+				"selector": "#scroll-bar-handler",
+				"method":"animate",
+				"property":"left",
+				"value-start":2,
+				"value-end":"eval(elementWidth-20-37)",
+				"scrollbar":true
+			},
+		};
+
+		$(window).load(function(){
+			$('#scroll-over-me').isAlive('create',{
+				elements:animations,
+				duration:500,
+				easing:"easeOutQuad",
+				enableScrollbarTouch:true,
+				useCSS3:true,
+				enableGPU:true,
+				onLoadingComplete:function(){
+					$('#myDiv').fadeIn();
+				}
+			});
+		});
+				
+		</script>
+	
+		
+	</head>
+	
+		<style>
+			body,html{
+				overflow:hidden;
+				margin:0;
+			}
+			#scroll-over-me{
+				width:100%;
+				height:100%;
+				background:black;
+				position:relative;
+				margin:auto;
+				
+			}
+			#myDiv{
+				width:100%;
+				height:100%;
+				display:none;
+				background-image:url(assets/360.jpg);
+				background-position: left center;
+				background-repeat: no-repeat;
+				background-size:9122px auto;
+				position:absolute;
+				top:0px;
+				left:0px;
+			}
+			#scroll-bar{
+				position:absolute;
+				width:100px;
+				height:40px;
+				border:1px solid gray;
+				bottom:20px;
+				left:10px;
+				border-radius:20px;
+			}
+			
+			#scroll-bar-handler{
+				position:absolute;
+				width:34px;
+				height:34px;
+				border:1px solid red;
+				top:2px;
+				left:2px;
+				border-radius:100%;
+				background:#ccc;
+				cursor:pointer;
+			}
+		</style>
+	
+	<body>
+		<div id="scroll-over-me">
+			<div id="myDiv"></div>
+			<div id="scroll-bar">
+				<div id="scroll-bar-handler"></div>
+			</div>
+		</div>
+	</body>
+</html>

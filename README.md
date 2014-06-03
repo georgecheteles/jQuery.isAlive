@@ -8,5 +8,4 @@ jQuery.isAlive
  - jQuery.isAlive is free to use.
 
 (c) 2013 George Cheteles
-george@we-code-magic.com
-www.we-code-magic.com
+orbideintuneric@gmail.com

@@ -1,5 +1,12 @@
 jQuery.isAlive Change Log
 
+ver. 1.9.13 (03 June 2014)
+ - calling isAlive without a method will return if that element is initialized (true/false)
+
+ver. 1.9.12 (20 March 2014)
+ - allows use of alias instead of only jQuery selectors
+ - adds "elementTweaks"
+
 ver. 1.9.11 (05 February 2014)
  - small changes
 

@@ -58,7 +58,9 @@ input[type=submit]{
 }
 
 .drawSurface{
-	position:relative;height:340px;background:#ccc;
+	position:relative;
+	height:340px;
+	background:#ccc;
 	margin-bottom:50px;
 }
 

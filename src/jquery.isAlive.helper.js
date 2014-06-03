@@ -6,12 +6,11 @@
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
 jQuery.isAlive.helper(0.0.3) is a list of functions for jQuery.isAlive plugin.
-Written by George Cheteles (george@we-code-magic.com).
+Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
-	http://www.we-code-magic.com 
-	office@we-code-magic.com
+	orbideintuneric@gmail.com
 Last modification on this file: 19 November 2013.
 */
 

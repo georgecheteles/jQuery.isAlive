@@ -5,14 +5,13 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.11)
-Written by George Cheteles (george@we-code-magic.com).
+jQuery.isAlive(1.9.13)
+Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
-	http://www.we-code-magic.com 
-	george@we-code-magic.com
-Last modification on this file: 5 February 2014
+	orbideintuneric@gmail.com
+Last modification on this file: 03 June 2014
 */
 
 (function(jQuery) {
@@ -473,6 +472,7 @@ Last modification on this file: 5 February 2014
 		this.CSS3TransitionArray = {};
 		this.CSS3ValuesArray = {};
 		this.JSValuesArray = {};
+		this.DOMElement = false;
 		/* MY CLASS/SET ARRAYS */
 		this.setArray = {};
 		this.onOffClassArray = {};
@@ -523,6 +523,7 @@ Last modification on this file: 5 February 2014
 			wheelDelay:250, /*number or false*/
 			enableGPU:false, /*false|true|webkit|chrome|safari|mobile*/
 			useIdAttribute:false,
+			elementTweaks:{'left':0,'top':0,'width':0,'height':0},
 			onStep:null,
 			onLoadingComplete:null,
 			onRebuild:null
@@ -640,14 +641,14 @@ Last modification on this file: 5 February 2014
 		
 		if(typeof(params)!="function"){
 			params = params.toString();
-			params = params.replace(/elementTop/g,thisObj.params.elementTop.toString());
 			params = params.replace(/elementLeft/g,thisObj.params.elementLeft.toString());
-			params = params.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
+			params = params.replace(/elementTop/g,thisObj.params.elementTop.toString());
 			params = params.replace(/elementWidth/g,thisObj.params.elementWidth.toString());
-			params = params.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
+			params = params.replace(/elementHeight/g,thisObj.params.elementHeight.toString());
 			params = params.replace(/documentWidth/g,thisObj.params.documentWidth.toString());
-			params = params.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
+			params = params.replace(/documentHeight/g,thisObj.params.documentHeight.toString());
 			params = params.replace(/windowWidth/g,thisObj.params.windowWidth.toString());
+			params = params.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
 		}
 		else	
 			params = params(thisObj.mySelector,thisObj.params).toString();
@@ -756,10 +757,12 @@ Last modification on this file: 5 February 2014
 			thisObj.params.windowHeight = jQuery(window).height();
 			thisObj.params.documentWidth = jQuery(document).width();
 			thisObj.params.documentHeight = jQuery(document).height();
-			thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
-			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
-			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
-			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
+			if(thisObj.DOMElement){
+				thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
+				thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
+				thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
+				thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
+			}
 			
 			/* RESET ALL DINAMIC ELEMENTS*/
 			for(key in thisObj.cssDinamicElements){
@@ -1342,23 +1345,33 @@ Last modification on this file: 5 February 2014
 		/*INCREMENT INDEX*/
 		incIndex++;
 		
+		/*CHECK IF ELEMENT IS FROM DOM*/
+		thisObj.DOMElement = (jQuery(thisObj.mySelector).length!=0);
+		
 		/*TIMELINE WRAPPER*/
 		thisObj.TimeLine = document.createElement('foo');
 		
 		/*SHOW SCROLL POSITION*/
 		if(thisObj.settings.debug)
-			jQuery(thisObj.mySelector).append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
+			thisObj.DOMElement ? jQuery(thisObj.mySelector).append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>') :  jQuery('body').append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
 		
 		/*GET WIDTH AND HEIGHT OF THE PARENT ELEMENT*/
 		thisObj.params.windowWidth = jQuery(window).width();
 		thisObj.params.windowHeight = jQuery(window).height();
 		thisObj.params.documentWidth = jQuery(document).width();
 		thisObj.params.documentHeight = jQuery(document).height();
-		thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
-		thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
-		thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
-		thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-		
+		if(thisObj.DOMElement){
+			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
+			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
+			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
+			thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
+		}
+		else{
+			thisObj.params.elementLeft = thisObj.settings.elementTweaks['left'];
+			thisObj.params.elementTop = thisObj.settings.elementTweaks['top'];
+			thisObj.params.elementWidth = thisObj.settings.elementTweaks['width'];
+			thisObj.params.elementHeight = thisObj.settings.elementTweaks['height'];
+		}
 		/*FIX JQUERY/CSS3 EASING*/
 		if(thisObj.settings.JSEasing==null)
 			thisObj.settings.JSEasing = thisObj.settings.easing;
@@ -1372,11 +1385,11 @@ Last modification on this file: 5 February 2014
 			thisObj.settings.maxDrag = thisObj.settings.stepsOnDrag;
 		
 		/*CHECK FOR TOUCH*/
-		if(thisObj.settings.enableTouch && thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1)
+		if(!thisObj.DOMElement || (thisObj.settings.enableTouch && thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
 			thisObj.settings.enableTouch = false;
 
 		/*CHECK FOR SCROLL*/
-		if(thisObj.settings.enableWheel && thisObj.settings.wheelType=="jump" && thisObj.settings.jumpPoints.length<=1)
+		if(!thisObj.DOMElement || (thisObj.settings.enableWheel && thisObj.settings.wheelType=="jump" && thisObj.settings.jumpPoints.length<=1))
 			thisObj.settings.enableWheel = false;
 			
 		/*CHECK IF SCROLLBARPOINTS EXIST*/
@@ -2792,7 +2805,8 @@ Last modification on this file: 5 February 2014
 	isAlive.prototype.destroy = function(){
 		var thisObj = this;
 		/*UNBIND EVENTS*/
-		jQuery(thisObj.mySelector).unbind('.isAlive');
+		if(thisObj.DOMElement)
+			jQuery(thisObj.mySelector).unbind('.isAlive');
 		for(var key in thisObj.settings.elements){
 			if(thisObj.settings.elements[key]['scrollbar']){
 				jQuery(thisObj.settings.elements[key]['selector']).unbind('.scrollbar');
@@ -2819,7 +2833,7 @@ Last modification on this file: 5 February 2014
 	var methods = {
 		create : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(jQuery(selector).length==0 || typeof(isAliveObjects[selector])!="undefined")
+			if(typeof(isAliveObjects[selector])!="undefined")
 				return false;
 			if(typeof(options) == "undefined")
 				options = {};
@@ -2956,7 +2970,7 @@ Last modification on this file: 5 February 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.11";
+			return "1.9.13";
 		}
 	};
 	
@@ -2966,7 +2980,7 @@ Last modification on this file: 5 February 2014
 			return mFunc(this,options);
 		}
 		else
-			return (typeof(method)=='undefined')?((incIndex)?true:false):false;
+			return (typeof(method)=='undefined') ? (typeof(isAliveObjects[this.selector])!='undefined') : false;
 	};
 	   
 /*JQUERY PLUGIN PART:END*/
