@@ -403,9 +403,16 @@
 					debug:true,
 					touchYFrom:40,
 					loop:true,
-					stepPoints:[0,5,10,15,20],
-					stepPointsSelector:".stepPointsWrap .sp",
-					stepPointsActiveClass:"active"
+					navPoints:[0,5,10,15,20],
+					navPointsSelector:".stepPointsWrap .sp",
+					navPointsActiveClass:"active",
+					navPointsClickEvent:true,
+					durationTweaks:{
+						'nav':{
+							'duration':200,
+							'durationType':'step'
+						}
+					}
 				});
 
 				jQuery('#drawSurface2').isAlive('create',{
@@ -441,31 +448,6 @@
 					return false;
 				});
 
-				$('.stepPointsWrap .sp1').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:0,durationType:'step',duration:100});
-					return false;
-				});
-				
-				$('.stepPointsWrap .sp2').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:5,durationType:'step',duration:100});
-					return false;
-				});
-				
-				$('.stepPointsWrap .sp3').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:10,durationType:'step',duration:100});
-					return false;
-				});
-				
-				$('.stepPointsWrap .sp4').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:15,durationType:'step',duration:100});
-					return false;
-				});
-
-				$('.stepPointsWrap .sp5').click(function(){
-					jQuery('#drawSurface1').isAlive('goTo',{to:20,durationType:'step',duration:100});
-					return false;
-				});
-				
 				$('#drawSurface1 a.btn2').click(function(){
 					jQuery('#drawSurface1').isAlive('goTo',{to:10,duration:2000});
 					return false;

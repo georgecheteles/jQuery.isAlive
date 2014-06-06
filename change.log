@@ -1,5 +1,9 @@
 jQuery.isAlive Change Log
 
+ver. 1.10.0 (06 June 2014)
+ - "stepPoints","stepPointsSelector","stepPointsActiveClass" are now "navPoints","navPointsSelector","navPointsActiveClass"
+ - adding "navPointsClickEvent" 
+
 ver. 1.9.13 (03 June 2014)
  - calling isAlive without a method will return if that element is initialized (true/false)
 
@@ -72,7 +76,7 @@ ver. 1.8.1 (2 January 2014)
 ver. 1.8.0 (1 January 2014)
  - bugs fixed
  - adding "wheelActions"
- - "dragFromX"/"dragFromY"/"wipeFromX"/"wipeFromY" is now "touchFromX" and "touchFromY"
+ - "dragFromX"/"dragFromY"/"wipeFromX"/"wipeFromY" are now "touchFromX" and "touchFromY"
 
 ver. 1.7.7 (31 December 2013)
  - bugs fixed

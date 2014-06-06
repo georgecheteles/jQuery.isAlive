@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.9.13+ Manual</h1>
+				<h1>jQuery.isAlive 1.10.0+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -200,20 +200,27 @@
 							Default: {up:-1,down:1}<br/>
 							You can define the action for each wheel move. +1 means forward and -1 means backward. 0 means no action.(See example)
 						</p>
-						stepPoints:
+						navPoints:
 						<p class="exp">
 							Type: Array<br/>
 							Define here the steps where you want to have a "breakpoint".(See example)
 						</p>
-						stepPointsSelector:
+						navPointsSelector:
 						<p class="exp">
 							Type: String<br/>
 							The "breakpoint" jQuery selector.(See example)
 						</p>
-						stepPointsActiveClass:
+						navPointsActiveClass:
 						<p class="exp">
 							Type: String<br/>
 							The "breakpoint" active jQuery class selector.(See example)
+						</p>
+						navPointsClickEvent:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: False<br/>
+							Values: true | false<br/>
+							Add onclick event on elements defined at "navPointsSelector". When clicked this will play until that "breakpoint".
 						</p>
 						enableTouch:
 						<p class="exp">

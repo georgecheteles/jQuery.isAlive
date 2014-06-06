@@ -5,12 +5,13 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.9.13)
+jQuery.isAlive(1.10.0)
 Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	orbideintuneric@gmail.com
+	https://github.com/georgecheteles
 Last modification on this file: 03 June 2014
 */
 
@@ -464,7 +465,7 @@ Last modification on this file: 03 June 2014
 		this.onComplete = null;
 		this.uniqId = incIndex;
 		this.functionsArray = {};
-		this.haveStepPoints;
+		this.haveNavPoints;
 		this.rebuildOnStop = false;
 		this.scrollBarPosition = 0;
 		this.toggleState = 0;
@@ -497,9 +498,10 @@ Last modification on this file: 03 June 2014
 			start:0,
 			loop:false,
 			preventWheel:true,
-			stepPoints:[],
-			stepPointsSelector:null,
-			stepPointsActiveClass:null,
+			navPoints:[],
+			navPointsSelector:null,
+			navPointsActiveClass:null,
+			navPointsClickEvent:false,
 			enableTouch:false,
 			touchType:'drag',/*drag|wipe*/
 			touchActions:{},
@@ -1195,8 +1197,8 @@ Last modification on this file: 03 June 2014
 		
 		for(pos=thisObj.settings.start;pos>=0;pos--){
 
-			if(thisObj.haveStepPoints && pointFoundSelector==-1)
-				pointFoundSelector=indexOf(thisObj.settings.stepPoints,pos);
+			if(thisObj.haveNavPoints && pointFoundSelector==-1)
+				pointFoundSelector=indexOf(thisObj.settings.navPoints,pos);
 		
 			if(typeof(thisObj.setArray['forward'][pos])!="undefined"){
 				for(selector in thisObj.setArray['forward'][pos]){
@@ -1275,8 +1277,8 @@ Last modification on this file: 03 June 2014
 		}
 					
 		if(pointFoundSelector!=-1){
-			jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
-			jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
+			jQuery(thisObj.settings.navPointsSelector).removeClass(thisObj.settings.navPointsActiveClass);
+			jQuery(thisObj.settings.navPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.navPointsActiveClass);
 		}
 
 		for(pos=0;pos<=thisObj.settings.start;pos++)
@@ -1397,14 +1399,14 @@ Last modification on this file: 03 June 2014
 			thisObj.settings.scrollbarType = "scroll";
 			
 		/*SORT AND INIT STEP POINTS*/	
-		thisObj.haveStepPoints = (thisObj.settings.stepPointsSelector!=null && thisObj.settings.stepPointsActiveClass!=null && thisObj.settings.stepPoints.length>0);
+		thisObj.haveNavPoints = (thisObj.settings.navPointsSelector!=null && thisObj.settings.navPointsActiveClass!=null && thisObj.settings.navPoints.length>0);
 			
 		/*SORT POINTS ARRAYS*/
 		thisObj.settings.wipePoints.sort(function(a,b){return a-b});
 		thisObj.settings.jumpPoints.sort(function(a,b){return a-b});
 		thisObj.settings.playPoints.sort(function(a,b){return a-b});
 		thisObj.settings.scrollbarPoints.sort(function(a,b){return a-b});
-		thisObj.settings.stepPoints.sort(function(a,b){return a-b});
+		thisObj.settings.navPoints.sort(function(a,b){return a-b});
 		
 		/*SETS THE DURATION TWEAKS*/
 		if(typeof(thisObj.settings.durationTweaks['wheel'])=="undefined")
@@ -1413,9 +1415,12 @@ Last modification on this file: 03 June 2014
 			thisObj.settings.durationTweaks['touch'] = {};
 		if(typeof(thisObj.settings.durationTweaks['scrollbar'])=="undefined")
 			thisObj.settings.durationTweaks['scrollbar'] = {};
+		if(typeof(thisObj.settings.durationTweaks['nav'])=="undefined")
+			thisObj.settings.durationTweaks['nav'] = {};
 		thisObj.settings.durationTweaks['wheel'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['wheel']);
 		thisObj.settings.durationTweaks['touch'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['touch']);
 		thisObj.settings.durationTweaks['scrollbar'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['scrollbar']);
+		thisObj.settings.durationTweaks['nav'] = jQuery.extend({duration:thisObj.settings.duration,durationType:"default",minStepDuration:thisObj.settings.minStepDuration},thisObj.settings.durationTweaks['nav']);
 
 		/*SET SCROLL & TOUCH ACTIONS*/
 		thisObj.settings.wheelActions = jQuery.extend({up:-1,down:1},thisObj.settings.wheelActions);
@@ -2004,6 +2009,14 @@ Last modification on this file: 03 June 2014
 				delete thisObj.settings.elements[key]['value-end'];
 			}
 		}
+
+		/*BIND CLICK ON STEP POINTS*/
+		if(thisObj.settings.navPointsSelector!=null && thisObj.settings.navPoints.length>0 && thisObj.settings.navPointsClickEvent)
+			jQuery(thisObj.settings.navPointsSelector).each(function(index){
+				jQuery(this).bind('click',function(){
+					thisObj.goTo({to:thisObj.settings.navPoints[index],animationType:'nav',duration:thisObj.settings.durationTweaks['nav']['duration'],durationType:thisObj.settings.durationTweaks['nav']['durationType'],minStepDuration:thisObj.settings.durationTweaks['nav']['minStepDuration']});
+				})
+			});
 		
 		/*CALLS FUNCTION TO BIND MOUSE AND SCROLL EVENTS*/
 		thisObj.bindScrollTouchEvents();
@@ -2204,11 +2217,11 @@ Last modification on this file: 03 June 2014
 						
 						/*STEP-POINTS AND ON-STEP EVENT*/
 						if(step!=stepStart){
-							if(thisObj.haveStepPoints){
-								var pointFound=indexOf(thisObj.settings.stepPoints,thisObj.getPos(step));
+							if(thisObj.haveNavPoints){
+								var pointFound=indexOf(thisObj.settings.navPoints,thisObj.getPos(step));
 								if(pointFound!=-1){
-									jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
-									jQuery(thisObj.settings.stepPointsSelector).eq(pointFound).addClass(thisObj.settings.stepPointsActiveClass);
+									jQuery(thisObj.settings.navPointsSelector).removeClass(thisObj.settings.navPointsActiveClass);
+									jQuery(thisObj.settings.navPointsSelector).eq(pointFound).addClass(thisObj.settings.navPointsActiveClass);
 								}
 							}
 							if(thisObj.settings.onStep!=null)
@@ -2617,8 +2630,8 @@ Last modification on this file: 03 June 2014
 							valuesCSS[selector][property] = thisObj.animPositions[pos][selector][property];
 					}
 				}
-				if(thisObj.haveStepPoints){
-					pointFound=indexOf(thisObj.settings.stepPoints,pos);
+				if(thisObj.haveNavPoints){
+					pointFound=indexOf(thisObj.settings.navPoints,pos);
 					if(pointFound!=-1)
 						pointFoundSelector = pointFound;
 				}
@@ -2642,8 +2655,8 @@ Last modification on this file: 03 June 2014
 			}
 				
 			if(pointFoundSelector!=-1 ){
-				jQuery(thisObj.settings.stepPointsSelector).removeClass(thisObj.settings.stepPointsActiveClass);
-				jQuery(thisObj.settings.stepPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.stepPointsActiveClass);
+				jQuery(thisObj.settings.navPointsSelector).removeClass(thisObj.settings.navPointsActiveClass);
+				jQuery(thisObj.settings.navPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.navPointsActiveClass);
 			}
 			
 			step = step + (thisObj.getLoop(thisObj.step)*thisObj.settings.max);
@@ -2970,7 +2983,7 @@ Last modification on this file: 03 June 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.9.13";
+			return "1.10.0";
 		}
 	};
 	
