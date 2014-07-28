@@ -10,7 +10,7 @@ Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
-	orbideintuneric@gmail.com
+	orbitdeintuneric@gmail.com
 	https://github.com/georgecheteles
 Last modification on this file: 19 November 2013.
 */
