@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.10.0+ Manual</h1>
+				<h1>jQuery.isAlive 1.10.1+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -367,6 +367,18 @@
 							Values: true | false<br/>
 							If this is set to TRUE the plugin will use the "id" HTML attribute as a selector. If one is not avalaible then it will generate an ID. This is used for faster animations and prevent CSS3 bugs.
 						</p>
+
+						addSelectorPrefix:
+						<p class="exp">
+							Type: Boolean or String<br/>
+							Default: false<br/>
+							Values: true | false | jQuery selector<br/>
+							Set to true if you want to add the master selector as prefix to all selectors (animations and navPoints), or give any selector you want. 
+						</p>
+
+						
+						
+						
 						onStep:
 						<p class="exp">
 							Type: Function<br/>
@@ -400,7 +412,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "animate" > use "animate" if you want to do a animation
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"step-start": > step where animation will start
@@ -430,7 +442,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"do": > property(value-start,value-end) or property(value-end) or reserved words like "fadeOut","fadeIn"
 	"step-start": > step where animation will start
 	"step-end": > step where animation will end
@@ -446,7 +458,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "set" > use "animate" if you want to change a CSS setting for an element
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"step-from": > step where you want this action to be done
@@ -466,7 +478,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "animate-set" > use "animate" if you want to do a animation
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"step-start": > step where animation will start
@@ -488,7 +500,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "static" > use "animate" if you want to change a CSS setting for an element
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
@@ -506,7 +518,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "set@start" > use "animate" if you want to change a CSS setting for an element
 	"property": > CSS property | scrollTop | scrollLeft | custom function
 	"value": > CSS value that you want to set
@@ -524,7 +536,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "add-class" > use "add-class" if you want to add a class to an element
 	"step-from": > step where the class will be added
 	"class-name": > the name of the class
@@ -541,7 +553,7 @@
 							</p>
 						<p class="code">
 0: {
-	"selector": > jQuery selector
+	"selector": > jQuery selector(optional, master selector will be used if not defined)
 	"method": "remove-class" > use "remove-class" if you want to remove a class from an element
 	"step-from": > step where the class will be removed
 	"class-name": > the name of the class

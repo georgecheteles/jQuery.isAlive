@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.10.0)
+jQuery.isAlive(1.10.1)
 Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	orbitdeintuneric@gmail.com
 	https://github.com/georgecheteles
-Last modification on this file: 03 June 2014
+Last modification on this file: 08 September 2014
 */
 
 (function(jQuery) {
@@ -526,6 +526,7 @@ Last modification on this file: 03 June 2014
 			enableGPU:false, /*false|true|webkit|chrome|safari|mobile*/
 			useIdAttribute:false,
 			elementTweaks:{'left':0,'top':0,'width':0,'height':0},
+			addSelectorPrefix:false, /*false|true|jquery selector*/
 			onStep:null,
 			onLoadingComplete:null,
 			onRebuild:null
@@ -884,7 +885,6 @@ Last modification on this file: 03 June 2014
 		else
 			thisObj.rebuildOnStop = true;
 	}
-	
 	
 	/*GETS START VALUES*/
 	isAlive.prototype.getStartCssValue = function(index){
@@ -1408,6 +1408,10 @@ Last modification on this file: 03 June 2014
 		thisObj.settings.scrollbarPoints.sort(function(a,b){return a-b});
 		thisObj.settings.navPoints.sort(function(a,b){return a-b});
 		
+		/*ADD MAIN SELECTOR TO NAV POINTS*/
+		if(thisObj.haveNavPoints && thisObj.settings.addSelectorPrefix)
+			thisObj.settings.navPointsSelector = thisObj.settings.addSelectorPrefix===true ? thisObj.mySelector + ' ' + thisObj.settings.navPointsSelector : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.navPointsSelector;
+
 		/*SETS THE DURATION TWEAKS*/
 		if(typeof(thisObj.settings.durationTweaks['wheel'])=="undefined")
 			thisObj.settings.durationTweaks['wheel'] = {};
@@ -1450,11 +1454,14 @@ Last modification on this file: 03 June 2014
 		var keyIndex = 0;
 		var tempArray = [];
 		for(key in thisObj.settings.elements){
-			/*IF NO SELECTOR IS FOUND*/
-			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined"){
-				delete thisObj.settings.elements[key];
-				continue;
-			}
+			
+			/*IF NO SELECTOR IS FOUND USE MASTER SELECTOR && ADD MAIN SELECTOR TO ELEMENTS*/
+			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined")
+				thisObj.settings.elements[key]['selector'] = thisObj.mySelector;
+			else
+				if(thisObj.settings.addSelectorPrefix)
+					thisObj.settings.elements[key]['selector'] = thisObj.settings.addSelectorPrefix===true ? thisObj.mySelector + ' ' + thisObj.settings.elements[key]['selector'] : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.elements[key]['selector'];
+			
 			/*DELETE ELEMENTS FOR OTHER BROWSERS THEN MINE*/
 			if(typeof(thisObj.settings.elements[key]['+browsers'])!="undefined"){
 				if(!validateBrowsers(thisObj.settings.elements[key]['+browsers'])){
@@ -1468,6 +1475,7 @@ Last modification on this file: 03 June 2014
 					continue;
 				}
 			}
+			
 			/*DELETE NON EXISTING DOM ELEMENTS*/
 			if(indexOf(tempArray,thisObj.settings.elements[key]['selector'])==-1){
 				if(jQuery(thisObj.settings.elements[key]['selector']).length==0){
@@ -1476,6 +1484,7 @@ Last modification on this file: 03 June 2014
 				}
 				tempArray.push(thisObj.settings.elements[key]['selector']);
 			}
+			
 			/*UNPACK SHORT ELEMENTS*/
 			if(typeof(thisObj.settings.elements[key]['do'])!="undefined"){
 				if(thisObj.settings.elements[key]['do'].indexOf('(')!=-1){
@@ -2983,7 +2992,7 @@ Last modification on this file: 03 June 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.10.0";
+			return "1.10.1";
 		}
 	};
 	

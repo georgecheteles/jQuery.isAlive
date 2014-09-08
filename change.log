@@ -1,5 +1,9 @@
 jQuery.isAlive Change Log
 
+ver. 1.10.1 (08 September 2014)
+ - adding "addSelectorPrefix"
+ - animation selector is not mandatory anymore 
+
 ver. 1.10.0 (06 June 2014)
  - "stepPoints","stepPointsSelector","stepPointsActiveClass" are now "navPoints","navPointsSelector","navPointsActiveClass"
  - adding "navPointsClickEvent" 
