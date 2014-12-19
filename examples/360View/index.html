@@ -20,8 +20,8 @@
 				"step-start":0,
 				"step-end":100,
 				"value-start":"0px center",
-				"value-end":function(s,e){
-					var t = -9122+e.elementWidth;
+				"value-end":function(e,d){
+					var t = -9122+d.elementWidth;
 					return t.toString()+"px center";
 				}
 			},
@@ -43,6 +43,7 @@
 				enableScrollbarTouch:true,
 				useCSS3:true,
 				enableGPU:true,
+				maxScroll:10,
 				onLoadingComplete:function(){
 					$('#myDiv').fadeIn();
 				}

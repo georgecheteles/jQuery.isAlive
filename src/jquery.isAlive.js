@@ -5,21 +5,21 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.10.1)
+jQuery.isAlive(1.11.0)
 Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	orbitdeintuneric@gmail.com
 	https://github.com/georgecheteles
-Last modification on this file: 08 September 2014
+Last modification on this file: 19 December 2014
 */
 
 (function(jQuery) {
 	
-	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS*/
-	var isAliveObjects = [];
-
+	/*THIS IS THE MAIN ARRAY THAT KEEPS ALL THE OBJECTS & OTHER VARS*/
+	var isAliveObjects = {};
+	
 	var incIndex = 0;
 	var browserObj = null;
 	var indexOf = null;
@@ -443,8 +443,8 @@ Last modification on this file: 08 September 2014
 	
 /*ISALIVE MAIN OBJECT:BEGIN*/	
 	
-	function isAlive(selector,options){
-		this.mySelector = selector;
+	function isAlive(element,options){
+		this.myElement = element;
 		this.TimeLine;
 		this.step=0;
 		this.lastStep=0;
@@ -473,7 +473,7 @@ Last modification on this file: 08 September 2014
 		this.CSS3TransitionArray = {};
 		this.CSS3ValuesArray = {};
 		this.JSValuesArray = {};
-		this.DOMElement = false;
+		this.baseClass = 'isalive-base-'+incIndex;
 		/* MY CLASS/SET ARRAYS */
 		this.setArray = {};
 		this.onOffClassArray = {};
@@ -502,6 +502,7 @@ Last modification on this file: 08 September 2014
 			navPointsSelector:null,
 			navPointsActiveClass:null,
 			navPointsClickEvent:false,
+			navPointsClickPrevent:true,
 			enableTouch:false,
 			touchType:'drag',/*drag|wipe*/
 			touchActions:{},
@@ -509,7 +510,7 @@ Last modification on this file: 08 September 2014
 			touchYFrom:null,
 			wipePoints:[],
 			preventTouch:true,
-			animateClass:'isalive-'+incIndex,
+			animateClass:'isalive-element-'+incIndex,
 			rebuildOnResize:true,
 			playPoints:[],
 			stepsOnScroll:1,
@@ -537,7 +538,7 @@ Last modification on this file: 08 September 2014
 
 		/*CALL ONLOADINGCOMPLETE FUNCTION*/
 		if(this.settings.onLoadingComplete!=null)
-			this.settings.onLoadingComplete(selector);
+			this.settings.onLoadingComplete(element);
 		
 	}
 
@@ -654,7 +655,7 @@ Last modification on this file: 08 September 2014
 			params = params.replace(/windowHeight/g,thisObj.params.windowHeight.toString());
 		}
 		else	
-			params = params(thisObj.mySelector,thisObj.params).toString();
+			params = params(thisObj.myElement,thisObj.params).toString();
 		
 		var doRecursive = function(params){
 			if(params.indexOf(' ')!=-1){
@@ -760,11 +761,11 @@ Last modification on this file: 08 September 2014
 			thisObj.params.windowHeight = jQuery(window).height();
 			thisObj.params.documentWidth = jQuery(document).width();
 			thisObj.params.documentHeight = jQuery(document).height();
-			if(thisObj.DOMElement){
-				thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-				thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
-				thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
-				thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
+			if(thisObj.myElement){
+				thisObj.params.elementLeft = thisObj.myElement.offset().left;
+				thisObj.params.elementTop = thisObj.myElement.offset().top;
+				thisObj.params.elementWidth = thisObj.myElement.width();
+				thisObj.params.elementHeight = thisObj.myElement.height();
 			}
 			
 			/* RESET ALL DINAMIC ELEMENTS*/
@@ -925,7 +926,7 @@ Last modification on this file: 08 September 2014
 
 		/* BIND SCROLL EVENTS */
 		if(thisObj.settings.enableWheel){
-			jQuery(thisObj.mySelector).bind(WheelEvent+'.isAlive',function(e){
+			thisObj.myElement.bind(WheelEvent+'.isAlive',function(e){
 				var wheelValue;
 				(e.type=='wheel') ? wheelValue = (e.originalEvent.deltaY > 0) : ((e.type=='mousewheel') ? wheelValue = (e.originalEvent.wheelDelta < 0) : wheelValue = (e.originalEvent.detail > 0)); 
 				(thisObj.settings.wheelType=="scroll") ? ((wheelValue) ? thisObj.doScroll(thisObj.settings.wheelActions.down) : thisObj.doScroll(thisObj.settings.wheelActions.up)) : ((wheelValue) ? thisObj.doJump(thisObj.settings.wheelActions.down) : thisObj.doJump(thisObj.settings.wheelActions.up));
@@ -1071,13 +1072,13 @@ Last modification on this file: 08 September 2014
 			}
 			
 			if(MSPointerEnabled && MSMaxTouchPoints){
-				jQuery(thisObj.mySelector).bind(MSPointerDown+'.isAlive',onTouchStart);
+				thisObj.myElement.bind(MSPointerDown+'.isAlive',onTouchStart);
 				/*PREVENT TOUCH EVENTS*/
 				if(thisObj.settings.preventTouch)
-					jQuery(thisObj.mySelector).addClass('isalive-notouchaction');
+					thisObj.myElement.addClass('isalive-notouchaction');
 			}
 			if('ontouchstart' in document.documentElement)
-				jQuery(thisObj.mySelector).bind('touchstart.isAlive',onTouchStart);
+				thisObj.myElement.bind('touchstart.isAlive',onTouchStart);
 		}
 		
 	}
@@ -1346,27 +1347,28 @@ Last modification on this file: 08 September 2014
 		
 		/*INCREMENT INDEX*/
 		incIndex++;
-		
-		/*CHECK IF ELEMENT IS FROM DOM*/
-		thisObj.DOMElement = (jQuery(thisObj.mySelector).length!=0);
+
+		/*ADD BASE CLASS*/
+		if(thisObj.myElement)
+			thisObj.myElement.addClass(this.baseClass);
 		
 		/*TIMELINE WRAPPER*/
 		thisObj.TimeLine = document.createElement('foo');
 		
 		/*SHOW SCROLL POSITION*/
 		if(thisObj.settings.debug)
-			thisObj.DOMElement ? jQuery(thisObj.mySelector).append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>') :  jQuery('body').append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
+			thisObj.myElement ? thisObj.myElement.append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>') :  jQuery('body').append('<div style="position:absolute;padding:5px;border:1px solid gray; color: red; top:10px;left:10px;display:inline-block;background:white;z-index:9999;" id="isalive-'+thisObj.uniqId+'-debuger" class="isalive-debuger"><span>'+thisObj.settings.start+'</span></div>');
 		
 		/*GET WIDTH AND HEIGHT OF THE PARENT ELEMENT*/
 		thisObj.params.windowWidth = jQuery(window).width();
 		thisObj.params.windowHeight = jQuery(window).height();
 		thisObj.params.documentWidth = jQuery(document).width();
 		thisObj.params.documentHeight = jQuery(document).height();
-		if(thisObj.DOMElement){
-			thisObj.params.elementLeft = jQuery(thisObj.mySelector).offset().left;
-			thisObj.params.elementTop = jQuery(thisObj.mySelector).offset().top;
-			thisObj.params.elementWidth = jQuery(thisObj.mySelector).width();
-			thisObj.params.elementHeight = jQuery(thisObj.mySelector).height();
+		if(thisObj.myElement){
+			thisObj.params.elementLeft = thisObj.myElement.offset().left;
+			thisObj.params.elementTop = thisObj.myElement.offset().top;
+			thisObj.params.elementWidth = thisObj.myElement.width();
+			thisObj.params.elementHeight = thisObj.myElement.height();
 		}
 		else{
 			thisObj.params.elementLeft = thisObj.settings.elementTweaks['left'];
@@ -1387,11 +1389,11 @@ Last modification on this file: 08 September 2014
 			thisObj.settings.maxDrag = thisObj.settings.stepsOnDrag;
 		
 		/*CHECK FOR TOUCH*/
-		if(!thisObj.DOMElement || (thisObj.settings.enableTouch && thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
+		if(!thisObj.myElement || (thisObj.settings.enableTouch && thisObj.settings.touchType=="wipe" && thisObj.settings.wipePoints.length<=1))
 			thisObj.settings.enableTouch = false;
 
 		/*CHECK FOR SCROLL*/
-		if(!thisObj.DOMElement || (thisObj.settings.enableWheel && thisObj.settings.wheelType=="jump" && thisObj.settings.jumpPoints.length<=1))
+		if(!thisObj.myElement || (thisObj.settings.enableWheel && thisObj.settings.wheelType=="jump" && thisObj.settings.jumpPoints.length<=1))
 			thisObj.settings.enableWheel = false;
 			
 		/*CHECK IF SCROLLBARPOINTS EXIST*/
@@ -1410,7 +1412,7 @@ Last modification on this file: 08 September 2014
 		
 		/*ADD MAIN SELECTOR TO NAV POINTS*/
 		if(thisObj.haveNavPoints && thisObj.settings.addSelectorPrefix)
-			thisObj.settings.navPointsSelector = thisObj.settings.addSelectorPrefix===true ? thisObj.mySelector + ' ' + thisObj.settings.navPointsSelector : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.navPointsSelector;
+			thisObj.settings.navPointsSelector = thisObj.settings.addSelectorPrefix===true ? '.'+thisObj.baseClass + ' ' + thisObj.settings.navPointsSelector : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.navPointsSelector;
 
 		/*SETS THE DURATION TWEAKS*/
 		if(typeof(thisObj.settings.durationTweaks['wheel'])=="undefined")
@@ -1457,10 +1459,10 @@ Last modification on this file: 08 September 2014
 			
 			/*IF NO SELECTOR IS FOUND USE MASTER SELECTOR && ADD MAIN SELECTOR TO ELEMENTS*/
 			if(typeof(thisObj.settings.elements[key]['selector'])=="undefined")
-				thisObj.settings.elements[key]['selector'] = thisObj.mySelector;
+				thisObj.settings.elements[key]['selector'] = '.'+thisObj.baseClass;
 			else
 				if(thisObj.settings.addSelectorPrefix)
-					thisObj.settings.elements[key]['selector'] = thisObj.settings.addSelectorPrefix===true ? thisObj.mySelector + ' ' + thisObj.settings.elements[key]['selector'] : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.elements[key]['selector'];
+					thisObj.settings.elements[key]['selector'] = thisObj.settings.addSelectorPrefix===true ? '.'+thisObj.baseClass + ' ' + thisObj.settings.elements[key]['selector'] : thisObj.settings.addSelectorPrefix + ' ' + thisObj.settings.elements[key]['selector'];
 			
 			/*DELETE ELEMENTS FOR OTHER BROWSERS THEN MINE*/
 			if(typeof(thisObj.settings.elements[key]['+browsers'])!="undefined"){
@@ -2022,8 +2024,12 @@ Last modification on this file: 08 September 2014
 		/*BIND CLICK ON STEP POINTS*/
 		if(thisObj.settings.navPointsSelector!=null && thisObj.settings.navPoints.length>0 && thisObj.settings.navPointsClickEvent)
 			jQuery(thisObj.settings.navPointsSelector).each(function(index){
-				jQuery(this).bind('click',function(){
+				jQuery(this).bind('click',function(e){
 					thisObj.goTo({to:thisObj.settings.navPoints[index],animationType:'nav',duration:thisObj.settings.durationTweaks['nav']['duration'],durationType:thisObj.settings.durationTweaks['nav']['durationType'],minStepDuration:thisObj.settings.durationTweaks['nav']['minStepDuration']});
+					if(thisObj.settings.navPointsClickPrevent){
+						e.preventDefault();
+						e.stopPropagation();
+					}
 				})
 			});
 		
@@ -2768,6 +2774,7 @@ Last modification on this file: 08 September 2014
 		options['animationType'] = 'rewind';
 		thisObj.goTo(options);
 	}
+
 	/*AUTOPLAY ANIMATION IN LOOPS*/
 	isAlive.prototype.autoplay = function(options){
 		var thisObj = this;
@@ -2805,6 +2812,7 @@ Last modification on this file: 08 September 2014
 		};
 		doAutoplay();
 	}
+
 	/*TOGGLE ANIMATION*/
 	isAlive.prototype.toggle = function(options){
 		var thisObj = this;
@@ -2827,8 +2835,11 @@ Last modification on this file: 08 September 2014
 	isAlive.prototype.destroy = function(){
 		var thisObj = this;
 		/*UNBIND EVENTS*/
-		if(thisObj.DOMElement)
-			jQuery(thisObj.mySelector).unbind('.isAlive');
+		if(thisObj.myElement){
+			thisObj.myElement.removeClass(thisObj.baseClass);
+			thisObj.myElement.removeData('isAliveKey');			
+			thisObj.myElement.unbind('.isAlive');
+		}
 		for(var key in thisObj.settings.elements){
 			if(thisObj.settings.elements[key]['scrollbar']){
 				jQuery(thisObj.settings.elements[key]['selector']).unbind('.scrollbar');
@@ -2850,138 +2861,167 @@ Last modification on this file: 08 September 2014
 	
 /*ISALIVE MAIN OBJECT:END*/
 	
-/*JQUERY PLUGIN PART:BEGIN*/	
+/*JQUERY PLUGIN PART:BEGIN*/
 
 	var methods = {
 		create : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])!="undefined")
-				return false;
-			if(typeof(options) == "undefined")
-				options = {};
-			isAliveObjects[selector] = new isAlive(selector,options);
+			if(jQuery(selector).length){
+				var element = jQuery(selector).first();
+				var isAliveKey = element.data('isAliveKey');
+				if(typeof(isAliveKey)!="undefined")
+					return false;
+				if(typeof(options)=="undefined")
+					options = {};
+				isAliveKey = 'isAlive:DOM:' + incIndex;
+				isAliveObjects[isAliveKey] = new isAlive(element,options);
+				element.data('isAliveKey',isAliveKey);
+			}
+			else{
+				var isAliveKey = 'isAlive:pseudo:' + selector;
+				if(typeof(isAliveObjects[isAliveKey])!="undefined")
+					return false;
+				if(typeof(options) == "undefined")
+					options = {};
+				isAliveObjects[isAliveKey] = new isAlive(false,options);
+			}
 			return thisObj;
 		},
 		destroy : function(thisObj){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			
-			isAliveObjects[selector].destroy();
-			delete isAliveObjects[selector];
+			isAliveObjects[isAliveKey].destroy();
+			delete isAliveObjects[isAliveKey];
 			return thisObj;
 		},
 		goTo : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].settings.max-1)
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[isAliveKey].settings.max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
-			isAliveObjects[selector].goTo(options);
+			isAliveObjects[isAliveKey].goTo(options);
 			return thisObj;
 		},
 		skip : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[selector].settings.max-1)
+			if(typeof(options) == "undefined" || typeof(options['to']) == "undefined" || options['to']<0 || options['to']>isAliveObjects[isAliveKey].settings.max-1)
 				return false;
 			options['to'] = Math.round(options['to']);
-			isAliveObjects[selector].skip(options['to']);
+			isAliveObjects[isAliveKey].skip(options['to']);
 			return thisObj;
 		},
 		play : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].play(options);
+			isAliveObjects[isAliveKey].play(options);
 			return thisObj;
 		},
 		rewind : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].rewind(options);
+			isAliveObjects[isAliveKey].rewind(options);
 			return thisObj;
 		},
 		autoplay : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].autoplay(options);
+			isAliveObjects[isAliveKey].autoplay(options);
 			return thisObj;
 		},
 		toggle : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].toggle(options);
+			isAliveObjects[isAliveKey].toggle(options);
 			return thisObj;
 		},
 		stop : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].stop();
+			isAliveObjects[isAliveKey].stop();
 			return thisObj;
 		},
 		rebuild : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].rebuildLayout();
+			isAliveObjects[isAliveKey].rebuildLayout();
 			return thisObj;
 		},
 		enableWheel : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].allowWheel = options;
+			isAliveObjects[isAliveKey].allowWheel = options;
 			return thisObj;
 		},
 		enableTouch : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].allowTouch = options;
+			isAliveObjects[isAliveKey].allowTouch = options;
 			return thisObj;
 		},
 		addOnComplete : function(thisObj,options){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined" || !isAliveObjects[selector].animating)
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			isAliveObjects[selector].onComplete = options;
+			isAliveObjects[isAliveKey].onComplete = options;
 			return thisObj;
 		},
 		getCurrentPosition : function(thisObj){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			return isAliveObjects[selector].getPos(isAliveObjects[selector].lastStep);
+			return isAliveObjects[isAliveKey].getPos(isAliveObjects[isAliveKey].lastStep);
 		},
 		getStepPosition : function(thisObj){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			return isAliveObjects[selector].getPos(isAliveObjects[selector].step);
+			return isAliveObjects[isAliveKey].getPos(isAliveObjects[isAliveKey].step);
 		},
 		getMaxStep : function(thisObj){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			return (isAliveObjects[selector].settings.max-1);
+			return isAliveObjects[isAliveKey].settings.max-1;
 		},
 		getAnimationState : function(thisObj){
 			var selector = thisObj.selector;
-			if(typeof(isAliveObjects[selector])=="undefined")
+			var isAliveKey = jQuery(selector).length ? jQuery(selector).first().data('isAliveKey') : 'isAlive:pseudo:' + selector;
+			if(typeof(isAliveKey)=="undefined" || typeof(isAliveObjects[isAliveKey])=="undefined")
 				return false;
-			return (isAliveObjects[selector].animating);
+			return isAliveObjects[isAliveKey].animating;
 		},
 		destroyAll : function(){
-			for(var selector in isAliveObjects){
-				isAliveObjects[selector].destroy();
-				delete isAliveObjects[selector];
+			for(var isAliveKey in isAliveObjects){
+				isAliveObjects[isAliveKey].destroy();
+				delete isAliveObjects[isAliveKey];
 			}
 			jQuery('style.isalive-style').remove()
 			jQuery(window).unbind('resize.general');
@@ -2992,7 +3032,7 @@ Last modification on this file: 08 September 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.10.1";
+			return "1.11.0";
 		}
 	};
 	
@@ -3002,7 +3042,7 @@ Last modification on this file: 08 September 2014
 			return mFunc(this,options);
 		}
 		else
-			return (typeof(method)=='undefined') ? (typeof(isAliveObjects[this.selector])!='undefined') : false;
+			return (typeof(method)=='undefined') ? (typeof(isAliveObjects[(jQuery(this.selector).length ? jQuery(this.selector).first().data('isAliveKey') : 'isAlive:pseudo:' + this.selector)])!='undefined') : false;
 	};
 	   
 /*JQUERY PLUGIN PART:END*/

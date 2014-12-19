@@ -1,5 +1,11 @@
 jQuery.isAlive Change Log
 
+ver. 1.11.0 (19 December 2014)
+ - the animation now binds to the DOM element, not the selector as until now
+ - adding "navPointsClickPrevent"
+ - wrappers get a base class(isalive-base-X)
+ - default class for animating elements is (isalive-element-X)
+
 ver. 1.10.1 (08 September 2014)
  - adding "addSelectorPrefix"
  - animation selector is not mandatory anymore 

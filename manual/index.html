@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.10.1+ Manual</h1>
+				<h1>jQuery.isAlive 1.11.0+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -144,7 +144,7 @@
 						<p class="exp">
 							Type: Integer<br/>
 							Default: 0<br/>
-							Sets how many steps you can drag at max in one animation.(See example)
+							Sets how many steps you can drag at max in one animation.(See example) (Very usefull for Apple Macbook track pad scrolling).
 						</p>
 						debug:
 						<p class="exp">
@@ -221,6 +221,13 @@
 							Default: False<br/>
 							Values: true | false<br/>
 							Add onclick event on elements defined at "navPointsSelector". When clicked this will play until that "breakpoint".
+						</p>
+						navPointsClickPrevent:
+						<p class="exp">
+							Type: Boolean<br/>
+							Default: True<br/>
+							Values: true | false<br/>
+							When "navPointsClickEvent" is used, setting this on TRUE will prevent the default click action.
 						</p>
 						enableTouch:
 						<p class="exp">

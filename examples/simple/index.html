@@ -244,7 +244,7 @@
 						"step-start":0,
 						"step-end":10,
 						"value-start":0,
-						"value-end":function(selector,dim){
+						"value-end":function(element,dim){
 							return dim.elementWidth-100;
 						}
 					},
@@ -407,6 +407,7 @@
 					navPointsSelector:".stepPointsWrap .sp",
 					navPointsActiveClass:"active",
 					navPointsClickEvent:true,
+					maxScroll:10,
 					durationTweaks:{
 						'nav':{
 							'duration':200,
