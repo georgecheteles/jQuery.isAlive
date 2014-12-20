@@ -1,5 +1,8 @@
 jQuery.isAlive Change Log
 
+ver. 1.11.1 (20 December 2014)
+ - adding element object to "onStep", "onLoadingComplete" and "onRebuild" events
+
 ver. 1.11.0 (19 December 2014)
  - the animation now binds to the DOM element, not the selector as until now
  - adding "navPointsClickPrevent"

@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>jQuery.isAlive Manual </title>
-		<script src="../jquery-1.10.2.min.js"></script>
+		<script src="../jquery-1.11.2.min.js"></script>
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
 		<link type="text/css" rel="stylesheet" href="style.css" media="screen" />
 	</head>
@@ -10,7 +10,7 @@
 		<a href="#" id="goToTop">Go To Top</a>
 		<div id="wrapper">
 			<div id="header">
-				<h1>jQuery.isAlive 1.11.0+ Manual</h1>
+				<h1>jQuery.isAlive 1.11.1+ Manual</h1>
 			</div>
 			<div id="content">
 				<div id="table-of-contents" class="section">
@@ -35,7 +35,7 @@
 						jQuery.isAlive is a complex jQuery plugin that allows you to create advance javascript animations for your site using jQuery animation function and CSS3 transitions.<br/>
 						jQuery.isAlive is compatible with the all modern browsers, but also old ones, starting with IE7.<br/>
 						Building animations with this plugin is simple and does not require coding experience.<br/>
-						jQuery.isAlive works on all browser starting with IE7+,Chrome,Forefox,Opera,Safari and all mobile browsers including IE10.<br/>
+						jQuery.isAlive works on all browser starting with IE7+,Chrome,Forefox,Opera,Safari and all mobile browsers including IE11.<br/>
 						jQuery.isAlive was tested with jQuery 1.4+.<br/>
 					</p>
 				</div>
@@ -261,7 +261,7 @@
 							Default: 10 for "drag" / 20 for "wipe"<br/>
 							Number of pixels for vertical drag/wipe to start.
 						</p>
-						wipePoints:,<br/>
+						wipePoints:<br/>
 						<p class="exp">
 							Type: Array<br/>
 							Define here the steps where you want to jump on each wipe(only when "touchType" is set to "wipe").(See example)
@@ -581,14 +581,15 @@
 						jQuery.isAlive has 3 events that you can use.
 					</p>
 					<p class="text">
-						<p class="imp">1. onStep(position,loop,animationType)</p>
+						<p class="imp">1. onStep(element,position,loop,animationType)</p>
 							<p class="blue">
 								This event is called on every step of your animation
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('create',{
 	elements:animations,
-	onStep:function(position,loop,animationType){
+	onStep:function(element,position,loop,animationType){
+		// element: the element used to bind jQuery.isAlive
 		// position: the position that your animation reached
 		// loop: the loop value(if your animation can has loops)
 		// animationType: the type of animation that is used when the function is called. Ca be: "init","skip","goTo","scroll","jump","wipe","drag","scrollbar","play","rewind","autoplay","toggle"
@@ -597,28 +598,29 @@ jQuery('#scroll-over-me').isAlive('create',{
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">2. onLoadingComplete()</p>
+						<p class="imp">2. onLoadingComplete(element)</p>
 							<p class="blue">
 								This event is called after the initialization procedure is done and the plugin is ready to be used
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('create',{
 	elements:animations,
-	onLoadingComplete:function(selector){
-		// selector: the selector used to bind jQuery.isAlive
+	onLoadingComplete:function(element){
+		// element: the element used to bind jQuery.isAlive
 	}
 });
 						</p>
 					</p>
 					<p class="text">
-						<p class="imp">1. onRebuild(params,position,loop)</p>
+						<p class="imp">1. onRebuild(element,params,position,loop)</p>
 							<p class="blue">
 								This event is called on a rebuild action (resize of the browser)
 							</p>
 						<p class="code">
 jQuery('#scroll-over-me').isAlive('create',{
 	elements:animations,
-	onRebuild:function(params,position,loop){
+	onRebuild:function(element,params,position,loop){
+		// element: the element used to bind jQuery.isAlive
 		// params: the left/top/width/height of your element, window and document
 		// position: the position that your animation reached
 		// loop: the loop value(if your animation can has loops)
@@ -941,11 +943,7 @@ jQuery: jQuery('#scroll-over-me').addClass('isalive-enablegpu');
 				<div id="section-12" class="section">
 					<h3>12. Download links</h3>
 					<p class="text">
-						<!--<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.js" target="_blank">jQuery.isAlive.js (latest)</a>
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.min.js" target="_blank">jQuery.isAlive.min.js (latest/minified)</a>
-						<a class="links" href="http://www.we-code-magic.com/software/isAlive/src/jquery.isAlive.helper.js" target="_blank">jQuery.isAlive.helper.js (latest)</a>-->
 						<a class="links" href="https://github.com/georgecheteles/jQuery.isAlive" target="_blank">Github.com</a>
-						<a class="links" href="http://plugins.jquery.com/jQueryIsAlive/" target="_blank">jQuery.com</a>
 					</p>
 				</div>
 			</div>

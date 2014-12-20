@@ -5,14 +5,14 @@
 | |/ |/ /  __/_____/ /__/ /_/ / /_/ /  __/_____/ / / / / / /_/ / /_/ / / /__  
 |__/|__/\___/      \___/\____/\__,_/\___/     /_/ /_/ /_/\__,_/\__, /_/\___/  
                                                               /____/          
-jQuery.isAlive(1.11.0)
+jQuery.isAlive(1.11.1)
 Written by George Cheteles (orbideintuneric@gmail.com).
 Licensed under the MIT (https://github.com/georgecheteles/jQuery.isAlive/blob/master/MIT-LICENSE.txt) license. 
 Please attribute the author if you use it.
 Find me at:
 	orbitdeintuneric@gmail.com
 	https://github.com/georgecheteles
-Last modification on this file: 19 December 2014
+Last modification on this file: 20 December 2014
 */
 
 (function(jQuery) {
@@ -535,11 +535,6 @@ Last modification on this file: 19 December 2014
 		
 		/*MAKES THE PLUGIN INITIOALIZATION*/
 		this.initAnimations();
-
-		/*CALL ONLOADINGCOMPLETE FUNCTION*/
-		if(this.settings.onLoadingComplete!=null)
-			this.settings.onLoadingComplete(element);
-		
 	}
 
 	/* LOGS IN DEBUGER */
@@ -881,7 +876,7 @@ Last modification on this file: 19 December 2014
 
 			/*CALLS THE ONREBUILD EVENT*/
 			if(thisObj.settings.onRebuild!=null)
-				thisObj.settings.onRebuild(thisObj.params,thisObj.getPos(thisObj.step),Math.floor(thisObj.step/(thisObj.settings.max+1)));
+				thisObj.settings.onRebuild(thisObj.myElement,thisObj.params,thisObj.getPos(thisObj.step),Math.floor(thisObj.step/(thisObj.settings.max+1)));
 		}
 		else
 			thisObj.rebuildOnStop = true;
@@ -1282,9 +1277,9 @@ Last modification on this file: 19 December 2014
 			jQuery(thisObj.settings.navPointsSelector).eq(pointFoundSelector).addClass(thisObj.settings.navPointsActiveClass);
 		}
 
-		for(pos=0;pos<=thisObj.settings.start;pos++)
-			if(thisObj.settings.onStep!=null)
-				thisObj.settings.onStep(pos,0,'init');
+		if(thisObj.settings.onStep!=null)
+			for(pos=0;pos<=thisObj.settings.start;pos++)
+				thisObj.settings.onStep(thisObj.myElement,pos,0,'init');
 	};
 	
 	/*THIS FUNCTION MAKES ALL THE INITIALIZATIONS FOR ANIMATIONS*/
@@ -2039,6 +2034,11 @@ Last modification on this file: 19 December 2014
 		/*THIS WILL SET THE CSS VALUES ON LOAD*/
 		if(thisObj.settings.initCSS)
 			thisObj.initCSS();
+
+		/*CALL ONLOADINGCOMPLETE FUNCTION*/
+		if(thisObj.settings.onLoadingComplete!=null)
+			thisObj.settings.onLoadingComplete(thisObj.myElement);
+
 	}
 	
 	/*ANIMATING MAIN FUNCTION!!!*/
@@ -2240,7 +2240,7 @@ Last modification on this file: 19 December 2014
 								}
 							}
 							if(thisObj.settings.onStep!=null)
-								thisObj.settings.onStep(thisObj.getPos(step),thisObj.getLoop(step),thisObj.animationType);
+								thisObj.settings.onStep(thisObj.myElement,thisObj.getPos(step),thisObj.getLoop(step),thisObj.animationType);
 						}
 						
 						if(directionForward){
@@ -2651,7 +2651,7 @@ Last modification on this file: 19 December 2014
 						pointFoundSelector = pointFound;
 				}
 				if(thisObj.settings.onStep!=null)
-					thisObj.settings.onStep(pos,thisObj.getLoop(thisObj.step),'skip');
+					thisObj.settings.onStep(thisObj.myElement,pos,thisObj.getLoop(thisObj.step),'skip');
 				
 				(thisObj.getPos(thisObj.step)<step)?pos = pos + 1:pos = pos - 1;
 			}
@@ -3032,7 +3032,7 @@ Last modification on this file: 19 December 2014
 			return getBrowser();
 		},
 		getVersion : function(){
-			return "1.11.0";
+			return "1.11.1";
 		}
 	};
 	
